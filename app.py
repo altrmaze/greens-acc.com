@@ -1,5 +1,6 @@
 "# This initializes the Flask app and sets a basic homepage route."
-from flask import Flask
+from 
+flask import Flask
 
 app = Flask(__name__)
 
@@ -9,6 +10,10 @@ def home():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+    "# This defines the User model and sets up the database."
+That way, you'll know it’s about user storage!"
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager
 
