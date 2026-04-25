@@ -52,3 +52,18 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('home'))
+    # Change directory into your codebase
+cd /to/your/project
+
+# o3-mini
+aider --model o3-mini
+
+# o1-mini
+aider --model o1-mini
+
+# GPT-4o
+aider --model gpt-4o
+
+# List models available from OpenAI
+aider --list-models openai/
+
