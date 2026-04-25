@@ -1,3 +1,4 @@
+"# This initializes the Flask app and sets a basic homepage route."
 from flask import Flask
 
 app = Flask(__name__)
