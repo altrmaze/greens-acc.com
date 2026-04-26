@@ -24,3 +24,24 @@ pool.getConnection((err, connection) => {
 
 module.exports = pool;
 
+const express = require('express');
+const app = express();
+const pool = require('./db'); // ملف الاتصال بقاعدة البيانات الذي أنشأناه سابقاً
+
+// ... أي إعدادات أخرى مثل app.use(express.json()) ...
+
+// --- انسخ الكود هنا ---
+app.get('/api/invoices', (req, res) => {
+    pool.query('SELECT * FROM invoices', (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('خطأ في السيرفر');
+        }
+        res.json(results); 
+    });
+});
+// ---------------------
+
+app.listen(3000, () => {
+    console.log('سيرفر GreensAcc يعمل على منفذ 3000');
+});
