@@ -45,3 +45,10 @@ app.get('/api/invoices', (req, res) => {
 app.listen(3000, () => {
     console.log('سيرفر GreensAcc يعمل على منفذ 3000');
 });
+async function loadInvoices() {
+    const response = await fetch('https://greensacc.com/api/invoices');
+    const invoices = await response.json();
+    
+    console.log(invoices); // هنا ستظهر لك قائمة الفواتير في الـ Console
+    // يمكنك الآن كتابة كود لعرضها في جدول داخل الصفحة
+}
