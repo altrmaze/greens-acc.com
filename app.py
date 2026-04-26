@@ -324,3 +324,5 @@ if __name__ == "__main__":
             db.session.add(User(username="admin", password="admin123", role="admin"))
             db.session.commit()
     app.run(debug=True)
+    pip install flask flask-sqlalchemy flask-login
+
