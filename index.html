@@ -3,185 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreensACC | Operational Suite</title>
+    <title>GreensACC - Trading System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .sidebar-gradient { background: linear-gradient(180deg, #0f172a 0%, #020617 100%); }
-        .glass-header { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        /* Smooth Slide Back Animation */
+        #sidebar { 
+            transition: transform 0.3s ease-in-out; 
+            z-index: 100; 
+        }
+        .sidebar-closed { transform: translateX(-100%); }
+        
+        /* Font visibility for the blue sidebar */
+        .sidebar-link { 
+            color: #ffffff !important; 
+            font-weight: 500;
+        }
     </style>
 </head>
-<body class="bg-[#fcfcfd] text-slate-900">
-    <div class="flex h-screen overflow-hidden">
-        <aside class="w-72 sidebar-gradient text-white flex flex-col shadow-2xl transition-all">
-            <div class="p-8 border-b border-slate-800/40">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20">
-                        <i class="fas fa-leaf text-slate-900 text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-extrabold tracking-tighter leading-none">Greens<span class="text-green-500">ACC</span></h1>
-                        <span class="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Trading & Logistics</span>
-                    </div>
-                </div>
-            </div>
+<body class="bg-gray-100">
+
+    <div id="overlay" class="fixed inset-0 bg-black/30 hidden z-40" onclick="toggleSidebar()"></div>
+
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0B1120] sidebar-closed shadow-xl">
+        <div class="p-6">
+            <h1 class="text-white font-bold text-2xl mb-8 flex items-center gap-2">
+                <span class="text-green-400">🍃</span> GreensACC
+            </h1>
             
-            <nav class="flex-1 p-6 space-y-2">
-                <button onclick="showTab('dashboard')" class="w-full flex items-center p-3.5 hover:bg-slate-800/60 rounded-xl transition group">
-                    <i class="fas fa-chart-pie mr-3 text-slate-500 group-hover:text-green-400 transition-colors"></i> 
-                    <span class="font-semibold text-sm text-slate-300 group-hover:text-white">Overview</span>
-                </button>
-                <button onclick="showTab('crm')" class="w-full flex items-center p-3.5 hover:bg-slate-800/60 rounded-xl transition group">
-                    <i class="fas fa-globe mr-3 text-slate-500 group-hover:text-green-400"></i> 
-                    <span class="font-semibold text-sm text-slate-300 group-hover:text-white">Partner Registry</span>
-                </button>
-                <button onclick="showTab('inventory')" class="w-full flex items-center p-3.5 hover:bg-slate-800/60 rounded-xl transition group">
-                    <i class="fas fa-box-open mr-3 text-slate-500 group-hover:text-green-400"></i> 
-                    <span class="font-semibold text-sm text-slate-300 group-hover:text-white">Stock Control</span>
-                </button>
+            <nav class="space-y-4">
+                <a href="#" class="sidebar-link block p-2">Overview</a>
+                <a href="#" class="sidebar-link block p-2">Partner Registry</a>
+                
+                <div class="pt-10">
+                    <label class="text-gray-400 text-xs uppercase">Choose Country</label>
+                    <select id="country" onchange="startSetup()" class="w-full mt-2 bg-[#1a2234] text-white border border-gray-600 rounded p-2">
+                        <option value="">Select...</option>
+                        <option value="Egypt">Egypt</option>
+                        <option value="Turkey">Turkey</option>
+                        <option value="UAE">UAE</option>
+                        <option value="USA">USA</option>
+                    </select>
+                </div>
             </nav>
-
-            <div class="p-6 mt-auto border-t border-slate-800/40">
-                <div class="flex justify-around items-center text-[8px] font-black text-slate-600 tracking-[0.2em] uppercase">
-                    <span>USA</span><span>EGY</span><span>TUR</span><span>DXB</span>
-                </div>
-            </div>
-        </aside>
-
-        <main class="flex-1 overflow-y-auto">
-            <header class="sticky top-0 z-10 glass-header border-b border-slate-200 p-6 flex justify-between items-center">
-                <h2 id="tab-title" class="text-lg font-bold text-slate-800 uppercase tracking-tight">Executive Dashboard</h2>
-                <div id="connection-status" class="flex items-center space-x-2 text-[10px] font-black uppercase tracking-tighter text-red-500 px-4 py-2 bg-red-50 rounded-full border border-red-100 transition-all">
-                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                    <span>System Connecting...</span>
-                </div>
-            </header>
-
-            <div class="p-10 max-w-7xl mx-auto">
-                <section id="dashboard" class="tab-content transition-opacity">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                            <p class="text-slate-400 text-[10px] uppercase font-black tracking-widest">Active Global Partners</p>
-                            <p id="partner-count" class="text-5xl font-black mt-2 text-slate-900">0</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="crm" class="tab-content hidden">
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 mb-8">
-                        <h3 class="font-black text-slate-900 mb-6 uppercase text-xs tracking-widest">Register Global Entity</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <input id="p-name" type="text" placeholder="Company Name" class="p-4 border border-slate-200 rounded-2xl bg-slate-50 focus:ring-2 focus:ring-green-500 outline-none transition-all">
-                            <select id="p-country" class="p-4 border border-slate-200 rounded-2xl bg-slate-50 outline-none">
-                                <option value="USA">United States</option>
-                                <option value="Egypt">Egypt</option>
-                                <option value="Turkey">Turkey</option>
-                                <option value="UAE">Dubai / UAE</option>
-                            </select>
-                            <button onclick="addPartner()" class="bg-green-500 text-slate-900 font-black py-4 px-8 rounded-2xl hover:bg-green-400 transition-all shadow-lg shadow-green-500/10">
-                                SAVE PARTNER
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 text-slate-400 text-[10px] uppercase font-black tracking-widest border-b border-slate-100">
-                                <tr><th class="p-6">Partner Name</th><th class="p-6">Region</th><th class="p-6">Status</th></tr>
-                            </thead>
-                            <tbody id="partner-list" class="text-slate-700 divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section id="inventory" class="tab-content hidden text-slate-400 h-64 flex items-center justify-center border-2 border-dashed rounded-3xl border-slate-200">
-                    <p class="italic">Inventory synchronization active. Waiting for warehouse data from Supabase.</p>
-                </section>
-            </div>
-        </main>
+        </div>
     </div>
 
-    <script>
-        // 1. Connection Keys (Your exact keys integrated)
-        const SUPABASE_URL = 'https://mwvfqicwghosfcmjxbxz.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_wJFjBeMankJKxHV-TGLXRA_dXU1mIL1';
-        
-        // Initialize Supabase Client
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <div class="min-h-screen">
+        <header class="bg-white p-4 shadow-sm flex justify-between items-center">
+            <button onclick="toggleSidebar()" class="text-2xl p-2">☰</button>
+            <div id="displayInfo" class="text-sm font-bold text-blue-800"></div>
+            <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded">Print</button>
+        </header>
 
-        // 2. Start-up Function
-        async function init() {
-            try {
-                // Try to fetch partners to check connection
-                const { data, error } = await _supabase.from('partners').select('*', { count: 'exact', head: true });
-                
-                if (!error) {
-                    const statusEl = document.getElementById('connection-status');
-                    statusEl.innerHTML = '<span class="w-2 h-2 rounded-full bg-green-500"></span><span>GreensACC Live</span>';
-                    statusEl.className = 'flex items-center space-x-2 text-[10px] font-black uppercase tracking-tighter text-green-600 px-4 py-2 bg-green-50 rounded-full border border-green-100';
-                    loadPartners();
-                } else {
-                    console.error("Connection successful but table missing:", error.message);
-                }
-            } catch (e) {
-                console.error("Link Failed:", e);
-            }
-        }
-
-        // 3. Add Partner Function
-        async function addPartner() {
-            const name = document.getElementById('p-name').value;
-            const country = document.getElementById('p-country').value;
-            
-            if (!name) return alert('Please enter a company name.');
-
-            const { error } = await _supabase
-                .from('partners')
-                .insert([{ name: name, country: country, type: 'Client' }]);
-
-            if (error) {
-                alert('Error saving data. Ensure your Supabase table is named "partners".');
-            } else {
-                document.getElementById('p-name').value = '';
-                loadPartners(); // Refresh list
-            }
-        }
-
-        // 4. Load Partners List
-        async function loadPartners() {
-            const { data, error } = await _supabase.from('partners').select('*').order('created_at', { ascending: false });
-            
-            if (!error && data) {
-                document.getElementById('partner-count').innerText = data.length;
-                const list = document.getElementById('partner-list');
-                list.innerHTML = data.map(p => `
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="p-6 font-bold text-slate-800">${p.name}</td>
-                        <td class="p-6 text-sm text-slate-500">${p.country}</td>
-                        <td class="p-6"><span class="text-[9px] bg-green-50 text-green-600 px-3 py-1 rounded-full font-black uppercase border border-green-100">Active</span></td>
-                    </tr>
-                `).join('');
-            }
-        }
-
-        // 5. Navigation Tab Switcher
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
-            
-            const titles = {
-                'dashboard': 'Executive Dashboard',
-                'crm': 'Partner Registry',
-                'inventory': 'Stock Control'
-            };
-            document.getElementById('tab-title').innerText = titles[tabId];
-        }
-
-        // Run on page load
-        init();
-    </script>
-</body>
-</html>
+        <main class="p-6">
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="flex justify-between items-center border-b pb-4 mb-4">
+                    <h2 class="font-bold">System Records</h2>
+                    <div class="space-x-2">
+                        <button class="bg-yellow-500 text-white px-3 py-1 rounded text-sm">Modify</button>
+                        <button class="bg-red-600 text-white px
