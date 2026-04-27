@@ -3,41 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreensACC - Trading System</title>
+    <title>GreensACC - General Trading</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Smooth Slide Back Animation */
-        #sidebar { 
-            transition: transform 0.3s ease-in-out; 
-            z-index: 100; 
+        /* 1. SIDEBAR SLIDE EFFECT */
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+            z-index: 50;
+            background-color: #0B1120; /* Your Dark Blue */
         }
-        .sidebar-closed { transform: translateX(-100%); }
+        /* Start hidden (off-screen) */
+        .sidebar-hidden { transform: translateX(-100%); }
         
-        /* Font visibility for the blue sidebar */
-        .sidebar-link { 
-            color: #ffffff !important; 
+        /* 2. FONT VISIBILITY */
+        .sidebar-link {
+            color: #FFFFFF !important;
             font-weight: 500;
+            opacity: 0.9;
         }
+        .sidebar-link:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+
+        /* RTL Support for Arabic */
+        [dir="rtl"] .sidebar-hidden { transform: translateX(100%); }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-50">
 
-    <div id="overlay" class="fixed inset-0 bg-black/30 hidden z-40" onclick="toggleSidebar()"></div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/10 hidden z-40"></div>
 
-    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0B1120] sidebar-closed shadow-xl">
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 sidebar-hidden shadow-2xl">
         <div class="p-6">
-            <h1 class="text-white font-bold text-2xl mb-8 flex items-center gap-2">
-                <span class="text-green-400">🍃</span> GreensACC
-            </h1>
+            <div class="flex items-center gap-3 mb-8">
+                <div class="bg-green-500 p-2 rounded-lg text-white">GB</div>
+                <h2 class="text-white font-bold text-xl">GreensACC</h2>
+            </div>
             
             <nav class="space-y-4">
-                <a href="#" class="sidebar-link block p-2">Overview</a>
-                <a href="#" class="sidebar-link block p-2">Partner Registry</a>
+                <a href="#" class="sidebar-link block p-2 rounded">Overview</a>
+                <a href="#" class="sidebar-link block p-2 rounded">Partner Registry</a>
+                <a href="#" class="sidebar-link block p-2 rounded">Stock Control</a>
                 
-                <div class="pt-10">
+                <div class="mt-10 border-t border-gray-700 pt-6">
                     <label class="text-gray-400 text-xs uppercase">Choose Country</label>
-                    <select id="country" onchange="startSetup()" class="w-full mt-2 bg-[#1a2234] text-white border border-gray-600 rounded p-2">
-                        <option value="">Select...</option>
+                    <select id="countrySelect" onchange="processGlobalSetup()" class="w-full mt-2 bg-[#1a2234] text-white border border-gray-600 rounded p-2 text-sm outline-none">
+                        <option value="">Select Region...</option>
                         <option value="Egypt">Egypt</option>
                         <option value="Turkey">Turkey</option>
                         <option value="UAE">UAE</option>
@@ -48,17 +57,67 @@
         </div>
     </div>
 
-    <div class="min-h-screen">
-        <header class="bg-white p-4 shadow-sm flex justify-between items-center">
-            <button onclick="toggleSidebar()" class="text-2xl p-2">☰</button>
-            <div id="displayInfo" class="text-sm font-bold text-blue-800"></div>
-            <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded">Print</button>
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white border-b p-4 flex justify-between items-center shadow-sm">
+            <button onclick="toggleSidebar()" class="text-2xl hover:bg-gray-100 p-2 rounded">☰</button>
+            <div id="navDisplay" class="text-sm font-bold text-blue-600">Global Operations</div>
+            <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm">Print</button>
         </header>
 
-        <main class="p-6">
-            <div class="bg-white rounded-lg shadow p-4">
-                <div class="flex justify-between items-center border-b pb-4 mb-4">
-                    <h2 class="font-bold">System Records</h2>
+        <main class="p-6 flex-grow">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                    <h3 class="font-bold">Active Records</h3>
                     <div class="space-x-2">
-                        <button class="bg-yellow-500 text-white px-3 py-1 rounded text-sm">Modify</button>
-                        <button class="bg-red-600 text-white px
+                        <button class="text-blue-600 font-bold border border-blue-600 px-3 py-1 rounded hover:bg-blue-50">Modify</button>
+                        <button class="text-red-600 font-bold border border-red-600 px-3 py-1 rounded hover:bg-red-50">Delete</button>
+                    </div>
+                </div>
+                <div class="p-8 text-center text-gray-400">
+                    Select a country from the sidebar to begin managing data.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('sidebar-hidden');
+            overlay.classList.toggle('hidden');
+        }
+
+        function processGlobalSetup() {
+            const country = document.getElementById('countrySelect').value;
+            if (!country) return;
+
+            // Set default local language names
+            let localName = "Local Language";
+            if (country === "Egypt" || country === "UAE") localName = "Arabic";
+            if (country === "Turkey") localName = "Turkish";
+
+            // ASK LANGUAGE
+            const useLocal = confirm(`Would you like to use ${localName}? (Cancel for English)`);
+            
+            // ASK CURRENCY
+            const useLocalCurr = confirm(`Use ${country} Local Currency? (Cancel for USD)`);
+
+            // Apply Direction
+            if (useLocal && (country === "Egypt" || country === "UAE")) {
+                document.body.dir = "rtl";
+            } else {
+                document.body.dir = "ltr";
+            }
+
+            // Update Header Information
+            document.getElementById('navDisplay').innerText = 
+                `${country} | ${useLocal ? localName : 'English'} | ${useLocalCurr ? 'Local' : 'USD'}`;
+
+            // SLIDE SIDEBAR BACK AUTOMATICALLY
+            toggleSidebar();
+        }
+    </script>
+</body>
+</html>
