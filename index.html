@@ -3,26 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenACC | Dashboard</title>
+    <title>GreenACC | Global Trading Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-green-700 p-4 text-white shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <span class="text-xl font-bold italic">Green Bananas</span>
-            <div class="space-x-4">
-                <span>Inventory</span>
-                <span>Invoices</span>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <aside class="w-64 bg-green-900 text-white flex flex-col shadow-xl">
+            <div class="p-6 border-b border-green-800">
+                <h1 class="text-2xl font-bold italic tracking-wider">GREEN BANANAS</h1>
+                <p class="text-xs text-green-400 mt-1 uppercase tracking-widest">General Trading Co.</p>
             </div>
-        </div>
-    </nav>
-    <div class="container mx-auto mt-10 p-6 bg-white rounded-lg shadow">
-        <h1 class="text-2xl font-semibold text-gray-800">GreenACC System</h1>
-        <p class="text-gray-600 mt-2">Connecting to global operations...</p>
-        <div class="mt-6 p-4 bg-green-50 border-l-4 border-green-500">
-            <p class="font-mono text-sm">Status: Building for US • Egypt • Turkey • Dubai</p>
-        </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="showTab('inventory')" class="w-full flex items-center p-3 hover:bg-green-800 rounded-lg transition"><i class="fas fa-boxes mr-3"></i> Inventory</button>
+                <button onclick="showTab('invoices')" class="w-full flex items-center p-3 hover:bg-green-800 rounded-lg transition"><i class="fas fa-file-invoice-dollar mr-3"></i> Invoices</button>
+                <button onclick="showTab('crm')" class="w-full flex items-center p-3 hover:bg-green-800 rounded-lg transition"><i class="fas fa-users mr-3"></i> Global Clients</button>
+            </nav>
+            <div class="p-4 border-t border-green-800 text-xs text-green-500 text-center">
+                USA • EGY • TUR • DXB
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-8">
+            <header class="flex justify-between items-center mb-10">
+                <h2 id="tab-title" class="text-3xl font-bold text-gray-800">Inventory Management</h2>
+                <div class="flex space-x-4">
+                    <button class="bg-green-700 text-white px-4 py-2 rounded shadow hover:bg-green-600">+ Add New</button>
+                </div>
+            </header>
+
+            <section id="inventory" class="tab-content">
+                <div class="bg-white rounded-xl shadow overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="p-4 font-semibold text-gray-600">Product Name</th>
+                                <th class="p-4 font-semibold text-gray-600">Region</th>
+                                <th class="p-4 font-semibold text-gray-600">Stock Level</th>
+                                <th class="p-4 font-semibold text-gray-600">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-4">Water Splash Body Splash</td>
+                                <td class="p-4">Egypt / Dubai</td>
+                                <td class="p-4 font-mono">1,250 Units</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span></td>
+                            </tr>
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="p-4">Giovanni Luxury Perfume</td>
+                                <td class="p-4">Turkey / USA</td>
+                                <td class="p-4 font-mono">480 Units</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="invoices" class="tab-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <h3 class="font-bold mb-4 border-b pb-2">Generate New Quotation</h3>
+                        <div class="space-y-4">
+                            <input type="text" placeholder="Client Name" class="w-full p-2 border rounded">
+                            <input type="number" placeholder="Quantity" class="w-full p-2 border rounded">
+                            <select class="w-full p-2 border rounded">
+                                <option>USD ($)</option>
+                                <option>EGP (LE)</option>
+                                <option>AED (د.إ)</option>
+                            </select>
+                            <button class="w-full bg-green-900 text-white py-2 rounded">Create Invoice</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="crm" class="tab-content hidden">
+                <div class="bg-white p-6 rounded-xl shadow">
+                    <p class="text-gray-500 italic">Database loading for Global Sourcing Partners...</p>
+                </div>
+            </section>
+        </main>
     </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('tab-title').innerText = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+        }
+    </script>
 </body>
 </html>
-
