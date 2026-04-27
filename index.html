@@ -3,111 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreensACC Global</title>
+    <title>GreensACC | Premium Trading</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Sidebar slide back logic */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; transition: background 0.3s; }
+
+        /* THE SEXY SIDEBAR */
         #sidebar {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: #0B1120;
+            transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1);
+            background: linear-gradient(180deg, #0B1120 0%, #070B14 100%);
             z-index: 100;
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
         .sidebar-hidden { transform: translateX(-100%); }
         [dir="rtl"] .sidebar-hidden { transform: translateX(100%); }
 
-        /* High Visibility Fonts */
-        .sidebar-link { color: #FFFFFF !important; font-weight: 600; font-size: 15px; }
-        
-        /* Smooth Overlay */
-        #overlay { transition: opacity 0.3s; }
+        /* Sidebar Glassmorphism effect */
+        .sidebar-link {
+            color: #E2E8F0 !important;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 4px 0;
+        }
+        .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #10B981 !important; /* Green Banana accent */
+            padding-left: 1.5rem;
+        }
+
+        /* Overlay blur for that premium feel */
+        #overlay {
+            backdrop-filter: blur(4px);
+            transition: opacity 0.4s ease;
+        }
+
+        /* Custom scrollbar for universal list */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='current 19l-7-7 7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem top 50%;
+            background-size: 0.75rem auto;
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-[#F8FAFC]">
 
-    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 hidden z-40"></div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 hidden z-40 opacity-0"></div>
 
-    <div id="sidebar" class="fixed top-0 left-0 h-full w-72 sidebar-hidden shadow-2xl">
-        <div class="p-6 flex flex-col h-full">
-            <h2 class="text-white text-2xl font-bold mb-8 italic">Green Bananas</h2>
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-80 sidebar-hidden shadow-[20px_0_60px_-15px_rgba(0,0,0,0.3)]">
+        <div class="p-8 flex flex-col h-full">
+            <div class="flex items-center gap-3 mb-12">
+                <span class="text-3xl">🍌</span>
+                <h1 class="text-white text-xl font-semibold tracking-tight">Greens<span class="text-green-500">ACC</span></h1>
+            </div>
             
-            <nav class="space-y-4 flex-grow">
-                <a href="#" class="sidebar-link block p-3 rounded-lg hover:bg-white/10">📊 Overview</a>
-                <a href="#" class="sidebar-link block p-3 rounded-lg hover:bg-white/10">🌐 Partners</a>
+            <nav class="flex-grow space-y-1">
+                <p class="text-gray-500 text-[10px] uppercase tracking-[2px] mb-4 font-bold">Main Navigation</p>
+                <a href="#" class="sidebar-link block p-3 text-sm">Dashboard</a>
+                <a href="#" class="sidebar-link block p-3 text-sm">Global Partners</a>
+                <a href="#" class="sidebar-link block p-3 text-sm">Logistics Flow</a>
                 
-                <div class="mt-8">
-                    <label class="text-gray-400 text-xs font-bold uppercase">Universal Registry</label>
-                    <select id="universalCountry" onchange="handleGlobalChange()" class="w-full mt-2 bg-[#1a2234] text-white border border-gray-700 rounded-md p-3">
-                        <option value="">Select Country...</option>
-                        </select>
+                <div class="mt-12">
+                    <p class="text-gray-500 text-[10px] uppercase tracking-[2px] mb-4 font-bold">Market Selection</p>
+                    <select id="countrySelect" onchange="handleSelection()" class="w-full bg-white/5 text-white border border-white/10 rounded-lg p-3 text-sm focus:outline-none focus:border-green-500 transition-colors">
+                        <option value="" class="bg-[#0B1120]">Universal Market...</option>
+                    </select>
                 </div>
             </nav>
 
-            <div class="text-gray-500 text-xs mt-auto">GreensACC v2.0 - Global Trading</div>
+            <div class="pt-6 border-t border-white/5">
+                <p class="text-gray-600 text-[10px]">© 2026 Green Bananas Trading</p>
+            </div>
         </div>
     </div>
 
     <div class="min-h-screen flex flex-col">
-        <header class="bg-white border-b p-4 flex justify-between items-center">
-            <button onclick="toggleSidebar()" class="text-2xl p-2 hover:bg-gray-100 rounded">☰</button>
-            <div id="headerStatus" class="font-bold text-blue-600">Global Registry</div>
-            <div class="flex gap-2">
-                <button class="bg-blue-600 text-white px-4 py-2 rounded font-bold text-sm">Modify</button>
-                <button class="bg-red-600 text-white px-4 py-2 rounded font-bold text-sm">Delete</button>
+        <header class="h-16 bg-white border-b border-gray-100 px-6 flex justify-between items-center sticky top-0 z-30">
+            <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16m-7 6h7"/></svg>
+            </button>
+            
+            <div id="activeMarket" class="text-[11px] font-bold uppercase tracking-widest text-gray-400">Universal Base</div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="window.print()" class="text-xs font-bold text-gray-500 hover:text-black transition-colors px-3">Print PDF</button>
+                <div class="h-4 w-[1px] bg-gray-200"></div>
+                <button class="bg-black text-white px-5 py-2 rounded-full text-[11px] font-bold uppercase tracking-wider hover:bg-green-600 transition-all">Actions</button>
             </div>
         </header>
 
-        <main class="p-6" id="mainContent">
-            <div class="bg-white p-10 rounded-xl shadow text-center text-gray-400 border-2 border-dashed">
-                Connect your Supabase Keys to see your partner data.
+        <main class="p-8 max-w-7xl mx-auto w-full">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-900" id="mainTitle">Partner Registry</h2>
+                    <p class="text-sm text-gray-500">Manage your global trading entities and columns.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 text-xs font-bold bg-white border border-gray-200 rounded-lg shadow-sm hover:border-blue-500 text-blue-600 transition-all">Modify Column</button>
+                    <button class="px-4 py-2 text-xs font-bold bg-white border border-gray-200 rounded-lg shadow-sm hover:border-red-500 text-red-600 transition-all">Delete Entry</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm min-h-[400px] flex items-center justify-center">
+                <div class="text-center">
+                    <div class="text-4xl mb-4 opacity-20">🌍</div>
+                    <p class="text-gray-400 text-sm">Select a market from the sidebar to load your data.</p>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
-        // --- 1. SUPABASE CONNECTION (KEEP YOUR OLD KEYS HERE) ---
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE'; 
-        const SUPABASE_KEY = 'YOUR_SUPABASE_KEY_HERE';
-        const supabase = netlifyConfig ? null : supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // --- DATA CONNECTION (PASTE YOUR KEYS HERE) ---
+        const SUPABASE_URL = 'YOUR_URL';
+        const SUPABASE_KEY = 'YOUR_KEY';
+        // const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- 2. UNIVERSAL COUNTRIES LIST ---
-        const countries = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Korea", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway", "Oman", "Pakistan", "Palestine", "Panama", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saudi Arabia", "Senegal", "Serbia", "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Tunisia", "Turkey", "Turkmenistan", "UAE", "Uganda", "Ukraine", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
+        // --- UNIVERSAL COUNTRY LIST ---
+        const countries = ["Afghanistan", "Albania", "Algeria", "Argentina", "Australia", "Austria", "Bahrain", "Belgium", "Brazil", "Canada", "China", "Cyprus", "Denmark", "Egypt", "France", "Germany", "Greece", "India", "Indonesia", "Iraq", "Italy", "Japan", "Jordan", "Kuwait", "Lebanon", "Malaysia", "Mexico", "Morocco", "Netherlands", "Norway", "Oman", "Pakistan", "Palestine", "Poland", "Portugal", "Qatar", "Russia", "Saudi Arabia", "Singapore", "South Africa", "Spain", "Sweden", "Switzerland", "Thailand", "Tunisia", "Turkey", "UAE", "United Kingdom", "United States"];
         
-        const select = document.getElementById('universalCountry');
+        const select = document.getElementById('countrySelect');
         countries.forEach(c => {
             let opt = document.createElement('option');
-            opt.value = c;
-            opt.innerHTML = c;
+            opt.value = c; opt.innerHTML = c; opt.className = "bg-[#0B1120]";
             select.appendChild(opt);
         });
 
-        // --- 3. SIDEBAR LOGIC ---
+        // --- SIDEBAR MOTION ---
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('overlay');
-            sb.classList.toggle('sidebar-hidden');
-            ov.classList.toggle('hidden');
+            const isHidden = sb.classList.contains('sidebar-hidden');
+
+            if (isHidden) {
+                sb.classList.remove('sidebar-hidden');
+                ov.classList.remove('hidden');
+                setTimeout(() => ov.style.opacity = "1", 10);
+            } else {
+                sb.classList.add('sidebar-hidden');
+                ov.style.opacity = "0";
+                setTimeout(() => ov.classList.add('hidden'), 400);
+            }
         }
 
-        // --- 4. GLOBAL CHANGE LOGIC ---
-        function handleGlobalChange() {
-            const country = document.getElementById('universalCountry').value;
+        // --- GLOBAL SELECTION LOGIC ---
+        function handleSelection() {
+            const country = document.getElementById('countrySelect').value;
             if(!country) return;
 
-            // Simple Prompt Logic
-            const lang = confirm(`Switch to Local Language for ${country}?\n(Cancel for English)`);
-            const curr = confirm(`Switch to Local Currency for ${country}?\n(Cancel for USD)`);
+            // Simple Language Prompt
+            const isLocal = confirm(`Set system to Local Language for ${country}?\n(Cancel for English)`);
+            const isLocalCurr = confirm(`Use ${country} Local Currency?\n(Cancel for USD)`);
 
-            // Change Language/Direction
-            if(lang && (country === "Egypt" || country === "UAE" || country === "Saudi Arabia" || country === "Qatar")) {
+            // Apply direction for Arabic/RTL regions
+            const rtlCountries = ["Egypt", "UAE", "Saudi Arabia", "Qatar", "Oman", "Kuwait", "Jordan", "Palestine", "Iraq", "Lebanon"];
+            if (isLocal && rtlCountries.includes(country)) {
                 document.body.dir = "rtl";
+                document.getElementById('mainTitle').innerText = "سجل الشركاء";
             } else {
                 document.body.dir = "ltr";
+                document.getElementById('mainTitle').innerText = "Partner Registry";
             }
 
-            document.getElementById('headerStatus').innerText = `${country} | ${lang ? 'Local' : 'English'} | ${curr ? 'Local' : 'USD'}`;
+            // UI Feedback
+            document.getElementById('activeMarket').innerText = `${country} | ${isLocal ? 'Local' : 'EN'} | ${isLocalCurr ? 'Local' : 'USD'}`;
             
-            // SLIDE BACK
+            // AUTOMATIC SLIDE BACK
             toggleSidebar();
         }
     </script>
