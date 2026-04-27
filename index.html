@@ -3,119 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreensACC - General Trading</title>
+    <title>GreensACC Global</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* 1. SIDEBAR SLIDE EFFECT */
+        /* Sidebar slide back logic */
         #sidebar {
-            transition: transform 0.3s ease-in-out;
-            z-index: 50;
-            background-color: #0B1120; /* Your Dark Blue */
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #0B1120;
+            z-index: 100;
         }
-        /* Start hidden (off-screen) */
         .sidebar-hidden { transform: translateX(-100%); }
-        
-        /* 2. FONT VISIBILITY */
-        .sidebar-link {
-            color: #FFFFFF !important;
-            font-weight: 500;
-            opacity: 0.9;
-        }
-        .sidebar-link:hover { opacity: 1; background: rgba(255,255,255,0.1); }
-
-        /* RTL Support for Arabic */
         [dir="rtl"] .sidebar-hidden { transform: translateX(100%); }
+
+        /* High Visibility Fonts */
+        .sidebar-link { color: #FFFFFF !important; font-weight: 600; font-size: 15px; }
+        
+        /* Smooth Overlay */
+        #overlay { transition: opacity 0.3s; }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 text-gray-900">
 
-    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/10 hidden z-40"></div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 hidden z-40"></div>
 
-    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 sidebar-hidden shadow-2xl">
-        <div class="p-6">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="bg-green-500 p-2 rounded-lg text-white">GB</div>
-                <h2 class="text-white font-bold text-xl">GreensACC</h2>
-            </div>
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-72 sidebar-hidden shadow-2xl">
+        <div class="p-6 flex flex-col h-full">
+            <h2 class="text-white text-2xl font-bold mb-8 italic">Green Bananas</h2>
             
-            <nav class="space-y-4">
-                <a href="#" class="sidebar-link block p-2 rounded">Overview</a>
-                <a href="#" class="sidebar-link block p-2 rounded">Partner Registry</a>
-                <a href="#" class="sidebar-link block p-2 rounded">Stock Control</a>
+            <nav class="space-y-4 flex-grow">
+                <a href="#" class="sidebar-link block p-3 rounded-lg hover:bg-white/10">📊 Overview</a>
+                <a href="#" class="sidebar-link block p-3 rounded-lg hover:bg-white/10">🌐 Partners</a>
                 
-                <div class="mt-10 border-t border-gray-700 pt-6">
-                    <label class="text-gray-400 text-xs uppercase">Choose Country</label>
-                    <select id="countrySelect" onchange="processGlobalSetup()" class="w-full mt-2 bg-[#1a2234] text-white border border-gray-600 rounded p-2 text-sm outline-none">
-                        <option value="">Select Region...</option>
-                        <option value="Egypt">Egypt</option>
-                        <option value="Turkey">Turkey</option>
-                        <option value="UAE">UAE</option>
-                        <option value="USA">USA</option>
-                    </select>
+                <div class="mt-8">
+                    <label class="text-gray-400 text-xs font-bold uppercase">Universal Registry</label>
+                    <select id="universalCountry" onchange="handleGlobalChange()" class="w-full mt-2 bg-[#1a2234] text-white border border-gray-700 rounded-md p-3">
+                        <option value="">Select Country...</option>
+                        </select>
                 </div>
             </nav>
+
+            <div class="text-gray-500 text-xs mt-auto">GreensACC v2.0 - Global Trading</div>
         </div>
     </div>
 
     <div class="min-h-screen flex flex-col">
-        <header class="bg-white border-b p-4 flex justify-between items-center shadow-sm">
-            <button onclick="toggleSidebar()" class="text-2xl hover:bg-gray-100 p-2 rounded">☰</button>
-            <div id="navDisplay" class="text-sm font-bold text-blue-600">Global Operations</div>
-            <button onclick="window.print()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm">Print</button>
+        <header class="bg-white border-b p-4 flex justify-between items-center">
+            <button onclick="toggleSidebar()" class="text-2xl p-2 hover:bg-gray-100 rounded">☰</button>
+            <div id="headerStatus" class="font-bold text-blue-600">Global Registry</div>
+            <div class="flex gap-2">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded font-bold text-sm">Modify</button>
+                <button class="bg-red-600 text-white px-4 py-2 rounded font-bold text-sm">Delete</button>
+            </div>
         </header>
 
-        <main class="p-6 flex-grow">
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                    <h3 class="font-bold">Active Records</h3>
-                    <div class="space-x-2">
-                        <button class="text-blue-600 font-bold border border-blue-600 px-3 py-1 rounded hover:bg-blue-50">Modify</button>
-                        <button class="text-red-600 font-bold border border-red-600 px-3 py-1 rounded hover:bg-red-50">Delete</button>
-                    </div>
-                </div>
-                <div class="p-8 text-center text-gray-400">
-                    Select a country from the sidebar to begin managing data.
-                </div>
+        <main class="p-6" id="mainContent">
+            <div class="bg-white p-10 rounded-xl shadow text-center text-gray-400 border-2 border-dashed">
+                Connect your Supabase Keys to see your partner data.
             </div>
         </main>
     </div>
 
     <script>
+        // --- 1. SUPABASE CONNECTION (KEEP YOUR OLD KEYS HERE) ---
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE'; 
+        const SUPABASE_KEY = 'YOUR_SUPABASE_KEY_HERE';
+        const supabase = netlifyConfig ? null : supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- 2. UNIVERSAL COUNTRIES LIST ---
+        const countries = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Korea", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Mexico", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway", "Oman", "Pakistan", "Palestine", "Panama", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saudi Arabia", "Senegal", "Serbia", "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa", "Spain", "Sri Lanka", "Sudan", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Tunisia", "Turkey", "Turkmenistan", "UAE", "Uganda", "Ukraine", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
+        
+        const select = document.getElementById('universalCountry');
+        countries.forEach(c => {
+            let opt = document.createElement('option');
+            opt.value = c;
+            opt.innerHTML = c;
+            select.appendChild(opt);
+        });
+
+        // --- 3. SIDEBAR LOGIC ---
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            
-            sidebar.classList.toggle('sidebar-hidden');
-            overlay.classList.toggle('hidden');
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('sidebar-hidden');
+            ov.classList.toggle('hidden');
         }
 
-        function processGlobalSetup() {
-            const country = document.getElementById('countrySelect').value;
-            if (!country) return;
+        // --- 4. GLOBAL CHANGE LOGIC ---
+        function handleGlobalChange() {
+            const country = document.getElementById('universalCountry').value;
+            if(!country) return;
 
-            // Set default local language names
-            let localName = "Local Language";
-            if (country === "Egypt" || country === "UAE") localName = "Arabic";
-            if (country === "Turkey") localName = "Turkish";
+            // Simple Prompt Logic
+            const lang = confirm(`Switch to Local Language for ${country}?\n(Cancel for English)`);
+            const curr = confirm(`Switch to Local Currency for ${country}?\n(Cancel for USD)`);
 
-            // ASK LANGUAGE
-            const useLocal = confirm(`Would you like to use ${localName}? (Cancel for English)`);
-            
-            // ASK CURRENCY
-            const useLocalCurr = confirm(`Use ${country} Local Currency? (Cancel for USD)`);
-
-            // Apply Direction
-            if (useLocal && (country === "Egypt" || country === "UAE")) {
+            // Change Language/Direction
+            if(lang && (country === "Egypt" || country === "UAE" || country === "Saudi Arabia" || country === "Qatar")) {
                 document.body.dir = "rtl";
             } else {
                 document.body.dir = "ltr";
             }
 
-            // Update Header Information
-            document.getElementById('navDisplay').innerText = 
-                `${country} | ${useLocal ? localName : 'English'} | ${useLocalCurr ? 'Local' : 'USD'}`;
-
-            // SLIDE SIDEBAR BACK AUTOMATICALLY
+            document.getElementById('headerStatus').innerText = `${country} | ${lang ? 'Local' : 'English'} | ${curr ? 'Local' : 'USD'}`;
+            
+            // SLIDE BACK
             toggleSidebar();
         }
     </script>
