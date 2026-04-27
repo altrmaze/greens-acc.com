@@ -3,58 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenACC | Global Trading Suite</title>
+    <title>GreenACC | Global Operations</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 font-sans">
     <div class="flex h-screen">
-        <aside class="w-64 bg-green-900 text-white flex flex-col shadow-xl">
-            <div class="p-6 border-b border-green-800">
-                <h1 class="text-2xl font-bold italic tracking-wider">GREEN BANANAS</h1>
-                <p class="text-xs text-green-400 mt-1 uppercase tracking-widest">General Trading Co.</p>
+        <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl">
+            <div class="p-6 border-b border-slate-800">
+                <h1 class="text-2xl font-bold italic tracking-wider text-green-500">GREEN BANANAS</h1>
+                <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">General Trading & Logistics</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="showTab('inventory')" class="w-full flex items-center p-3 hover:bg-green-800 rounded-lg transition"><i class="fas fa-boxes mr-3"></i> Inventory</button>
-                <button onclick="showTab('invoices')" class="w-full flex items-center p-3 hover:bg-green-800 rounded-lg transition"><i class="fas fa-file-invoice-dollar mr-3"></i> Invoices</button>
-                <button onclick="showTab('crm')" class="w-full flex items-center p-3 hover:bg-green-800 rounded-lg transition"><i class="fas fa-users mr-3"></i> Global Clients</button>
+                <button onclick="showTab('dashboard')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition border-l-4 border-green-500 bg-slate-800"><i class="fas fa-chart-line mr-3"></i> Overview</button>
+                <button onclick="showTab('inventory')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-boxes mr-3"></i> Stock Control</button>
+                <button onclick="showTab('invoices')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-file-invoice-dollar mr-3"></i> Finance & Invoices</button>
+                <button onclick="showTab('crm')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-globe mr-3"></i> Global Partners</button>
             </nav>
-            <div class="p-4 border-t border-green-800 text-xs text-green-500 text-center">
+            <div class="p-4 border-t border-slate-800 text-[10px] text-slate-500 text-center font-mono">
                 USA • EGY • TUR • DXB
             </div>
         </aside>
 
         <main class="flex-1 overflow-y-auto p-8">
-            <header class="flex justify-between items-center mb-10">
-                <h2 id="tab-title" class="text-3xl font-bold text-gray-800">Inventory Management</h2>
-                <div class="flex space-x-4">
-                    <button class="bg-green-700 text-white px-4 py-2 rounded shadow hover:bg-green-600">+ Add New</button>
+            <header class="flex justify-between items-center mb-10 border-b pb-5">
+                <div>
+                    <h2 id="tab-title" class="text-3xl font-bold text-slate-800 uppercase tracking-tight">Operational Overview</h2>
+                    <p class="text-slate-500 text-sm mt-1">Real-time trading data across global hubs.</p>
                 </div>
             </header>
 
-            <section id="inventory" class="tab-content">
-                <div class="bg-white rounded-xl shadow overflow-hidden">
+            <section id="dashboard" class="tab-content">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <p class="text-slate-400 text-xs uppercase font-bold">Active Shipments</p>
+                        <p class="text-2xl font-bold mt-2">--</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <p class="text-slate-400 text-xs uppercase font-bold">Pending Invoices</p>
+                        <p class="text-2xl font-bold mt-2">--</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                        <p class="text-slate-400 text-xs uppercase font-bold">Stock Value</p>
+                        <p class="text-2xl font-bold mt-2">--</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="inventory" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <table class="w-full text-left">
-                        <thead class="bg-gray-50 border-b">
+                        <thead class="bg-slate-50 border-b text-slate-500 text-xs uppercase">
                             <tr>
-                                <th class="p-4 font-semibold text-gray-600">Product Name</th>
-                                <th class="p-4 font-semibold text-gray-600">Region</th>
-                                <th class="p-4 font-semibold text-gray-600">Stock Level</th>
-                                <th class="p-4 font-semibold text-gray-600">Status</th>
+                                <th class="p-4">SKU / Item</th>
+                                <th class="p-4">Origin</th>
+                                <th class="p-4">Warehouse</th>
+                                <th class="p-4">Quantity</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-4">Water Splash Body Splash</td>
-                                <td class="p-4">Egypt / Dubai</td>
-                                <td class="p-4 font-mono">1,250 Units</td>
-                                <td class="p-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span></td>
-                            </tr>
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="p-4">Giovanni Luxury Perfume</td>
-                                <td class="p-4">Turkey / USA</td>
-                                <td class="p-4 font-mono">480 Units</td>
-                                <td class="p-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Active</span></td>
+                        <tbody class="text-slate-700">
+                            <tr>
+                                <td colspan="4" class="p-10 text-center text-slate-400">No active stock items linked to licenses yet.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -62,26 +71,23 @@
             </section>
 
             <section id="invoices" class="tab-content hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-xl shadow">
-                        <h3 class="font-bold mb-4 border-b pb-2">Generate New Quotation</h3>
-                        <div class="space-y-4">
-                            <input type="text" placeholder="Client Name" class="w-full p-2 border rounded">
-                            <input type="number" placeholder="Quantity" class="w-full p-2 border rounded">
-                            <select class="w-full p-2 border rounded">
-                                <option>USD ($)</option>
-                                <option>EGP (LE)</option>
-                                <option>AED (د.إ)</option>
-                            </select>
-                            <button class="w-full bg-green-900 text-white py-2 rounded">Create Invoice</button>
+                <div class="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-800 mb-6">New Transaction</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" placeholder="Bill To" class="p-3 border rounded-lg bg-slate-50">
+                            <input type="text" placeholder="Tax ID / Reference" class="p-3 border rounded-lg bg-slate-50">
                         </div>
+                        <input type="text" placeholder="Description of Goods" class="w-full p-3 border rounded-lg bg-slate-50">
+                        <button class="w-full bg-slate-800 text-white py-3 rounded-lg font-bold hover:bg-slate-700">Initialize Invoice</button>
                     </div>
                 </div>
             </section>
 
             <section id="crm" class="tab-content hidden">
-                <div class="bg-white p-6 rounded-xl shadow">
-                    <p class="text-gray-500 italic">Database loading for Global Sourcing Partners...</p>
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 text-center">
+                    <i class="fas fa-globe-americas text-4xl text-slate-200 mb-4"></i>
+                    <p class="text-slate-500">Global sourcing directory is currently under encryption.</p>
                 </div>
             </section>
         </main>
@@ -90,8 +96,17 @@
     <script>
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
-            document.getElementById('tab-title').innerText = tabId.charAt(0).toUpperCase() + tabId.slice(1);
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'border-l-4', 'border-green-500');
+            });
+
+            const activeTab = document.getElementById(tabId);
+            const activeBtn = event.currentTarget;
+
+            activeTab.classList.remove('hidden');
+            activeBtn.classList.add('bg-slate-800', 'border-l-4', 'border-green-500');
+            
+            document.getElementById('tab-title').innerText = activeBtn.innerText.trim();
         }
     </script>
 </body>
