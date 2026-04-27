@@ -3,111 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenACC | Global Operations</title>
+    <title>GreenACC | Operational Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-100 font-sans">
     <div class="flex h-screen">
         <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-xl">
             <div class="p-6 border-b border-slate-800">
                 <h1 class="text-2xl font-bold italic tracking-wider text-green-500">GREEN BANANAS</h1>
-                <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">General Trading & Logistics</p>
+                <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-bold">General Trading & Logistics</p>
             </div>
             <nav class="flex-1 p-4 space-y-2">
-                <button onclick="showTab('dashboard')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition border-l-4 border-green-500 bg-slate-800"><i class="fas fa-chart-line mr-3"></i> Overview</button>
-                <button onclick="showTab('inventory')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-boxes mr-3"></i> Stock Control</button>
-                <button onclick="showTab('invoices')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-file-invoice-dollar mr-3"></i> Finance & Invoices</button>
-                <button onclick="showTab('crm')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-globe mr-3"></i> Global Partners</button>
+                <button onclick="showTab('dashboard')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-chart-line mr-3 text-green-500"></i> Overview</button>
+                <button onclick="showTab('crm')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-globe mr-3 text-green-500"></i> Global Partners</button>
+                <button onclick="showTab('invoices')" class="w-full flex items-center p-3 hover:bg-slate-800 rounded-lg transition"><i class="fas fa-file-invoice-dollar mr-3 text-green-500"></i> Transactions</button>
             </nav>
-            <div class="p-4 border-t border-slate-800 text-[10px] text-slate-500 text-center font-mono">
-                USA • EGY • TUR • DXB
-            </div>
+            <div class="p-4 border-t border-slate-800 text-[10px] text-slate-500 text-center font-mono">USA • EGY • TUR • DXB</div>
         </aside>
 
         <main class="flex-1 overflow-y-auto p-8">
             <header class="flex justify-between items-center mb-10 border-b pb-5">
-                <div>
-                    <h2 id="tab-title" class="text-3xl font-bold text-slate-800 uppercase tracking-tight">Operational Overview</h2>
-                    <p class="text-slate-500 text-sm mt-1">Real-time trading data across global hubs.</p>
-                </div>
+                <h2 id="tab-title" class="text-3xl font-extrabold text-slate-800 uppercase">Operational Overview</h2>
+                <div id="connection-status" class="text-xs font-bold text-red-500 uppercase px-3 py-1 bg-red-50 rounded-full border border-red-200 tracking-widest">Offline</div>
             </header>
 
             <section id="dashboard" class="tab-content">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <p class="text-slate-400 text-xs uppercase font-bold">Active Shipments</p>
-                        <p class="text-2xl font-bold mt-2">--</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <p class="text-slate-400 text-xs uppercase font-bold">Pending Invoices</p>
-                        <p class="text-2xl font-bold mt-2">--</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <p class="text-slate-400 text-xs uppercase font-bold">Stock Value</p>
-                        <p class="text-2xl font-bold mt-2">--</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="inventory" class="tab-content hidden">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-50 border-b text-slate-500 text-xs uppercase">
-                            <tr>
-                                <th class="p-4">SKU / Item</th>
-                                <th class="p-4">Origin</th>
-                                <th class="p-4">Warehouse</th>
-                                <th class="p-4">Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-slate-700">
-                            <tr>
-                                <td colspan="4" class="p-10 text-center text-slate-400">No active stock items linked to licenses yet.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section id="invoices" class="tab-content hidden">
-                <div class="max-w-2xl bg-white p-8 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-800 mb-6">New Transaction</h3>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <input type="text" placeholder="Bill To" class="p-3 border rounded-lg bg-slate-50">
-                            <input type="text" placeholder="Tax ID / Reference" class="p-3 border rounded-lg bg-slate-50">
-                        </div>
-                        <input type="text" placeholder="Description of Goods" class="w-full p-3 border rounded-lg bg-slate-50">
-                        <button class="w-full bg-slate-800 text-white py-3 rounded-lg font-bold hover:bg-slate-700">Initialize Invoice</button>
+                        <p class="text-slate-400 text-xs uppercase font-bold tracking-widest">Active Partners</p>
+                        <p id="partner-count" class="text-3xl font-bold mt-2 text-slate-800">0</p>
                     </div>
                 </div>
             </section>
 
             <section id="crm" class="tab-content hidden">
-                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 text-center">
-                    <i class="fas fa-globe-americas text-4xl text-slate-200 mb-4"></i>
-                    <p class="text-slate-500">Global sourcing directory is currently under encryption.</p>
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 mb-8">
+                    <h3 class="font-bold text-slate-800 mb-6 uppercase tracking-tight">Add Global Partner</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input id="p-name" type="text" placeholder="Company Name" class="p-3 border rounded-lg bg-slate-50 focus:ring-2 focus:ring-green-500 outline-none">
+                        <select id="p-country" class="p-3 border rounded-lg bg-slate-50 outline-none">
+                            <option value="USA">United States</option>
+                            <option value="Egypt">Egypt</option>
+                            <option value="Turkey">Turkey</option>
+                            <option value="UAE">Dubai / UAE</option>
+                        </select>
+                        <button onclick="addPartner()" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition">Save Partner</button>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b text-slate-500 text-xs uppercase font-bold">
+                            <tr><th class="p-4">Name</th><th class="p-4">Region</th><th class="p-4">Status</th></tr>
+                        </thead>
+                        <tbody id="partner-list" class="text-slate-700">
+                            </tbody>
+                    </table>
                 </div>
             </section>
+
+            <section id="invoices" class="tab-content hidden text-slate-400 italic">Financial modules pending license verification.</section>
         </main>
     </div>
 
     <script>
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-            document.querySelectorAll('nav button').forEach(btn => {
-                btn.classList.remove('bg-slate-800', 'border-l-4', 'border-green-500');
-            });
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://mwvfqicwghosfcmjxbxz.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_wJFjBeMankJKxHV-TGLXRA_dXU1mIL1';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            const activeTab = document.getElementById(tabId);
-            const activeBtn = event.currentTarget;
-
-            activeTab.classList.remove('hidden');
-            activeBtn.classList.add('bg-slate-800', 'border-l-4', 'border-green-500');
-            
-            document.getElementById('tab-title').innerText = activeBtn.innerText.trim();
+        async function init() {
+            try {
+                const { data, error } = await _supabase.from('partners').select('count');
+                if (!error) {
+                    document.getElementById('connection-status').innerText = 'Connected';
+                    document.getElementById('connection-status').className = 'text-xs font-bold text-green-600 uppercase px-3 py-1 bg-green-50 rounded-full border border-green-200 tracking-widest';
+                    loadPartners();
+                }
+            } catch (e) { console.error(e); }
         }
+
+        async function addPartner() {
+            const name = document.getElementById('p-name').value;
+            const country = document.getElementById('p-country').value;
+            if (!name) return alert('Enter company name');
+
+            const { error } = await _supabase.from('partners').insert([{ name, country, type: 'Client' }]);
+            if (error) alert('Error: Make sure you ran the SQL Query in Supabase first!');
+            else {
+                document.getElementById('p-name').value = '';
+                loadPartners();
+            }
+        }
+
+        async function loadPartners() {
+            const { data, error } = await _supabase.from('partners').select('*');
+            if (!error) {
+                document.getElementById('partner-count').innerText = data.length;
+                const list = document.getElementById('partner-list');
+                list.innerHTML = data.map(p => `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-4 font-semibold">${p.name}</td>
+                        <td class="p-4 text-slate-500">${p.country}</td>
+                        <td class="p-4"><span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded font-bold uppercase border border-blue-100">Registered</span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('tab-title').innerText = tabId === 'crm' ? 'Global Partners' : tabId.toUpperCase();
+        }
+
+        init();
     </script>
 </body>
 </html>
