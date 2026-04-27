@@ -3,82 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreensACC | Global Intelligence Hub</title>
+    <title>GreensACC | Business Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
 
         /* SIDEBAR PHYSICS */
-        #sidebar {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background-color: #0B1120;
-            z-index: 100;
-            position: fixed;
-            top: 0;
-            height: 100%;
-            width: 18rem;
-        }
+        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); background-color: #0B1120; z-index: 100; position: fixed; top: 0; height: 100%; width: 18rem; }
         .sidebar-hidden { transform: translateX(-100%); left: 0; }
         [dir="rtl"] #sidebar { right: 0; left: auto; }
         [dir="rtl"] .sidebar-hidden { transform: translateX(100%); }
 
-        /* STOCK TICKER */
-        .ticker-wrap { background: #000; color: #fff; height: 35px; overflow: hidden; position: fixed; bottom: 0; width: 100%; z-index: 50; border-top: 1px solid #333; }
-        .ticker { display: inline-block; white-space: nowrap; animation: ticker 45s linear infinite; line-height: 35px; font-family: monospace; font-size: 12px; }
-        @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        /* LIVE STOCK TICKER */
+        .ticker-bar { background: #000; color: #fff; height: 35px; position: fixed; bottom: 0; width: 100%; overflow: hidden; display: flex; align-items: center; z-index: 50; border-top: 1px solid #222; }
+        .ticker-move { display: flex; white-space: nowrap; animation: tickerScroll 40s linear infinite; font-family: monospace; font-size: 12px; }
+        @keyframes tickerScroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* MINI-MENU MODAL */
-        .modal-active { display: flex !important; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* PROFILE UPLOAD CIRCLE */
+        .profile-upload { width: 80px; height: 80px; border: 2px dashed #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; position: relative; }
+        .profile-preview { width: 100%; height: 100%; object-fit: cover; display: none; }
     </style>
 </head>
-<body class="bg-[#F9FAFB] text-gray-900">
+<body class="bg-slate-50">
 
-    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 hidden z-40 backdrop-blur-sm"></div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 hidden z-40 backdrop-blur-sm"></div>
 
     <div id="sidebar" class="sidebar-hidden shadow-2xl flex flex-col text-white">
-        <div class="p-8">
+        <div class="p-8 h-full flex flex-col">
             <div class="flex items-center gap-3 mb-12">
-                <div class="bg-green-500 p-2 rounded-xl text-white text-2xl shadow-lg shadow-green-500/20">🍃</div>
-                <h1 class="font-bold text-2xl tracking-tighter">GreensACC</h1>
+                <div class="bg-green-500 p-2 rounded-xl text-white text-2xl shadow-lg">🍃</div>
+                <h1 class="font-bold text-2xl tracking-tighter italic">GreensACC</h1>
             </div>
 
-            <nav class="space-y-6">
-                <div>
-                    <p class="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-3">Secure Access</p>
-                    <button onclick="signInWithGoogle()" class="w-full mb-2 bg-white text-black p-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-gray-100 transition-all">
-                        <img src="https://www.google.com/favicon.ico" class="w-4"> Google Login
-                    </button>
-                    <button onclick="signInWithApple()" class="w-full bg-gray-800 text-white p-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-black transition-all">
-                        <img src="https://www.apple.com/favicon.ico" class="w-4"> Apple ID
-                    </button>
+            <nav class="space-y-6 flex-grow">
+                <div id="userSection" class="hidden pb-6 border-b border-slate-800">
+                    <div class="flex items-center gap-4">
+                        <div id="navAvatar" class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-xs">U</div>
+                        <div>
+                            <p id="navUserName" class="text-xs font-bold">User Name</p>
+                            <button onclick="logout()" class="text-[10px] text-red-400 hover:underline">Logout</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="pt-6 border-t border-gray-800">
-                    <p class="text-[10px] uppercase font-bold text-gray-500 tracking-widest mb-3">Universal Market</p>
-                    <select id="countrySelect" onchange="openSetupMenu()" class="w-full bg-[#1a2234] border border-gray-700 rounded-xl p-3 text-sm text-white focus:border-green-500 outline-none cursor-pointer">
-                        <option value="">Choose Country...</option>
-                        <option value="USA">United States</option>
-                        <option value="Egypt">Egypt (مصر)</option>
-                        <option value="Turkey">Turkey (Türkiye)</option>
-                        <option value="UAE">UAE (الإمارات)</option>
-                        <option value="China">China</option>
-                        <option value="Germany">Germany</option>
+                <button onclick="openAuthModal('login')" id="loginBtn" class="w-full bg-blue-600 text-white p-3 rounded-xl text-xs font-bold shadow-lg shadow-blue-500/20">Sign In / Register</button>
+
+                <div class="pt-6">
+                    <p class="text-[10px] uppercase font-bold text-slate-500 mb-3 tracking-widest">Market Access</p>
+                    <select id="countrySelect" onchange="handleMarketChange()" class="w-full bg-[#1a2234] border border-slate-700 rounded-xl p-3 text-sm text-white outline-none">
+                        <option value="">Global Markets...</option>
+                        <option value="Egypt">Egypt</option>
+                        <option value="Turkey">Turkey</option>
+                        <option value="UAE">UAE</option>
+                        <option value="USA">USA</option>
                     </select>
                 </div>
             </nav>
-        </div>
-        <div class="mt-auto p-8 border-t border-gray-800 text-[10px] text-gray-500 uppercase font-bold">
-            Admin: admin | Pass: green123
+            <div class="text-[9px] text-slate-600 uppercase font-bold mt-auto">© 2026 Green Bananas Trading</div>
         </div>
     </div>
 
-    <div class="min-h-screen flex flex-col pb-12">
+    <div id="authModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl relative">
+            <button onclick="closeModal('authModal')" class="absolute top-6 right-8 text-2xl text-slate-300">×</button>
+            
+            <div id="authHeader" class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-900">Welcome Back</h2>
+                <p class="text-xs text-slate-400 mt-2">Enter your credentials to access GreensACC</p>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
+                <div id="regFields" class="hidden space-y-4">
+                    <div class="flex justify-center mb-4">
+                        <label class="profile-upload" id="profileLabel">
+                            <span class="text-[10px] text-slate-400 text-center px-2">Upload Profile</span>
+                            <input type="file" class="hidden" accept="image/*" onchange="previewImage(this)">
+                            <img id="imgPreview" class="profile-preview absolute inset-0">
+                        </label>
+                    </div>
+                    <input type="text" placeholder="Full Name or Company Name" class="w-full border-2 border-slate-100 rounded-2xl p-4 text-sm outline-none focus:border-blue-500">
+                </div>
+
+                <input type="email" id="authEmail" placeholder="Email (Google, Yahoo, Hotmail...)" required class="w-full border-2 border-slate-100 rounded-2xl p-4 text-sm outline-none focus:border-blue-500">
+                <input type="password" id="authPass" placeholder="Password" required class="w-full border-2 border-slate-100 rounded-2xl p-4 text-sm outline-none focus:border-blue-500">
+                
+                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-xl hover:bg-blue-700 transition-all">Continue</button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button onclick="toggleAuthMode()" id="toggleBtn" class="text-xs font-bold text-blue-600">Don't have an account? Register</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="min-h-screen flex flex-col pb-10">
         <header class="bg-white/80 backdrop-blur-md border-b p-5 flex justify-between items-center sticky top-0 z-30">
-            <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-full transition-all">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16m-7 6h7"/></svg>
-            </button>
-            <div id="activeStatus" class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.2em]">Global Hub</div>
-            <button class="bg-blue-600 text-white px-6 py-2 rounded-full text-xs font-bold shadow-lg hover:bg
+            <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center hover:bg-slate-100 rounded-full transition-all text-2xl">☰</button>
+            <div id="activeMarket" class="text-[10px] font-bold text-blue-600 uppercase tracking-widest italic">Universal Trading Hub</div>
+            <button class="bg-blue-600 text-white px-6 py-2 rounded-full text-xs font-bold shadow-lg">New Entry</button>
+        </header>
+
+        <main class="p-8 max-w-6xl mx-auto w-full">
+            <div id="cookieNotice" class="hidden mb-6 bg-blue-900 text-white p-4 rounded-2xl flex justify-between items-center">
+                <p class="text-xs">Welcome back, Guest. Your local session is active using cookies.</p>
+                <button onclick="this.parentElement.remove()" class="text-xs font-bold opacity-50">Dismiss</button>
+            </div>
+
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-6 border-b flex justify-between items-center text-[10px] font-bold text-slate-400">
+                    <span class="tracking-widest uppercase">Global Entity Intelligence</span>
+                    <div class="flex gap-4">
+                        <button class="text-blue-600 hover:underline">MODIFY</button>
+                        <button class="text-red-600 hover:underline">DELETE</button>
+                    </div>
+                </div>
+                <div class="p-20 text-center">
+                    <p class="text-slate-300 text-sm italic">Registered data from Amazon, Alibaba, and Partners will appear here.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="ticker-bar"><div class="ticker-move">
+        &nbsp;&nbsp; NASDAQ: +0.45% ▲ &nbsp;&nbsp; DOW: -0.12% ▼ &nbsp;&nbsp; GOLD: $2,345.20 ▲ &nbsp;&nbsp; BRENT OIL: $87.40 ▲ &nbsp;&nbsp; USD/EGP: 48.50 ▼ &nbsp;&nbsp; USD/TRY: 32.42 ▲ &nbsp;&nbsp; BTC: $64,120 ▲ &nbsp;&nbsp; NVIDIA: +2.1% ▲ &nbsp;&nbsp; ALIBABA: +0.8% ▲
+    </div></div>
+
+    <script>
+        let isLoginMode = true;
+
+        // COOKIES ENGINE
+        function setCookie(name, value) {
+            document.cookie = `${name}=${value}; path=/; max-age=31536000`;
+            if(name === 'isGuest') document.getElementById('cookieNotice').classList.remove('hidden');
+        }
+
+        window.onload = () => {
+            if(document.cookie.includes('isGuest=true')) {
+                document.getElementById('cookieNotice').classList.remove('hidden');
+            } else {
+                setCookie('isGuest', 'true');
+            }
+        };
+
+        // SIDEBAR & MODAL LOGIC
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('sidebar-hidden');
+            document.getElementById('overlay').classList.toggle('hidden');
+        }
+
+        function openAuthModal(mode) {
+            document.getElementById('authModal').classList.remove('hidden');
+            isLoginMode = (mode === 'login');
+            updateAuthUI();
+        }
+
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const regFields = document.getElementById('regFields');
+            const authHeader = document.getElementById('authHeader');
+            const toggleBtn = document.getElementById('toggleBtn');
+
+            if(isLoginMode) {
+                regFields.classList.add('hidden');
+                authHeader.innerHTML = `<h2 class="text-2xl font-bold">Welcome Back</h2><p class="text-xs text-slate-400 mt-2">Sign in to your professional account</p>`;
+                toggleBtn.innerText = "Don't have an account? Register";
+            } else {
+                regFields.classList.remove('hidden');
+                authHeader.innerHTML = `<h2 class="text-2xl font-bold">Create Account</h2><p class="text-xs text-slate-400 mt-2">Join the global trading network</p>`;
+                toggleBtn.innerText = "Already have an account? Login";
+            }
+        }
+
+        // IMAGE PREVIEW
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.getElementById('imgPreview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('profileLabel').querySelector('span').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // AUTH ENGINE
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            // Simulated Success
+            localStorage.setItem('userEmail', email);
+            alert("Success! Profile engine active. Syncing with Supabase...");
+            
+            document.getElementById('loginBtn').classList.add('hidden');
+            document.getElementById('userSection').classList.remove('hidden');
+            document.getElementById('navUserName').innerText = email.split('@')[0];
+            
+            closeModal('authModal');
+            toggleSidebar();
+        }
+
+        function logout() {
+            localStorage.removeItem('userEmail');
+            location.reload();
+        }
+
+        function handleMarketChange() {
+            const country = document.getElementById('countrySelect').value;
+            if(!country) return;
+            const rtl = ["Egypt", "UAE"];
+            document.body.dir = rtl.includes(country) ? "rtl" : "ltr";
+            document.getElementById('activeMarket').innerText = `${country} Market Active`;
+            toggleSidebar();
+        }
+    </script>
+</body>
+</html>
