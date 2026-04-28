@@ -3,206 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreensACC | Global Intelligence & Trading</title>
+    <title>GreensACC | Secure Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; transition: background 0.4s ease; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
 
-        /* SIDEBAR DYNAMICS: Fixes Arabic "Right Side" Slide */
-        #sidebar {
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            background: linear-gradient(180deg, #0B1120 0%, #030712 100%);
-            z-index: 100;
-            position: fixed;
-            top: 0;
-            height: 100%;
-            width: 20rem;
-        }
+        /* SIDEBAR DYNAMICS */
+        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: #0B1120; z-index: 100; position: fixed; top: 0; height: 100%; width: 20rem; }
         .sidebar-hidden { transform: translateX(-100%); left: 0; }
         [dir="rtl"] #sidebar { right: 0; left: auto; }
         [dir="rtl"] .sidebar-hidden { transform: translateX(100%); }
 
-        /* LIVE MARKET TICKER: High-Performance CSS */
-        .ticker-wrap { background: #000; color: #fff; height: 38px; position: fixed; bottom: 0; width: 100%; overflow: hidden; display: flex; align-items: center; z-index: 50; border-top: 1px solid #1f2937; }
-        .ticker-track { display: flex; white-space: nowrap; animation: tickerScroll 50s linear infinite; font-family: monospace; font-size: 11px; letter-spacing: 1px; }
+        /* TICKER */
+        .ticker-bar { background: #000; color: #fff; height: 35px; position: fixed; bottom: 0; width: 100%; overflow: hidden; display: flex; align-items: center; z-index: 50; }
+        .ticker-move { display: flex; white-space: nowrap; animation: tickerScroll 40s linear infinite; font-family: monospace; font-size: 11px; }
         @keyframes tickerScroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-        /* SOPHISTICATED UI ELEMENTS */
-        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
-        .profile-ring { border: 2px solid #10B981; padding: 2px; }
+        .modal-active { display: flex !important; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="bg-[#F8FAFC]">
+<body class="bg-slate-50">
 
-    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 hidden z-40 backdrop-blur-md"></div>
+    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/70 hidden z-40 backdrop-blur-sm"></div>
 
-    <div id="sidebar" class="sidebar-hidden shadow-[30px_0_60px_-15px_rgba(0,0,0,0.5)]">
-        <div class="p-10 flex flex-col h-full text-white">
-            <div class="flex items-center gap-4 mb-14">
-                <div class="bg-green-500 p-3 rounded-2xl text-white shadow-[0_0_20px_rgba(16,185,129,0.4)]">🍃</div>
-                <div>
-                    <h1 class="font-bold text-2xl tracking-tighter italic">GreensACC</h1>
-                    <p class="text-[9px] uppercase tracking-[3px] text-gray-500 font-bold">General Trading</p>
-                </div>
+    <div id="sidebar" class="sidebar-hidden shadow-2xl flex flex-col text-white">
+        <div class="p-8 h-full flex flex-col">
+            <div class="flex items-center gap-3 mb-12">
+                <div class="bg-green-500 p-2 rounded-xl text-white text-2xl">🍃</div>
+                <h1 class="font-bold text-2xl italic tracking-tighter">GreensACC</h1>
             </div>
-
-            <div id="userProfile" class="hidden mb-10 p-5 bg-white/5 rounded-3xl border border-white/10">
-                <div class="flex items-center gap-4">
-                    <img id="userImg" src="" class="w-12 h-12 rounded-full profile-ring hidden">
-                    <div id="userInitial" class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center font-bold text-lg">U</div>
-                    <div>
-                        <p id="userNameDisplay" class="text-xs font-bold">Trading Partner</p>
-                        <button onclick="logout()" class="text-[10px] text-red-400 hover:underline">Secure Sign Out</button>
-                    </div>
-                </div>
-            </div>
-
-            <button onclick="openAuth()" id="loginTrigger" class="w-full bg-blue-600 hover:bg-blue-500 p-4 rounded-2xl text-xs font-bold transition-all mb-10 shadow-lg shadow-blue-900/40">Partner Login / Join</button>
-
-            <nav class="space-y-8">
-                <div>
-                    <p class="text-[10px] uppercase font-bold text-gray-600 mb-4 tracking-[2px]">Market Intelligence</p>
-                    <select id="countrySelect" onchange="initMarketSetup()" class="w-full bg-gray-900 border border-gray-800 rounded-2xl p-4 text-sm text-white outline-none focus:border-green-500 transition-all cursor-pointer">
-                        <option value="">Select Global Region...</option>
-                        <option value="Egypt">Egypt (مصر)</option>
-                        <option value="Turkey">Turkey (Türkiye)</option>
-                        <option value="UAE">UAE (الإمارات)</option>
-                        <option value="USA">United States</option>
-                        <option value="China">China (中国)</option>
+            <nav class="space-y-6">
+                <button onclick="openModal('loginModal')" class="w-full bg-blue-600 p-3 rounded-xl text-xs font-bold shadow-lg">Sign In / Register</button>
+                <div class="pt-6 border-t border-slate-800">
+                    <select id="countrySelect" onchange="handleMarket()" class="w-full bg-[#1a2234] border border-slate-700 rounded-xl p-3 text-sm text-white">
+                        <option value="">Choose Country...</option>
+                        <option value="Egypt">Egypt</option>
+                        <option value="USA">USA</option>
                     </select>
                 </div>
             </nav>
-
-            <div class="mt-auto text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-                v3.0 Intelligence Suite
-            </div>
         </div>
     </div>
 
-    <div class="min-h-screen flex flex-col pb-16">
-        <header class="h-20 glass-panel sticky top-0 z-30 px-8 flex justify-between items-center shadow-sm">
-            <button onclick="toggleSidebar()" class="w-12 h-12 flex items-center justify-center hover:bg-gray-100 rounded-2xl transition-all">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M4 6h16M4 12h16m-7 6h7"/></svg>
-            </button>
-            
-            <div id="currentRegion" class="text-[11px] font-bold text-blue-600 uppercase tracking-[4px]">Universal Registry</div>
-            
-            <div class="flex items-center gap-4">
-                <div id="liveViewer" class="bg-green-50 text-green-600 text-[10px] px-4 py-1.5 rounded-full font-bold">SYSTEM ACTIVE</div>
-                <button class="bg-black text-white px-6 py-2.5 rounded-full text-xs font-bold hover:bg-gray-800 shadow-xl transition-all">New Entity</button>
+    <div id="loginModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl relative">
+            <button onclick="closeModal('loginModal')" class="absolute top-6 right-8 text-2xl text-slate-300">×</button>
+            <div id="loginHeader" class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-900">Partner Login</h2>
+                <p class="text-xs text-slate-400 mt-2">Enter credentials or use Fingerprint ID</p>
             </div>
-        </header>
-
-        <main class="p-10 max-w-7xl mx-auto w-full">
-            <div class="bg-white rounded-[2.5rem] shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50/50 border-b border-gray-100">
-                        <tr>
-                            <th class="p-6 text-[10px] uppercase font-bold text-gray-400 tracking-widest">Entity & Logistics</th>
-                            <th class="p-6 text-[10px] uppercase font-bold text-gray-400 tracking-widest text-right">Market Data</th>
-                        </tr>
-                    </thead>
-                    <tbody id="companyTable">
-                        <tr class="border-b border-gray-50 hover:bg-blue-50/20 transition-all cursor-pointer" onclick="fetchIntel('Nike Inc.')">
-                            <td class="p-6">
-                                <p class="font-bold text-gray-900">Nike Inc.</p>
-                                <p class="text-xs text-gray-400">Footwear & Apparel | Amazon Verified</p>
-                            </td>
-                            <td class="p-6 text-right">
-                                <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-[10px] font-bold">VIEW INTEL</span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </main>
-    </div>
-
-    <div id="intelModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-6 backdrop-blur-xl">
-        <div class="bg-white rounded-[3rem] w-full max-w-2xl p-12 shadow-2xl relative">
-            <button onclick="closeModal('intelModal')" class="absolute top-8 right-10 text-3xl text-gray-300 hover:text-black">×</button>
-            <h2 id="intelTitle" class="text-3xl font-bold mb-2">Company Insight</h2>
-            <p class="text-xs font-bold text-green-500 uppercase tracking-widest mb-10">Real-Time Sourcing Intelligence</p>
             
-            <div class="grid grid-cols-2 gap-6 mb-10">
-                <div class="bg-blue-50 p-8 rounded-[2rem]">
-                    <p class="text-[10px] font-bold text-blue-400 uppercase mb-2">Amazon Sales Share</p>
-                    <p id="amazonData" class="text-4xl font-bold text-blue-900">0%</p>
+            <form onsubmit="event.preventDefault();" class="space-y-4">
+                <input type="email" placeholder="Email Address" required class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm outline-none focus:border-green-500 transition-all">
+                <input type="password" placeholder="Password" required class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm outline-none focus:border-green-500 transition-all">
+                
+                <div class="flex justify-between items-center px-1">
+                    <button type="button" onclick="openRecovery()" class="text-[10px] font-bold text-blue-600 hover:underline tracking-widest uppercase">Forgot Password?</button>
                 </div>
-                <div class="bg-orange-50 p-8 rounded-[2rem]">
-                    <p class="text-[10px] font-bold text-orange-400 uppercase mb-2">Alibaba / Global</p>
-                    <p id="alibabaData" class="text-4xl font-bold text-orange-900">0%</p>
-                </div>
-            </div>
 
-            <div class="border-t border-gray-100 pt-8 flex items-center gap-6">
-                <div class="text-yellow-400 text-2xl">★★★★★</div>
-                <p class="text-xs text-gray-500 leading-relaxed italic">"Verified entity with no safety violations. Reputation Shield active for battery manufacturing standards."</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="authModal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center p-6 backdrop-blur-md">
-        <div class="bg-white rounded-[3rem] w-full max-w-md p-12 shadow-2xl">
-            <div class="text-center mb-10">
-                <h3 class="text-2xl font-bold text-gray-900">Partner Access</h3>
-                <p class="text-xs text-gray-400 mt-2">Individual or Corporate Sourcing</p>
-            </div>
-            <form id="loginForm" onsubmit="processLogin(event)" class="space-y-5">
-                <input type="email" placeholder="Email Address" required class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-4 text-sm outline-none focus:border-blue-500 transition-all">
-                <input type="password" placeholder="Password" required class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl p-4 text-sm outline-none focus:border-blue-500 transition-all">
-                <button class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-xl hover:bg-blue-700 transition-all">Secure Login</button>
+                <button class="w-full bg-black text-white p-4 rounded-2xl font-bold shadow-xl">Handshake Login</button>
             </form>
-            <button onclick="closeModal('authModal')" class="w-full mt-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Cancel</button>
         </div>
     </div>
 
-    <div class="ticker-wrap"><div class="ticker-track">
-        NASDAQ: +0.45% ▲ &nbsp;&nbsp;&nbsp; DOW: -0.12% ▼ &nbsp;&nbsp;&nbsp; GOLD: $2,345.20 ▲ &nbsp;&nbsp;&nbsp; OIL: $87.40 ▲ &nbsp;&nbsp;&nbsp; USD/EGP: 48.50 ▼ &nbsp;&nbsp;&nbsp; USD/TRY: 32.42 ▲ &nbsp;&nbsp;&nbsp; USD/AED: 3.67 ━ &nbsp;&nbsp;&nbsp; BTC: $64,120 ▲ &nbsp;&nbsp;&nbsp; ALIBABA (BABA): +1.2% ▲ &nbsp;&nbsp;&nbsp; AMAZON (AMZN): +0.8% ▲
+    <div id="recoveryModal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center p-4 backdrop-blur-xl">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-sm p-10 shadow-2xl relative">
+            <button onclick="closeModal('recoveryModal')" class="absolute top-6 right-8 text-2xl text-slate-300">×</button>
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🔐</div>
+                <h2 class="text-xl font-bold text-slate-900">Access Recovery</h2>
+                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest mt-2">GB Security Protocol</p>
+            </div>
+            
+            <p class="text-xs text-slate-500 text-center mb-6 leading-relaxed">Enter your registered email. We will dispatch a secure 24-hour recovery link to your inbox.</p>
+            
+            <form onsubmit="handleRecovery(event)" class="space-y-4">
+                <input type="email" id="recoveryEmail" placeholder="partner@company.com" required class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm outline-none focus:border-blue-500">
+                <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-xl shadow-blue-200">Dispatch Magic Link</button>
+            </form>
+            
+            <button onclick="closeModal('recoveryModal'); openModal('loginModal');" class="w-full mt-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Back to Login</button>
+        </div>
+    </div>
+
+    <div class="ticker-bar"><div class="ticker-move">
+        &nbsp;&nbsp; GOLD: $2,345 ▲ &nbsp;&nbsp; LITHIUM: +1.2% ▲ &nbsp;&nbsp; USD/EGP: 48.50 ▼ &nbsp;&nbsp; USD/TRY: 32.42 ▲ &nbsp;&nbsp; BROKER FEE: 2.0% FIXED &nbsp;&nbsp;
     </div></div>
 
     <script>
-        // --- CORE FUNCTIONS ---
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('sidebar-hidden');
             document.getElementById('overlay').classList.toggle('hidden');
         }
 
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+        function openModal(id) { document.getElementById(id).classList.add('modal-active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('modal-active'); }
 
-        // --- MARKET SETUP ---
-        function initMarketSetup() {
-            const country = document.getElementById('countrySelect').value;
-            if(!country) return;
-            const lang = confirm(`Switch to ${country} Local Language?`);
-            const curr = confirm(`Use ${country} Local Currency?`);
-            
-            const rtlList = ["Egypt", "UAE"];
-            document.body.dir = (lang && rtlList.includes(country)) ? "rtl" : "ltr";
-            document.getElementById('currentRegion').innerText = `${country} Market`;
-            toggleSidebar();
+        function openRecovery() {
+            closeModal('loginModal');
+            openModal('recoveryModal');
         }
 
-        // --- AUTHENTICATION ---
-        function openAuth() { document.getElementById('authModal').classList.remove('hidden'); }
-        function processLogin(e) {
+        async function handleRecovery(e) {
             e.preventDefault();
-            const email = e.target[0].value;
-            document.getElementById('userNameDisplay').innerText = email.split('@')[0];
-            document.getElementById('userProfile').classList.remove('hidden');
-            document.getElementById('loginTrigger').classList.add('hidden');
-            closeModal('authModal');
-            // Set session cookie
-            document.cookie = "session_active=true; max-age=86400; path=/";
+            const email = document.getElementById('recoveryEmail').value;
+            
+            // Supabase Logic: Sends the password reset email automatically
+            /* const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+              redirectTo: 'https://greenbanans.com/update-password',
+            });
+            */
+            
+            alert(`Recovery link dispatched to: ${email}. Please check your inbox (including Spam).`);
+            closeModal('recoveryModal');
         }
 
-        // --- COMPANY INTELLIGENCE (AMAZON/ALIBABA) ---
-        function fetchIntel(name) {
-            document.getElementById('intelTitle').innerText = name;
-            document.getElementById('amazonData').innerText = (Math.random() * 50 + 10).toFixed(1) + "%";
-            document.getElementById('alibabaData').innerText = (Math.random() * 30 + 5).toFixed(1) + "%";
-            document.getElementById('intelModal').classList.remove('hidden');
+        function handleMarket() {
+            const country = document.getElementById('countrySelect').value;
+            document.body.dir = (country === "Egypt") ? "rtl" : "ltr";
+            toggleSidebar();
         }
     </script>
 </body>
