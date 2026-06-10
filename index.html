@@ -3,170 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenACC — Trading Command Center Blueprint</title>
+    <title>GreenACC — Trading Command Center & AI Negotiation Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#0f172a] text-slate-100 font-sans min-height-screen">
+<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen antialiased">
 
-    <nav class="border-b border-slate-800 bg-[#1e293b]/50 backdrop-blur px-6 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center space-x-3">
-            <div class="h-9 w-9 bg-gradient-to-tr from-sky-400 to-emerald-400 rounded-lg flex items-center justify-center font-bold text-slate-900 text-lg">
-                G
-            </div>
-            <div>
-                <span class="text-xl font-black tracking-tight bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent">GreenACC</span>
-                <span class="text-xs block text-slate-500 font-mono">v1.0.0 // PRODUCTION_BLUEPRINT</span>
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 shadow-sm font-mono">
+        <div class="inline-block animate-marquee space-x-8">
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>BANANAS (AGRI/USD): $14.20 <span class="text-emerald-400 ml-1">+1.4%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>FREIGHT INDEX (US-GLBL): $3,450 <span class="text-emerald-400 ml-1">+0.8%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-rose-400 rounded-full mr-2"></span>FUEL INDEX (DIESEL-US): $3.85 <span class="text-rose-400 ml-1">-0.3%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / EGP: 47.85 <span class="text-emerald-400 ml-1">+2.1%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / AED: 3.67 <span class="text-slate-400 ml-1">0.0%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-rose-400 rounded-full mr-2"></span>USD / TRY: 32.45 <span class="text-rose-400 ml-1">-0.5%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / MNT: 3,420 <span class="text-emerald-400 ml-1">+0.2%</span></span>
+        </div>
+    </div>
+    <style>
+        @keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+        .animate-marquee { display: inline-block; padding-left: 100%; animation: marquee 30s linear infinite; }
+        .animate-marquee:hover { animation-play-state: paused; }
+    </style>
+
+    <nav class="border-b border-slate-200 bg-white/90 backdrop-blur px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-xs">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3 group">
+                <div class="h-11 w-11 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center shadow-xs overflow-hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-emerald-600">
+                        <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-1.5V9a3 3 0 00-3-3h-3V4.5a3 3 0 00-3-3H4.5a3 3 0 00-3 3V9a3 3 0 003 3H6v1.5a3 3 0 003 3h3V18a3 3 0 003 3h4.5zM6 10.5H4.5a1.5 1.5 0 01-1.5-1.5V4.5a1.5 1.5 0 011.5-1.5H9a1.5 1.5 0 011.5 1.5V6H9a3 3 0 00-3 3v1.5z" />
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-tight text-slate-900">GreenACC</span>
+                    <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase font-mono">By Green Bananas</span>
+                </div>
             </div>
         </div>
         
-        <div class="flex items-center space-x-3 text-xs font-mono">
-            <span class="px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400">repo: github/greenacc</span>
-            <span class="px-2.5 py-1 rounded-full bg-emerald-950 border border-emerald-500/30 text-emerald-400 flex items-center">
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5"></span> hosted: render_live
-            </span>
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-col">
+                <label class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-1">Operating Region</label>
+                <select class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs">
+                    <option value="global">🌍 Global (All Countries Listed)</option>
+                    <option value="us">🇺🇸 United States</option>
+                    <option value="ae">🇦🇪 United Arab Emirates</option>
+                    <option value="eg">🇪🇬 Egypt</option>
+                    <option value="tr">🇹🇷 Turkey</option>
+                    <option value="mn">🇲🇳 Mongolia</option>
+                    <option value="my">🇲🇾 Malaysia</option>
+                    <option value="sa">🇸🇦 Saudi Arabia</option>
+                </select>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-1">System Language Engine</label>
+                <select class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs">
+                    <option value="en-base">🇬🇧 English (Base Environment)</option>
+                    <option value="en-ar">🇬🇧 English + 🇦🇪 العربية (Dual Interface)</option>
+                    <option value="en-mn">🇬🇧 English + 🇲🇳 Mongolian (Dual Interface)</option>
+                    <option value="en-tr">🇬🇧 English + 🇹🇷 Türkçe (Dual Interface)</option>
+                    <option value="en-ms">🇬🇧 English + 🇲🇾 Bahasa Melayu (Dual Interface)</option>
+                </select>
+            </div>
         </div>
     </nav>
 
     <div class="max-w-7xl mx-auto p-6 space-y-6">
         
-        <header class="bg-gradient-to-r from-slate-900 via-[#1e293b] to-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <header class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
-                <h1 class="text-2xl font-extrabold text-white">Global Trading Architecture Overview</h1>
-                <p class="text-slate-400 text-sm mt-1">Visual grid distribution mapping CRM, Multi-Currency Ledgers, and Warehouse Stocks.</p>
+                <h2 class="text-xl font-bold text-slate-900">Trading Logistics & AI Contract Orchestration</h2>
+                <p class="text-slate-500 text-sm mt-1">Render cloud-hosted static framework overview showcasing interface button distribution layouts.</p>
             </div>
             <div class="flex gap-2">
-                <button class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 transition">Domain DNS Docs</button>
-                <button class="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-900 text-xs font-bold rounded-lg transition">Supabase API Console</button>
+                <span class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-mono border border-slate-200">repo: github/greensacc</span>
+                <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-mono font-bold border border-emerald-200">endpoint: supabase_live</span>
             </div>
         </header>
 
-        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-[#1e293b] p-4 rounded-xl border border-slate-800 relative group cursor-pointer hover:border-sky-500/50 transition">
-                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Total Volume</span>
-                <span class="text-2xl font-bold block mt-1 text-sky-400">$2,485,900.00</span>
-                <span class="text-[10px] text-slate-500 block mt-2 font-mono">SYS_VALUE_AGGREGATED</span>
-            </div>
-            
-            <div class="bg-[#1e293b] p-4 rounded-xl border border-slate-800 relative group cursor-pointer hover:border-emerald-500/50 transition">
-                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Active Partners</span>
-                <span class="text-2xl font-bold block mt-1 text-emerald-400">142 Nodes</span>
-                <span class="text-[10px] text-slate-500 block mt-2 font-mono">CRM_REGISTRY_COUNT</span>
-            </div>
-
-            <div class="bg-[#1e293b] p-4 rounded-xl border border-slate-800 relative group cursor-pointer hover:border-amber-500/50 transition">
-                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Fleet Mechanics</span>
-                <span class="text-2xl font-bold block mt-1 text-amber-400">38 Drivers</span>
-                <span class="text-[10px] text-slate-500 block mt-2 font-mono">LOGISTICS_TRUCKING_RECRUIT</span>
-            </div>
-
-            <div class="bg-[#1e293b] p-4 rounded-xl border border-slate-800 relative group cursor-pointer hover:border-purple-500/50 transition">
-                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Crypto Safety</span>
-                <span class="text-2xl font-bold block mt-1 text-purple-400">AES-256 Bit</span>
-                <span class="text-[10px] text-slate-500 block mt-2 font-mono">PG_CRYPTO_HARDENED</span>
-            </div>
-        </section>
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <div class="bg-[#1e293b]/70 border border-slate-800 rounded-xl p-5 space-y-4">
-                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">Command Controls</h3>
-                
-                <button class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left rounded-lg text-sm font-medium flex justify-between items-center group transition">
-                    <span>➕ Register Global Supplier</span>
-                    <span class="text-xs bg-slate-900 px-2 py-0.5 rounded text-slate-400 group-hover:text-sky-400">CRM</span>
-                </button>
+            <div class="space-y-6 lg:col-span-1">
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">Command & CRM Operations</h3>
+                    
+                    <button class="w-full py-3 px-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center group transition shadow-2xs">
+                        <span class="text-slate-700">➕ Add New Partner Profile</span>
+                        <span class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-500">CRM</span>
+                    </button>
 
-                <button class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left rounded-lg text-sm font-medium flex justify-between items-center group transition">
-                    <span>📦 Process Warehouse Stock Entry</span>
-                    <span class="text-xs bg-slate-900 px-2 py-0.5 rounded text-slate-400 group-hover:text-emerald-400">INV</span>
-                </button>
+                    <button class="w-full py-3 px-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center group transition shadow-2xs">
+                        <span class="text-slate-700">📦 Dispatch Warehouse Stock</span>
+                        <span class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-500">STOCK</span>
+                    </button>
 
-                <button class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left rounded-lg text-sm font-medium flex justify-between items-center group transition">
-                    <span>🧾 Generate Multi-Currency Bill</span>
-                    <span class="text-xs bg-slate-900 px-2 py-0.5 rounded text-slate-400 group-hover:text-amber-400">FIN</span>
-                </button>
+                    <button class="w-full py-3 px-4 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center group transition shadow-2xs">
+                        <span class="text-slate-700">🧾 Multi-Currency Ledger Invoice</span>
+                        <span class="text-xs bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-500">FINANCE</span>
+                    </button>
+                </div>
 
-                <button class="w-full py-3 px-4 bg-gradient-to-r from-purple-900/40 to-slate-800 hover:from-purple-900/60 border border-purple-500/30 text-left rounded-lg text-sm font-medium flex justify-between items-center group transition">
-                    <span>🔒 Fetch Encrypted Ledger Log</span>
-                    <span class="text-xs bg-purple-950 text-purple-300 px-2 py-0.5 rounded border border-purple-500/20">VAULT</span>
-                </button>
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-3">System Hardening</h3>
+                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-mono font-bold text-slate-700 block">PG_CRYPTO ACTIVATED</span>
+                            <span class="text-[11px] text-slate-400 block">Symmetrical Ledger Encoding</span>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-1 bg-purple-50 text-purple-700 rounded border border-purple-200 font-bold">AES-256</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="lg:col-span-2 bg-[#1e293b]/70 border border-slate-800 rounded-xl p-5">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 font-mono">Row-Level Isolated Regional Nodes</h3>
-                    <span class="text-[11px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded border border-sky-800 font-mono">RLS_POLICIES_ENABLED</span>
-                </div>
+            <div class="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between">
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg flex justify-between items-center">
+                <div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 mb-4 gap-2">
                         <div>
-                            <span class="text-xs font-mono text-slate-500">REGION_01</span>
-                            <span class="text-base font-bold block text-white">United States (USA)</span>
+                            <h3 class="text-base font-bold text-slate-900">Automated AI Agent Negotiation Sandbox</h3>
+                            <p class="text-xs text-slate-400">Autonomous trade intelligence agent handling cross-border parameters.</p>
                         </div>
-                        <span class="text-xs px-2 py-1 bg-sky-500/10 text-sky-400 rounded border border-sky-500/20 font-bold">USD ($)</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-500 font-medium">AI Agent Control:</span>
+                            <button class="bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-emerald-600 shadow-2xs hover:bg-emerald-600 transition">
+                                ENABLED (AUTONOMOUS)
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg flex justify-between items-center">
-                        <div>
-                            <span class="text-xs font-mono text-slate-500">REGION_02</span>
-                            <span class="text-base font-bold block text-white">Egypt (Cairo Hub)</span>
+                    <div class="space-y-4 my-2">
+                        <div class="flex flex-col items-end">
+                            <div class="max-w-[85%] bg-emerald-50 border border-emerald-100 p-3.5 rounded-2xl rounded-tr-none shadow-2xs">
+                                <span class="text-[10px] font-mono font-bold text-emerald-800 uppercase block tracking-wider mb-1">Your View (Input: Arabic)</span>
+                                <p class="text-sm font-medium text-slate-800 text-right dir-rtl">نحن بحاجة إلى تأمين شحن 5000 طن من الموز بحد أقصى للسعر يبلغ 14.00 دولار للطن شامل الشحن والجمارك.</p>
+                                
+                                <div class="mt-2.5 pt-2 border-t border-emerald-200/50 flex justify-between items-center gap-4">
+                                    <span class="text-[10px] font-bold text-emerald-600 font-mono">⚡ LIVE TRANSMISSION ENGINE TRANSLATION</span>
+                                    <span class="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold font-mono">SENT AS ENGLISH</span>
+                                </div>
+                                <p class="text-xs italic text-slate-600 mt-1">"We need to secure shipment of 5,000 tons of bananas at a target maximum ceiling threshold of $14.00/ton inclusive of freight and custom compliance."</p>
+                            </div>
                         </div>
-                        <span class="text-xs px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded border border-emerald-500/20 font-bold">EGP (ج.م)</span>
-                    </div>
 
-                    <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg flex justify-between items-center">
-                        <div>
-                            <span class="text-xs font-mono text-slate-500">REGION_03</span>
-                            <span class="text-base font-bold block text-white">United Arab Emirates (Dubai)</span>
+                        <div class="flex flex-col items-start">
+                            <div class="max-w-[85%] bg-slate-50 border border-slate-200 p-3.5 rounded-2xl rounded-tl-none shadow-2xs">
+                                <span class="text-[10px] font-mono font-bold text-slate-500 uppercase block tracking-wider mb-1">Counterparty (Input: Mongolian)</span>
+                                <p class="text-sm font-medium text-slate-400 font-mono">Бид таны саналыг хүлээн авах боломжтой, гэхдээ тээвэрлэлтийн даатгалыг танай тал хариуцах шаардлагатай.</p>
+                                
+                                <div class="mt-2.5 pt-2 border-t border-slate-200 flex justify-between items-center gap-4">
+                                    <span class="text-[10px] font-bold text-slate-600 font-mono">🔮 REAL-TIME INBOUND CONVERSION</span>
+                                    <span class="text-[10px] bg-slate-700 text-slate-200 px-1.5 py-0.5 rounded font-bold font-mono">PREFERENCE: ENGLISH</span>
+                                </div>
+                                <p class="text-xs font-semibold text-slate-900 mt-1">"We can accept your target baseline figures, provided that international marine freight cargo insurance coverage metrics are paid on your company ledger account."</p>
+                            </div>
                         </div>
-                        <span class="text-xs px-2 py-1 bg-amber-500/10 text-amber-400 rounded border border-amber-500/20 font-bold">AED (د.إ)</span>
-                    </div>
-
-                    <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg flex justify-between items-center">
-                        <div>
-                            <span class="text-xs font-mono text-slate-500">REGION_04</span>
-                            <span class="text-base font-bold block text-white">Turkey (Istanbul Outlet)</span>
-                        </div>
-                        <span class="text-xs px-2 py-1 bg-rose-500/10 text-rose-400 rounded border border-rose-500/20 font-bold">TRY (₺)</span>
                     </div>
                 </div>
+
+                <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl shadow-2xs">
+                    <div class="flex items-center space-x-2 text-amber-800 font-bold text-xs font-mono uppercase tracking-wider">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M12 21a9 9 0 110-18 9 9 0 010 18zm0-3a3 3 0 100-6 3 3 0 000 6z" />
+                        </svg>
+                        <span>Active AI Agent Tactical Recommendations</span>
+                    </div>
+                    <p class="text-xs text-amber-900 mt-1.5 leading-relaxed">
+                        The partner's global reputation ledger lists a score of <strong>94/100</strong>. AI analysis suggests accepting the cargo insurance adjustments to expedite custom clearings within the Cairo and Dubai distribution pipelines.
+                    </p>
+                    <div class="mt-3 flex gap-2 justify-end">
+                        <button class="bg-white hover:bg-slate-50 border border-amber-300 text-amber-900 text-[11px] font-bold px-3 py-1 rounded-md shadow-3xs transition">Reject Proposal</button>
+                        <button class="bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold px-3 py-1 rounded-md shadow-3xs transition">Authorize Agent to Sign Contract</button>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <footer class="bg-[#1e293b]/70 border border-slate-800 rounded-xl p-5">
-            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 font-mono mb-4">Mock Cross-Border Operations Stream</h3>
-            
-            <div class="space-y-2">
-                <div class="p-3 bg-slate-900/40 rounded-lg flex justify-between items-center text-sm border border-slate-800/60">
-                    <div class="flex items-center space-x-3">
-                        <div class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded">SELL</div>
-                        <div>
-                            <span class="font-semibold block text-slate-200">Al-Mansour Trading Corp</span>
-                            <span class="text-xs text-slate-500">Destination Hub: Egypt</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-bold text-white block">EGP 450,000.00</span>
-                        <span class="text-xs text-slate-500 font-mono">Rate: 1 USD = 47.90 EGP</span>
-                    </div>
-                </div>
-
-                <div class="p-3 bg-slate-900/40 rounded-lg flex justify-between items-center text-sm border border-slate-800/60">
-                    <div class="flex items-center space-x-3">
-                        <div class="px-2 py-1 bg-sky-500/10 text-sky-400 text-xs font-bold rounded">BUY</div>
-                        <div>
-                            <span class="font-semibold block text-slate-200">Global Tech Freight Lines</span>
-                            <span class="text-xs text-slate-500">Destination Hub: USA Logistics</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-bold text-white block">USD $12,400.00</span>
-                        <span class="text-xs text-slate-500 font-mono">Base Base Currency Settlement</span>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </div>
 
 </body>
