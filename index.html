@@ -1,167 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreensACC | Enterprise Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+-- ====================================================================
+-- GREENACC CORE DATABASE ARCHITECTURE
+-- ====================================================================
+create extension if not exists "uuid-ossp";
+create extension if not exists "pgcrypto";
+
+-- Clean teardown for a fresh deployment
+drop table if exists deployment_logs cascade;
+drop table if exists secure_financial_ledgers cascade;
+drop table if exists transactions cascade;
+drop table if exists inventory cascade;
+drop table if exists partners cascade;
+
+-- 1. GLOBAL PARTNERS (CRM Module)
+create table partners (
+    id uuid default uuid_generate_v4() primary key,
+    name text not null,
+    company_name text,
+    email text check (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$'),
+    phone text,
+    region text not null check (region in ('USA', 'Egypt', 'Turkey', 'Dubai', 'Other')),
+    reputation_score int default 100 check (reputation_score >= 0 and reputation_score <= 100),
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 2. GLOBAL INVENTORY (Multi-Hub Stock Control)
+create table inventory (
+    id uuid default uuid_generate_v4() primary key,
+    item_name text not null,
+    sku text unique not null,
+    quantity int default 0 check (quantity >= 0),
+    warehouse_location text not null,
+    region text not null check (region in ('USA', 'Egypt', 'Turkey', 'Dubai', 'Other')),
+    last_updated timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 3. FINANCIAL TRANSACTIONS (Multi-Currency Ledgers)
+create table transactions (
+    id uuid default uuid_generate_v4() primary key,
+    partner_id uuid references partners(id) on delete set null,
+    transaction_type text not null check (transaction_type in ('BUY', 'SELL', 'TRANSFER')),
+    amount numeric(15, 2) not null check (amount >= 0.00),
+    currency text default 'USD' check (currency in ('USD', 'EGP', 'TRY', 'AED')),
+    exchange_rate numeric(10, 4) default 1.0000 check (exchange_rate > 0),
+    status text default 'PENDING' check (status in ('PENDING', 'COMPLETED', 'CANCELLED')),
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 4. SECURE VAULT (Encrypted Symmetrical Records)
+create table secure_financial_ledgers (
+    id uuid default uuid_generate_v4() primary key,
+    partner_id uuid references partners(id) on delete cascade,
+    region text not null check (region in ('USA', 'Egypt', 'Turkey', 'Dubai', 'Other')),
+    encrypted_balance bytea not null, 
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 5. DEPLOYMENT AUDIT LOGS (Tracks GitHub & Render Status)
+create table deployment_logs (
+    id uuid default uuid_generate_v4() primary key,
+    environment text default 'Production',
+    provider text default 'Render',
+    status text not null,
+    commit_shasum text,
+    logged_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- ROW-LEVEL SECURITY (RLS) POLICIES
+alter table partners enable row level security;
+alter table inventory enable row level security;
+alter table transactions enable row level security;
+alter table secure_financial_ledgers enable row level security;
+
+create policy "Regional Isolation - Partners" on partners for all using (auth.jwt() ->> 'user_region' = region);
+create policy "Regional Isolation - Inventory" on inventory for all using (auth.jwt() ->> 'user_region' = region);
+create policy "Regional Isolation - Transactions" on transactions for all using (auth.jwt() ->> 'user_region' = region);
+create policy "Regional Isolation - Ledgers" on secure_financial_ledgers for all using (auth.jwt() ->> 'user_region' = region);
         
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            margin: 0; 
-            background: #f8fafc; 
-            overflow-x: hidden; /* Prevents the 'wild' horizontal scrolling */
-        }
-
-        /* SIDEBAR: Locked and Smooth */
-        #sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            width: 18rem;
-            background: #0B1120;
-            z-index: 1000;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            color: white;
-            box-shadow: 20px 0 50px rgba(0,0,0,0.2);
-        }
-        
-        /* LTR/RTL Logic Fix */
-        .sidebar-hidden { transform: translateX(-100%); left: 0; }
-        [dir="rtl"] #sidebar { right: 0; left: auto; }
-        [dir="rtl"] .sidebar-hidden { transform: translateX(100%); }p 
-        /* TICKER BAR: Stays at the bottom, moves correctly */
-        .ticker-wrap {
-            background: #000;
-            color: #10B981;
-            height: 40px;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            overflow: hidden;
-            z-index: 900;
-            display: flex;
-            align-items: center;
-            border-top: 1px solid #10B981;
-        }
-        
-        .ticker-move {
-            display: flex;
-            white-space: nowrap;
-            animation: tickerFlow 35s linear infinite;
-        }
-
-        @keyframes tickerFlow {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-
-        /* MODAL FIX */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .modal.active { display: flex; }
-    </style>
-</head>
-<body id="mainBody">
-
-    <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 hidden z-[950]"></div>
-
-    <div id="sidebar" class="sidebar-hidden">
-        <div class="p-8 flex flex-col h-full">
-            <div class="flex items-center gap-3 mb-10">
-                <div class="bg-green-500 p-2 rounded-xl text-white text-2xl shadow-lg shadow-green-500/20">🍃</div>
-                <h1 class="font-bold text-2xl italic tracking-tighter">GreensACCهشام حتمي محمد صالح </h1>
-            </div>
-
-            <nav class="space-y-6 flex-grow">
-                <button onclick="openModal('authModal')" class="w-full bg-blue-600 p-4 rounded-2xl text-xs font-bold shadow-xl hover:bg-blue-500 transition-all">Sign In / Register</button>
-                
-                <div class="pt-8 border-t border-slate-800">
-                    <p class="text-[10px] uppercase font-bold text-slate-500 mb-4 tracking-[0.2em]">Global Markets</p>
-                    <select id="marketSelect" onchange="marketTrigger()" class="w-full bg-[#1a2234] border border-slate-700 rounded-2xl p-4 text-sm text-white outline-none cursor-pointer">
-                        <option value="">Choose Country...</option>
-                        <option value="USA">United States</option>
-                        <option value="Egypt">Egypt (مصر)</option>
-                        <option value="Turkey">بالتوفيق يا ايمون ازهري  Turkey</option>
-                        <option value="UAE">UAE (الإمارات)</option>
-                    </select>
-                </div>
-            </nav>
-            
-            <div class="text-[9px] text-slate-600 font-bold tracking-[0.3em] uppercase">Enterprise V5</div>
-        </div>
-    </div>
-
-    <div class="min-h-screen flex flex-col">
-        <header class="bg-white/90 backdrop-blur-md border-b p-5 flex justify-between items-center sticky top-0 z-[800]">
-            <button onclick="toggleSidebar()" class="text-2xl p-2 hover:bg-slate-100 rounded-full transition-all">☰</button>
-            <div id="activeTag" class="text-[10px] font-bold text-blue-600 uppercase tracking-[0.4em]">Universal Base</div>
-            <button class="bg-black text-white px-6 py-2.5 rounded-full text-[10px] font-bold hover:bg-green-600 transition-all shadow-lg">New Entity</button>
-        </header>
-
-        <main class="p-8 max-w-6xl mx-auto w-full mb-20">
-            <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden min-h-[400px]">
-                <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Encrypted Brokerage Registry</span>
-                    <div class="flex gap-4">
-                        <button class="text-blue-600 text-xs font-bold">MODIFY</button>
-                        <button class="text-red-600 text-xs font-bold">DELETE</button>
-                    </div>
-                </div>
-                
-                <div class="p-20 text-center">
-                    <p class="text-slate-300 italic text-sm">Select a market from the sidebar to initialize data handshake.</p>
-                </div>
-            </div>
-        </main>
-
-        <div class="ticker-wrap">
-            <div class="ticker-move">
-                &nbsp;&nbsp;&nbsp; NASDAQ: +0.45% ▲ &nbsp;&nbsp;&nbsp; DOW: -0.12% ▼ &nbsp;&nbsp;&nbsp; GOLD (XAU): $2,345.20 ▲ &nbsp;&nbsp;&nbsp; BRENT CRUDE: $87.40 ▲ &nbsp;&nbsp;&nbsp; USD/EGP: 48.50 ▼ &nbsp;&nbsp;&nbsp; USD/TRY: 32.42 ▲ &nbsp;&nbsp;&nbsp; SUCCESS FEE: 2.0% FIXED &nbsp;&nbsp;&nbsp;
-            </div>
-        </div>
-    </div>
-
-    <div id="authModal" class="modal">
-        <div class="bg-white rounded-[3rem] w-full max-w-md p-10 shadow-2xl">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-bold">Partner Access</h2>
-                <button onclick="closeModal('authModal')" class="text-slate-300 text-3xl">&times;</button>
-            </div>
-            <form class="space-y-4">
-                <input type="email" placeholder="Email Address" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm focus:border-blue-500 outline-none">
-                <input type="password" placeholder="Password" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm focus:border-blue-500 outline-none">
-                <button class="w-full bg-black text-white p-4 rounded-2xl font-bold shadow-2xl">Initialize Login</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const ov = document.getElementById('overlay');
-            sb.classList.toggle('sidebar-hidden');
-            ov.classList.toggle('hidden');
-        }
-
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        function marketTrigger() {
-            const country = document.getElementById('marketSelect').value;
-            if(!country) return;
-            
-            // Apply RTL for Arabic countries
-            const rtlList = ["Egypt", "UAE"];
-            document.getElementById('mainBody').dir = rtlList.includes(country) ? "rtl" : "ltr";
-            
-            // Update Active Status
-            document.getElementById('activeTag').innerText = `${country} Market Active`;
-            
-            toggleSidebar(); // Automatically slide back
-        }
-    </script>
-</body>
-</html>
