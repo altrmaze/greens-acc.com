@@ -1,78 +1,173 @@
--- ====================================================================
--- GREENACC CORE DATABASE ARCHITECTURE
--- ====================================================================
-create extension if not exists "uuid-ossp";
-create extension if not exists "pgcrypto";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenACC — Trading Command Center Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0f172a] text-slate-100 font-sans min-height-screen">
 
--- Clean teardown for a fresh deployment
-drop table if exists deployment_logs cascade;
-drop table if exists secure_financial_ledgers cascade;
-drop table if exists transactions cascade;
-drop table if exists inventory cascade;
-drop table if exists partners cascade;
-
--- 1. GLOBAL PARTNERS (CRM Module)
-create table partners (
-    id uuid default uuid_generate_v4() primary key,
-    name text not null,
-    company_name text,
-    email text check (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$'),
-    phone text,
-    region text not null check (region in ('USA', 'Egypt', 'Turkey', 'Dubai', 'Other')),
-    reputation_score int default 100 check (reputation_score >= 0 and reputation_score <= 100),
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- 2. GLOBAL INVENTORY (Multi-Hub Stock Control)
-create table inventory (
-    id uuid default uuid_generate_v4() primary key,
-    item_name text not null,
-    sku text unique not null,
-    quantity int default 0 check (quantity >= 0),
-    warehouse_location text not null,
-    region text not null check (region in ('USA', 'Egypt', 'Turkey', 'Dubai', 'Other')),
-    last_updated timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- 3. FINANCIAL TRANSACTIONS (Multi-Currency Ledgers)
-create table transactions (
-    id uuid default uuid_generate_v4() primary key,
-    partner_id uuid references partners(id) on delete set null,
-    transaction_type text not null check (transaction_type in ('BUY', 'SELL', 'TRANSFER')),
-    amount numeric(15, 2) not null check (amount >= 0.00),
-    currency text default 'USD' check (currency in ('USD', 'EGP', 'TRY', 'AED')),
-    exchange_rate numeric(10, 4) default 1.0000 check (exchange_rate > 0),
-    status text default 'PENDING' check (status in ('PENDING', 'COMPLETED', 'CANCELLED')),
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- 4. SECURE VAULT (Encrypted Symmetrical Records)
-create table secure_financial_ledgers (
-    id uuid default uuid_generate_v4() primary key,
-    partner_id uuid references partners(id) on delete cascade,
-    region text not null check (region in ('USA', 'Egypt', 'Turkey', 'Dubai', 'Other')),
-    encrypted_balance bytea not null, 
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- 5. DEPLOYMENT AUDIT LOGS (Tracks GitHub & Render Status)
-create table deployment_logs (
-    id uuid default uuid_generate_v4() primary key,
-    environment text default 'Production',
-    provider text default 'Render',
-    status text not null,
-    commit_shasum text,
-    logged_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- ROW-LEVEL SECURITY (RLS) POLICIES
-alter table partners enable row level security;
-alter table inventory enable row level security;
-alter table transactions enable row level security;
-alter table secure_financial_ledgers enable row level security;
-
-create policy "Regional Isolation - Partners" on partners for all using (auth.jwt() ->> 'user_region' = region);
-create policy "Regional Isolation - Inventory" on inventory for all using (auth.jwt() ->> 'user_region' = region);
-create policy "Regional Isolation - Transactions" on transactions for all using (auth.jwt() ->> 'user_region' = region);
-create policy "Regional Isolation - Ledgers" on secure_financial_ledgers for all using (auth.jwt() ->> 'user_region' = region);
+    <nav class="border-b border-slate-800 bg-[#1e293b]/50 backdrop-blur px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div class="h-9 w-9 bg-gradient-to-tr from-sky-400 to-emerald-400 rounded-lg flex items-center justify-center font-bold text-slate-900 text-lg">
+                G
+            </div>
+            <div>
+                <span class="text-xl font-black tracking-tight bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent">GreenACC</span>
+                <span class="text-xs block text-slate-500 font-mono">v1.0.0 // PRODUCTION_BLUEPRINT</span>
+            </div>
+        </div>
         
+        <div class="flex items-center space-x-3 text-xs font-mono">
+            <span class="px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400">repo: github/greenacc</span>
+            <span class="px-2.5 py-1 rounded-full bg-emerald-950 border border-emerald-500/30 text-emerald-400 flex items-center">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse mr-1.5"></span> hosted: render_live
+            </span>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-6 space-y-6">
+        
+        <header class="bg-gradient-to-r from-slate-900 via-[#1e293b] to-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-extrabold text-white">Global Trading Architecture Overview</h1>
+                <p class="text-slate-400 text-sm mt-1">Visual grid distribution mapping CRM, Multi-Currency Ledgers, and Warehouse Stocks.</p>
+            </div>
+            <div class="flex gap-2">
+                <button class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-slate-700 transition">Domain DNS Docs</button>
+                <button class="px-4 py-2 bg-sky-500 hover:bg-sky-400 text-slate-900 text-xs font-bold rounded-lg transition">Supabase API Console</button>
+            </div>
+        </header>
+
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-[#1e293b] p-4 rounded-xl border border-slate-800 relative group cursor-pointer hover:border-sky-500/50 transition">
+                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Total Volume</span>
+                <span class="text-2xl font-bold block mt-1 text-sky-400">$2,485,900.00</span>
+                <span class="text-[10px] text-slate-500 block mt-2 font-mono">SYS_VALUE_AGGREGATED</span>
+            </div>
+            
+            <div class="bg-[#1e293b] p-4 rounded-xl border border-slate-800 relative group cursor-pointer hover:border-emerald-500/50 transition">
+                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Active Partners</span>
+                <span class="text-2xl font-bold block mt-1 text-emerald-400">142 Nodes</span>
+                <span class="text-[10px] text-slate-500 block mt-2 font-mono">CRM_REGISTRY_COUNT</span>
+            </div>
+
+            <div class="bg-[#1e293b] p-4 rounded-xl border border-slate-800 relative group cursor-pointer hover:border-amber-500/50 transition">
+                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Fleet Mechanics</span>
+                <span class="text-2xl font-bold block mt-1 text-amber-400">38 Drivers</span>
+                <span class="text-[10px] text-slate-500 block mt-2 font-mono">LOGISTICS_TRUCKING_RECRUIT</span>
+            </div>
+
+            <div class="bg-[#1e293b] p-4 rounded-xl border border-slate-800 relative group cursor-pointer hover:border-purple-500/50 transition">
+                <span class="text-xs text-slate-400 font-medium block uppercase tracking-wider">Crypto Safety</span>
+                <span class="text-2xl font-bold block mt-1 text-purple-400">AES-256 Bit</span>
+                <span class="text-[10px] text-slate-500 block mt-2 font-mono">PG_CRYPTO_HARDENED</span>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="bg-[#1e293b]/70 border border-slate-800 rounded-xl p-5 space-y-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">Command Controls</h3>
+                
+                <button class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left rounded-lg text-sm font-medium flex justify-between items-center group transition">
+                    <span>➕ Register Global Supplier</span>
+                    <span class="text-xs bg-slate-900 px-2 py-0.5 rounded text-slate-400 group-hover:text-sky-400">CRM</span>
+                </button>
+
+                <button class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left rounded-lg text-sm font-medium flex justify-between items-center group transition">
+                    <span>📦 Process Warehouse Stock Entry</span>
+                    <span class="text-xs bg-slate-900 px-2 py-0.5 rounded text-slate-400 group-hover:text-emerald-400">INV</span>
+                </button>
+
+                <button class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left rounded-lg text-sm font-medium flex justify-between items-center group transition">
+                    <span>🧾 Generate Multi-Currency Bill</span>
+                    <span class="text-xs bg-slate-900 px-2 py-0.5 rounded text-slate-400 group-hover:text-amber-400">FIN</span>
+                </button>
+
+                <button class="w-full py-3 px-4 bg-gradient-to-r from-purple-900/40 to-slate-800 hover:from-purple-900/60 border border-purple-500/30 text-left rounded-lg text-sm font-medium flex justify-between items-center group transition">
+                    <span>🔒 Fetch Encrypted Ledger Log</span>
+                    <span class="text-xs bg-purple-950 text-purple-300 px-2 py-0.5 rounded border border-purple-500/20">VAULT</span>
+                </button>
+            </div>
+
+            <div class="lg:col-span-2 bg-[#1e293b]/70 border border-slate-800 rounded-xl p-5">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 font-mono">Row-Level Isolated Regional Nodes</h3>
+                    <span class="text-[11px] bg-sky-950 text-sky-400 px-2 py-0.5 rounded border border-sky-800 font-mono">RLS_POLICIES_ENABLED</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-mono text-slate-500">REGION_01</span>
+                            <span class="text-base font-bold block text-white">United States (USA)</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 bg-sky-500/10 text-sky-400 rounded border border-sky-500/20 font-bold">USD ($)</span>
+                    </div>
+
+                    <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-mono text-slate-500">REGION_02</span>
+                            <span class="text-base font-bold block text-white">Egypt (Cairo Hub)</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded border border-emerald-500/20 font-bold">EGP (ج.م)</span>
+                    </div>
+
+                    <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-mono text-slate-500">REGION_03</span>
+                            <span class="text-base font-bold block text-white">United Arab Emirates (Dubai)</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 bg-amber-500/10 text-amber-400 rounded border border-amber-500/20 font-bold">AED (د.إ)</span>
+                    </div>
+
+                    <div class="p-4 bg-slate-900/60 border border-slate-800 rounded-lg flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-mono text-slate-500">REGION_04</span>
+                            <span class="text-base font-bold block text-white">Turkey (Istanbul Outlet)</span>
+                        </div>
+                        <span class="text-xs px-2 py-1 bg-rose-500/10 text-rose-400 rounded border border-rose-500/20 font-bold">TRY (₺)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="bg-[#1e293b]/70 border border-slate-800 rounded-xl p-5">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 font-mono mb-4">Mock Cross-Border Operations Stream</h3>
+            
+            <div class="space-y-2">
+                <div class="p-3 bg-slate-900/40 rounded-lg flex justify-between items-center text-sm border border-slate-800/60">
+                    <div class="flex items-center space-x-3">
+                        <div class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded">SELL</div>
+                        <div>
+                            <span class="font-semibold block text-slate-200">Al-Mansour Trading Corp</span>
+                            <span class="text-xs text-slate-500">Destination Hub: Egypt</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold text-white block">EGP 450,000.00</span>
+                        <span class="text-xs text-slate-500 font-mono">Rate: 1 USD = 47.90 EGP</span>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-slate-900/40 rounded-lg flex justify-between items-center text-sm border border-slate-800/60">
+                    <div class="flex items-center space-x-3">
+                        <div class="px-2 py-1 bg-sky-500/10 text-sky-400 text-xs font-bold rounded">BUY</div>
+                        <div>
+                            <span class="font-semibold block text-slate-200">Global Tech Freight Lines</span>
+                            <span class="text-xs text-slate-500">Destination Hub: USA Logistics</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold text-white block">USD $12,400.00</span>
+                        <span class="text-xs text-slate-500 font-mono">Base Base Currency Settlement</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+</body>
+</html>
