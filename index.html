@@ -1,1070 +1,131 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Green Bananas | Global Compliance & Trading Portal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green ACC | Global Accounting & Trading Platform</title>
+    <style>
+        :root {
+            --green: #1c6b2a;
+            --gold: #d4af37;
+            --black: #111827;
+            --gray: #f3f4f6;
+            --blue: #2563eb;
+            --white: #ffffff;
+            --danger: #b91c1c;
+        }
 
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #ffffff;
-      --soft: #f8fafc;
-      --text: #1e293b;
-      --muted: #64748b;
-      --green: #1f7a3f;
-      --gold: #d4af37;
-      --black: #111827;
-      --blue: #2563eb;
-      --red: #b91c1c;
-      --border: #e2e8f0;
-      --success: #16a34a;
-      --radius: 18px;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
 
-    * { box-sizing: border-box; }
+        /* Header & Branding */
+        header { background: linear-gradient(135deg, #0d3d19, var(--green)); color: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--gold); }
+        .trademark-bar { background: var(--black); color: var(--gold); text-align: center; padding: 5px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(212,175,55,.25), transparent 30%),
-        linear-gradient(135deg, #07130b, #0f172a 55%, #111827);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 25px;
-    }
+        /* Portal Container */
+        .portal-wrapper { max-width: 950px; margin: 40px auto; padding: 0 20px; }
 
-    .app {
-      max-width: 1150px;
-      margin: auto;
-    }
+        /* Localization Engine */
+        .localization-bar { background: var(--black); color: var(--white); padding: 15px; border-radius: 8px 8px 0 0; display: flex; gap: 20px; justify-content: center; }
+        .localization-bar select { padding: 5px; border-radius: 4px; background: #333; color: white; border: none; }
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-      margin-bottom: 25px;
-      color: white;
-    }
+        /* Main UI */
+        .card { background: var(--white); padding: 40px; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        /* Gated Sections */
+        .gated-deal-flow { margin-top: 30px; position: relative; padding: 20px; border: 2px dashed #ccc; border-radius: 8px; }
+        .blur-overlay { filter: blur(5px); pointer-events: none; }
+        .paywall { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: 1px;
-    }
-
-    .logo {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), #fff2a8, var(--green));
-      display: grid;
-      place-items: center;
-      color: #111;
-      font-weight: 900;
-      box-shadow: 0 10px 25px rgba(0,0,0,.25);
-    }
-
-    .language-select {
-      padding: 12px 15px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.25);
-      background: rgba(255,255,255,.1);
-      color: white;
-      font-weight: 700;
-    }
-
-    .language-select option { color: #111; }
-
-    .hero, .card {
-      background: rgba(255,255,255,.96);
-      border: 1px solid rgba(255,255,255,.4);
-      border-radius: var(--radius);
-      box-shadow: 0 18px 45px rgba(0,0,0,.2);
-    }
-
-    .hero {
-      padding: 45px;
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    h1 {
-      margin: 0 0 10px;
-      font-size: clamp(2rem, 5vw, 4rem);
-      color: var(--black);
-    }
-
-    h2 { color: var(--black); }
-
-    .gold { color: var(--gold); }
-
-    .subtitle {
-      color: var(--muted);
-      max-width: 760px;
-      margin: 0 auto 30px;
-      font-size: 1.1rem;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .track {
-      padding: 28px;
-      border-radius: 16px;
-      border: 2px solid var(--border);
-      background: var(--soft);
-      cursor: pointer;
-      transition: .2s;
-      text-align: left;
-    }
-
-    .track:hover {
-      transform: translateY(-4px);
-      border-color: var(--gold);
-      background: white;
-    }
-
-    .track h3 { margin-top: 0; }
-
-    .card {
-      display: none;
-      padding: 35px;
-      margin-bottom: 25px;
-    }
-
-    .card.active { display: block; }
-
-    .notice {
-      background: #fff7ed;
-      border-left: 5px solid var(--gold);
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-
-    .danger {
-      background: #fef2f2;
-      border-left: 5px solid var(--red);
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-
-    .success {
-      background: #f0fdf4;
-      border-left: 5px solid var(--success);
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 7px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 13px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      font-size: 1rem;
-      background: #fff;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--gold);
-      box-shadow: 0 0 0 4px rgba(212,175,55,.18);
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .full { grid-column: 1 / -1; }
-
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 25px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border: none;
-      padding: 14px 22px;
-      border-radius: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: .2s;
-    }
-
-    .primary {
-      background: linear-gradient(135deg, var(--black), #243044);
-      color: white;
-    }
-
-    .primary:hover { transform: translateY(-2px); }
-
-    .secondary {
-      background: white;
-      border: 1px solid var(--border);
-      color: var(--black);
-    }
-
-    .green {
-      background: var(--green);
-      color: white;
-    }
-
-    button:disabled {
-      background: #cbd5e1;
-      color: #94a3b8;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .steps {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 30px;
-      gap: 10px;
-    }
-
-    .step-dot {
-      flex: 1;
-      padding: 12px;
-      border-radius: 999px;
-      background: #e2e8f0;
-      text-align: center;
-      font-weight: 800;
-      color: #64748b;
-    }
-
-    .step-dot.active {
-      background: linear-gradient(135deg, var(--green), var(--gold));
-      color: white;
-    }
-
-    .panel { display: none; }
-    .panel.active { display: block; }
-
-    .market-tabs {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin: 20px 0;
-    }
-
-    .market-btn {
-      background: var(--soft);
-      border: 1px solid var(--border);
-      color: var(--black);
-    }
-
-    .market-btn.active {
-      background: var(--black);
-      color: var(--gold);
-      border-color: var(--gold);
-    }
-
-    .market-box {
-      background: var(--soft);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-    }
-
-    .checkbox {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      background: var(--soft);
-      padding: 18px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      margin-top: 20px;
-    }
-
-    .checkbox input {
-      width: 22px;
-      height: 22px;
-    }
-
-    .summary-box {
-      white-space: pre-wrap;
-      background: #020617;
-      color: #e5e7eb;
-      border-radius: 14px;
-      padding: 20px;
-      overflow-x: auto;
-    }
-
-    @media (max-width: 750px) {
-      body { padding: 15px; }
-      .hero, .card { padding: 24px; }
-      .grid, .form-grid, .market-tabs { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column; align-items: stretch; }
-    }
-  </style>
+        /* Buttons & Inputs */
+        .btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-green { background: var(--green); color: white; }
+        .btn-gold { background: var(--gold); color: black; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+        
+        .hidden { display: none; }
+    </style>
 </head>
-
 <body>
-  <div class="app">
 
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">GB</div>
-        <div>
-          <div>GREEN BANANAS</div>
-          <small>www.greenbananas.com</small>
-        </div>
-      </div>
+<div class="trademark-bar">Green ACC™ Global Accounting & Trading Operations | All Rights Reserved 2026</div>
+<header>
+    <h1>Green ACC</h1>
+    <p>Precision Logistics • Financial Compliance • Global Trading</p>
+</header>
 
-      <select id="languageSelect" class="language-select">
-        <option value="en">English</option>
-        <option value="ar">العربية</option>
-        <option value="fr">Français</option>
-      </select>
+<div class="portal-wrapper">
+    <div class="localization-bar">
+        <select id="country" onchange="updateLocale()">
+            <option value="US">USA (USD)</option>
+            <option value="AE">UAE (AED)</option>
+            <option value="MY">Malaysia (MYR)</option>
+        </select>
+        <select id="lang">
+            <option>English</option>
+            <option>Arabic</option>
+        </select>
+        <span id="tzDisplay">Timezone: UTC</span>
     </div>
 
-    <section id="dashboard" class="hero">
-      <h1 data-i18n="mainTitle">Global Compliance & <span class="gold">Trading Portal</span></h1>
-      <p class="subtitle" data-i18n="mainSubtitle">
-        Select your registration type. This portal helps organize KYC, AML, trade-market, and corporate onboarding information.
-      </p>
-
-      <div class="grid">
-        <div class="track" onclick="showTrack('individual')">
-          <h3 data-i18n="individualTitle">Individual Registration</h3>
-          <p data-i18n="individualText">For brokers, private traders, agents, or independent users.</p>
-        </div>
-
-        <div class="track" onclick="showTrack('corporate')">
-          <h3 data-i18n="corporateTitle">Corporate / Enterprise</h3>
-          <p data-i18n="corporateText">For companies, LLCs, suppliers, buyers, and international trading entities.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="individualTrack" class="card">
-      <h2 data-i18n="individualHeader">Individual Compliance Registration</h2>
-
-      <div class="notice">
-        <strong data-i18n="legalNoteTitle">Important notice:</strong>
-        <span data-i18n="legalNote">
-          This form is for internal onboarding support only. It does not replace legal, banking, sanctions, customs, or licensed compliance review.
-        </span>
-      </div>
-
-      <form id="individualForm">
-        <div class="form-grid">
-          <div>
-            <label data-i18n="fullName">Legal Full Name</label>
-            <input id="indName" required placeholder="John Doe" />
-          </div>
-
-          <div>
-            <label data-i18n="email">Email Address</label>
-            <input id="indEmail" type="email" required placeholder="john@example.com" />
-          </div>
-
-          <div>
-            <label data-i18n="country">Country</label>
-            <input id="indCountry" required placeholder="United States" />
-          </div>
-
-          <div>
-            <label data-i18n="role">Role</label>
-            <select id="indRole" required>
-              <option value="">Select...</option>
-              <option>Broker</option>
-              <option>Buyer</option>
-              <option>Seller</option>
-              <option>Agent</option>
-              <option>Consultant</option>
+    <div class="card" id="mainCard">
+        <div id="setupView">
+            <h2>Step 1: Choose Your Operational Sector</h2>
+            <select id="sectorSelect" onchange="loadSectorPolicy()">
+                <option value="AGRI">Agriculture & Commodity Trading</option>
+                <option value="LOGISTICS">Global Supply Chain & Logistics</option>
             </select>
-          </div>
+            
+            <div id="policyBox" class="policy-scroll-window" style="height: 150px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+                </div>
+
+            <button class="btn btn-green" onclick="unlockDeals()">Accept & Continue</button>
         </div>
 
-        <h2 data-i18n="tradeMarket">Trade Market</h2>
-
-        <div class="market-tabs">
-          <button type="button" class="market-btn active" onclick="selectMarket('general', this)" data-i18n="generalTrading">General Trading</button>
-          <button type="button" class="market-btn" onclick="selectMarket('energy', this)" data-i18n="energy">Energy</button>
-          <button type="button" class="market-btn" onclick="selectMarket('realestate', this)" data-i18n="realEstate">Real Estate</button>
-          <button type="button" class="market-btn" onclick="selectMarket('cars', this)" data-i18n="cars">Cars</button>
+        <div id="dealView" class="gated-deal-flow hidden">
+            <div id="dealContent" class="blur-overlay">
+                <h3>Live Market Deals</h3>
+                <p>Deal ID: GACC-001 | Wheat | 40,000 MT | Status: Available</p>
+                <p>Deal ID: GACC-002 | Machinery | 2 Units | Status: Available</p>
+            </div>
+            
+            <div id="paywall" class="paywall">
+                <h3>Access Gated Content</h3>
+                <p>Requires $20 Compliance Clearance Fee.</p>
+                <button class="btn btn-gold" onclick="processPayment()">Pay $20 & Unlock Deals</button>
+            </div>
         </div>
-
-        <div id="marketInfo" class="market-box"></div>
-
-        <div class="danger">
-          <strong data-i18n="restrictedTitle">Restricted activity warning:</strong>
-          <p data-i18n="restrictedText">
-            Users must not use this platform for illegal goods, sanctioned parties, false documents, money laundering, wildlife trafficking, dark-web transactions, or deceptive trade.
-          </p>
-        </div>
-
-        <div class="checkbox">
-          <input type="checkbox" id="indAgree" />
-          <label for="indAgree" data-i18n="agreeText">
-            I confirm that the information provided is accurate and that I agree to compliance review before any transaction.
-          </label>
-        </div>
-
-        <div class="buttons">
-          <button type="button" class="secondary" onclick="backHome()" data-i18n="back">Back</button>
-          <button id="indSubmit" type="submit" class="primary" disabled data-i18n="submit">Submit Registration</button>
-        </div>
-      </form>
-    </section>
-
-    <section id="corporateTrack" class="card">
-      <div class="steps">
-        <div id="dot1" class="step-dot active">1 Company</div>
-        <div id="dot2" class="step-dot">2 Representative</div>
-        <div id="dot3" class="step-dot">3 Review</div>
-      </div>
-
-      <form id="corporateForm">
-
-        <div id="step1" class="panel active">
-          <h2 data-i18n="companyProfile">Company Profile</h2>
-
-          <div class="form-grid">
-            <div class="full">
-              <label data-i18n="companyName">Registered Company Name</label>
-              <input id="companyName" required placeholder="Green Bananas LLC" />
-            </div>
-
-            <div>
-              <label data-i18n="regNumber">Registration / Tax ID</label>
-              <input id="regNumber" required placeholder="EIN / License Number" />
-            </div>
-
-            <div>
-              <label data-i18n="jurisdiction">Country of Incorporation</label>
-              <select id="jurisdiction" required>
-                <option value="">Select...</option>
-                <option>United States</option>
-                <option>United Arab Emirates</option>
-                <option>Egypt</option>
-                <option>Turkey</option>
-                <option>United Kingdom</option>
-                <option>Other</option>
-              </select>
-            </div>
-
-            <div class="full">
-              <label data-i18n="address">Corporate Address</label>
-              <textarea id="corpAddress" rows="3" required></textarea>
-            </div>
-          </div>
-
-          <div class="buttons">
-            <button type="button" class="secondary" onclick="backHome()" data-i18n="back">Back</button>
-            <button type="button" class="primary" onclick="nextStep(2)" data-i18n="continue">Continue</button>
-          </div>
-        </div>
-
-        <div id="step2" class="panel">
-          <h2 data-i18n="repInfo">Authorized Representative</h2>
-
-          <div class="form-grid">
-            <div>
-              <label data-i18n="firstName">First Name</label>
-              <input id="repFirst" required />
-            </div>
-
-            <div>
-              <label data-i18n="lastName">Last Name</label>
-              <input id="repLast" required />
-            </div>
-
-            <div>
-              <label data-i18n="email">Email Address</label>
-              <input id="repEmail" type="email" required />
-            </div>
-
-            <div>
-              <label data-i18n="position">Position / Title</label>
-              <input id="repPosition" required placeholder="Director / Manager" />
-            </div>
-          </div>
-
-          <div class="buttons">
-            <button type="button" class="secondary" onclick="nextStep(1)" data-i18n="back">Back</button>
-            <button type="button" class="primary" onclick="nextStep(3)" data-i18n="continue">Continue</button<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Green Bananas | Global Compliance & Trading Portal</title>
-
-  <style>
-    :root {
-      --bg: #0f172a;
-      --card: #ffffff;
-      --soft: #f8fafc;
-      --text: #1e293b;
-      --muted: #64748b;
-      --green: #1f7a3f;
-      --gold: #d4af37;
-      --black: #111827;
-      --blue: #2563eb;
-      --red: #b91c1c;
-      --border: #e2e8f0;
-      --success: #16a34a;
-      --radius: 18px;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(212,175,55,.25), transparent 30%),
-        linear-gradient(135deg, #07130b, #0f172a 55%, #111827);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 25px;
-    }
-
-    .app {
-      max-width: 1150px;
-      margin: auto;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-      margin-bottom: 25px;
-      color: white;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: 1px;
-    }
-
-    .logo {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), #fff2a8, var(--green));
-      display: grid;
-      place-items: center;
-      color: #111;
-      font-weight: 900;
-      box-shadow: 0 10px 25px rgba(0,0,0,.25);
-    }
-
-    .language-select {
-      padding: 12px 15px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.25);
-      background: rgba(255,255,255,.1);
-      color: white;
-      font-weight: 700;
-    }
-
-    .language-select option { color: #111; }
-
-    .hero, .card {
-      background: rgba(255,255,255,.96);
-      border: 1px solid rgba(255,255,255,.4);
-      border-radius: var(--radius);
-      box-shadow: 0 18px 45px rgba(0,0,0,.2);
-    }
-
-    .hero {
-      padding: 45px;
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    h1 {
-      margin: 0 0 10px;
-      font-size: clamp(2rem, 5vw, 4rem);
-      color: var(--black);
-    }
-
-    h2 { color: var(--black); }
-
-    .gold { color: var(--gold); }
-
-    .subtitle {
-      color: var(--muted);
-      max-width: 760px;
-      margin: 0 auto 30px;
-      font-size: 1.1rem;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .track {
-      padding: 28px;
-      border-radius: 16px;
-      border: 2px solid var(--border);
-      background: var(--soft);
-      cursor: pointer;
-      transition: .2s;
-      text-align: left;
-    }
-
-    .track:hover {
-      transform: translateY(-4px);
-      border-color: var(--gold);
-      background: white;
-    }
-
-    .track h3 { margin-top: 0; }
-
-    .card {
-      display: none;
-      padding: 35px;
-      margin-bottom: 25px;
-    }
-
-    .card.active { display: block; }
-
-    .notice {
-      background: #fff7ed;
-      border-left: 5px solid var(--gold);
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-
-    .danger {
-      background: #fef2f2;
-      border-left: 5px solid var(--red);
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-
-    .success {
-      background: #f0fdf4;
-      border-left: 5px solid var(--success);
-      padding: 18px;
-      border-radius: 12px;
-      margin: 20px 0;
-    }
-
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 7px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 13px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      font-size: 1rem;
-      background: #fff;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--gold);
-      box-shadow: 0 0 0 4px rgba(212,175,55,.18);
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
-
-    .full { grid-column: 1 / -1; }
-
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 25px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border: none;
-      padding: 14px 22px;
-      border-radius: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: .2s;
-    }
-
-    .primary {
-      background: linear-gradient(135deg, var(--black), #243044);
-      color: white;
-    }
-
-    .primary:hover { transform: translateY(-2px); }
-
-    .secondary {
-      background: white;
-      border: 1px solid var(--border);
-      color: var(--black);
-    }
-
-    .green {
-      background: var(--green);
-      color: white;
-    }
-
-    button:disabled {
-      background: #cbd5e1;
-      color: #94a3b8;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .steps {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 30px;
-      gap: 10px;
-    }
-
-    .step-dot {
-      flex: 1;
-      padding: 12px;
-      border-radius: 999px;
-      background: #e2e8f0;
-      text-align: center;
-      font-weight: 800;
-      color: #64748b;
-    }
-
-    .step-dot.active {
-      background: linear-gradient(135deg, var(--green), var(--gold));
-      color: white;
-    }
-
-    .panel { display: none; }
-    .panel.active { display: block; }
-
-    .market-tabs {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin: 20px 0;
-    }
-
-    .market-btn {
-      background: var(--soft);
-      border: 1px solid var(--border);
-      color: var(--black);
-    }
-
-    .market-btn.active {
-      background: var(--black);
-      color: var(--gold);
-      border-color: var(--gold);
-    }
-
-    .market-box {
-      background: var(--soft);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-    }
-
-    .checkbox {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      background: var(--soft);
-      padding: 18px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      margin-top: 20px;
-    }
-
-    .checkbox input {
-      width: 22px;
-      height: 22px;
-    }
-
-    .summary-box {
-      white-space: pre-wrap;
-      background: #020617;
-      color: #e5e7eb;
-      border-radius: 14px;
-      padding: 20px;
-      overflow-x: auto;
-    }
-
-    @media (max-width: 750px) {
-      body { padding: 15px; }
-      .hero, .card { padding: 24px; }
-      .grid, .form-grid, .market-tabs { grid-template-columns: 1fr; }
-      .topbar { flex-direction: column; align-items: stretch; }
-    }
-  </style>
-</head>
-
-<body>
-  <div class="app">
-
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">GB</div>
-        <div>
-          <div>GREEN BANANAS</div>
-          <small>www.greenbananas.com</small>
-        </div>
-      </div>
-
-      <select id="languageSelect" class="language-select">
-        <option value="en">English</option>
-        <option value="ar">العربية</option>
-        <option value="fr">Français</option>
-      </select>
     </div>
+</div>
 
-    <section id="dashboard" class="hero">
-      <h1 data-i18n="mainTitle">Global Compliance & <span class="gold">Trading Portal</span></h1>
-      <p class="subtitle" data-i18n="mainSubtitle">
-        Select your registration type. This portal helps organize KYC, AML, trade-market, and corporate onboarding information.
-      </p>
+<script>
+    function loadSectorPolicy() {
+        const sector = document.getElementById('sectorSelect').value;
+        const policyBox = document.getElementById('policyBox');
+        if(sector === 'AGRI') {
+            policyBox.innerHTML = "<strong>Agriculture Policy:</strong> You agree to abide by UN FAO standards and phytosanitary regulations. All commodities must be certified non-GMO.";
+        } else {
+            policyBox.innerHTML = "<strong>Logistics Policy:</strong> You agree to international freight tracking standards and transparency in shipping manifests.";
+        }
+    }
 
-      <div class="grid">
-        <div class="track" onclick="showTrack('individual')">
-          <h3 data-i18n="individualTitle">Individual Registration</h3>
-          <p data-i18n="individualText">For brokers, private traders, agents, or independent users.</p>
-        </div>
+    function unlockDeals() {
+        document.getElementById('dealView').classList.remove('hidden');
+    }
 
-        <div class="track" onclick="showTrack('corporate')">
-          <h3 data-i18n="corporateTitle">Corporate / Enterprise</h3>
-          <p data-i18n="corporateText">For companies, LLCs, suppliers, buyers, and international trading entities.</p>
-        </div>
-      </div>
-    </section>
+    function processPayment() {
+        alert("Redirecting to Green ACC Payment Gateway...");
+        document.getElementById('dealContent').classList.remove('blur-overlay');
+        document.getElementById('paywall').classList.add('hidden');
+    }
 
-    <section id="individualTrack" class="card">
-      <h2 data-i18n="individualHeader">Individual Compliance Registration</h2>
+    function updateLocale() {
+        const country = document.getElementById('country').value;
+        document.getElementById('tzDisplay').innerText = "Timezone: " + (country === 'US' ? "EST" : country === 'AE' ? "GST" : "MYT");
+    }
 
-      <div class="notice">
-        <strong data-i18n="legalNoteTitle">Important notice:</strong>
-        <span data-i18n="legalNote">
-          This form is for internal onboarding support only. It does not replace legal, banking, sanctions, customs, or licensed compliance review.
-        </span>
-      </div>
+    // Initialize
+    loadSectorPolicy();
+</script>
 
-      <form id="individualForm">
-        <div class="form-grid">
-          <div>
-            <label data-i18n="fullName">Legal Full Name</label>
-            <input id="indName" required placeholder="John Doe" />
-          </div>
-
-          <div>
-            <label data-i18n="email">Email Address</label>
-            <input id="indEmail" type="email" required placeholder="john@example.com" />
-          </div>
-
-          <div>
-            <label data-i18n="country">Country</label>
-            <input id="indCountry" required placeholder="United States" />
-          </div>
-
-          <div>
-            <label data-i18n="role">Role</label>
-            <select id="indRole" required>
-              <option value="">Select...</option>
-              <option>Broker</option>
-              <option>Buyer</option>
-              <option>Seller</option>
-              <option>Agent</option>
-              <option>Consultant</option>
-            </select>
-          </div>
-        </div>
-
-        <h2 data-i18n="tradeMarket">Trade Market</h2>
-
-        <div class="market-tabs">
-          <button type="button" class="market-btn active" onclick="selectMarket('general', this)" data-i18n="generalTrading">General Trading</button>
-          <button type="button" class="market-btn" onclick="selectMarket('energy', this)" data-i18n="energy">Energy</button>
-          <button type="button" class="market-btn" onclick="selectMarket('realestate', this)" data-i18n="realEstate">Real Estate</button>
-          <button type="button" class="market-btn" onclick="selectMarket('cars', this)" data-i18n="cars">Cars</button>
-        </div>
-
-        <div id="marketInfo" class="market-box"></div>
-
-        <div class="danger">
-          <strong data-i18n="restrictedTitle">Restricted activity warning:</strong>
-          <p data-i18n="restrictedText">
-            Users must not use this platform for illegal goods, sanctioned parties, false documents, money laundering, wildlife trafficking, dark-web transactions, or deceptive trade.
-          </p>
-        </div>
-
-        <div class="checkbox">
-          <input type="checkbox" id="indAgree" />
-          <label for="indAgree" data-i18n="agreeText">
-            I confirm that the information provided is accurate and that I agree to compliance review before any transaction.
-          </label>
-        </div>
-
-        <div class="buttons">
-          <button type="button" class="secondary" onclick="backHome()" data-i18n="back">Back</button>
-          <button id="indSubmit" type="submit" class="primary" disabled data-i18n="submit">Submit Registration</button>
-        </div>
-      </form>
-    </section>
-
-    <section id="corporateTrack" class="card">
-      <div class="steps">
-        <div id="dot1" class="step-dot active">1 Company</div>
-        <div id="dot2" class="step-dot">2 Representative</div>
-        <div id="dot3" class="step-dot">3 Review</div>
-      </div>
-
-      <form id="corporateForm">
-
-        <div id="step1" class="panel active">
-          <h2 data-i18n="companyProfile">Company Profile</h2>
-
-          <div class="form-grid">
-            <div class="full">
-              <label data-i18n="companyName">Registered Company Name</label>
-              <input id="companyName" required placeholder="Green Bananas LLC" />
-            </div>
-
-            <div>
-              <label data-i18n="regNumber">Registration / Tax ID</label>
-              <input id="regNumber" required placeholder="EIN / License Number" />
-            </div>
-
-            <div>
-              <label data-i18n="jurisdiction">Country of Incorporation</label>
-              <select id="jurisdiction" required>
-                <option value="">Select...</option>
-                <option>United States</option>
-                <option>United Arab Emirates</option>
-                <option>Egypt</option>
-                <option>Turkey</option>
-                <option>United Kingdom</option>
-                <option>Other</option>
-              </select>
-            </div>
-
-            <div class="full">
-              <label data-i18n="address">Corporate Address</label>
-              <textarea id="corpAddress" rows="3" required></textarea>
-            </div>
-          </div>
-
-          <div class="buttons">
-            <button type="button" class="secondary" onclick="backHome()" data-i18n="back">Back</button>
-            <button type="button" class="primary" onclick="nextStep(2)" data-i18n="continue">Continue</button>
-          </div>
-        </div>
-
-        <div id="step2" class="panel">
-          <h2 data-i18n="repInfo">Authorized Representative</h2>
-
-          <div class="form-grid">
-            <div>
-              <label data-i18n="firstName">First Name</label>
-              <input id="repFirst" required />
-            </div>
-
-            <div>
-              <label data-i18n="lastName">Last Name</label>
-              <input id="repLast" required />
-            </div>
-
-            <div>
-              <label data-i18n="email">Email Address</label>
-              <input id="repEmail" type="email" required />
-            </div>
-
-            <div>
-              <label data-i18n="position">Position / Title</label>
-              <input id="repPosition" required placeholder="Director / Manager" />
-            </div>
-          </div>
-
-          <div class="buttons">
-            <button type="button" class="secondary" onclick="nextStep(1)" data-i18n="back">Back</button>
-            <button type="button" class="primary" onclick="nextStep(3)" data-i18n="continue">Continue</button>
-          </div>
-        </div>
-
-        <div id="step3" class="panel">
-          <h2 data-i18n="reviewCompliance">Compliance Review</h2>
-
-          <label data-i18n="businessType">Business Type</label>
-          <select id="businessType" required>
-            <option value="">Select...</option>
-            <option>General Trading</option>
-            <option>Energy / Petroleum Products</option>
-            <option>Real Estate</option>
-            <option>Automotive</option>
-            <option>Import / Export</option>
-            <option>Consulting</option>
-          </select>
-
-          <br><br>
-
-          <label data-i18n="tradeDetails">Trade Details</label>
-          <textarea id="tradeDetails" rows="4" required placeholder="Describe products, countries, suppliers, buyers, ports, payment method, and documents."></textarea>
-
-          <div class="checkbox">
-            <input type="checkbox" id="corpAgree" />
-            <label for="corpAgree" data-i18n="corpAgree">
-              I confirm that the company is not using sanctioned parties, false documents, illegal products, or deceptive financial activity.
-            </label>
-          </div>
-
-          <div class="buttons">
-            <button type="button" class="secondary" onclick="nextStep(2)" data-i18n="back">Back</button>
-            <button id="corpSubmit" type="submit" class="green" disabled data-i18n="submitCorporate">Submit Corporate Profile</button>
-          </div>
-        </div>
-      </form>
-    </section>
-
-    <section id="resultCard" class="card">
-      <h2 data-i18n="submissionComplete">Submission Complete</h2>
-      <div class="success" data-i18n="submissionNote">
-        Your information has been organized for review. Connect this form to your backend/database before collecting real customer documents.
-      </div>
-      <div id="summary" class="summary-box"></div>
-      <div class="buttons">
-        <button class="primary" onclick="backHome()" data-i18n="mainMenu">Main Menu</button>
-      </div>
-    </section>
-
-  </div>
-
-  <
+</body>
+</html>
