@@ -3,157 +3,492 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenACC — Secure Trading Command & AI Escrow Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen antialiased">
-
-    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 shadow-sm font-mono">
-        <div class="inline-block animate-marquee space-x-8">
-            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>BANANAS (AGRI/USD): $14.20 <span class="text-emerald-400 ml-1">+1.4%</span></span>
-            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>FREIGHT INDEX (US-GLBL): $3,450 <span class="text-emerald-400 ml-1">+0.8%</span></span>
-            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / EGP: 47.85 <span class="text-emerald-400 ml-1">+2.1%</span></span>
-            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / AED: 3.67 <span class="text-slate-400 ml-1">0.0%</span></span>
-            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-rose-400 rounded-full mr-2"></span>USD / TRY: 32.45 <span class="text-rose-400 ml-1">-0.5%</span></span>
-            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / MNT: 3,420 <span class="text-emerald-400 ml-1">+0.2%</span></span>
-        </div>
-    </div>
+    <title>Corporate Registration & Global Compliance Onboarding</title>
     <style>
-        @keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
-        .animate-marquee { display: inline-block; padding-left: 100%; animation: marquee 30s linear infinite; }
-        .animate-marquee:hover { animation-play-state: paused; }
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --primary-color: #0f172a;
+            --accent-color: #2563eb;
+            --border-color: #e2e8f0;
+            --danger-color: #b91c1c;
+            --danger-bg: #fef2f2;
+            --success-color: #16a34a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .onboarding-wizard {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Step Progress Bar Indicators */
+        .step-indicator-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-indicator-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step-dot.active {
+            background: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+        }
+
+        .step-dot.completed {
+            background: var(--success-color);
+        }
+
+        .step-label {
+            position: absolute;
+            top: 45px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .step-dot.active .step-label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Form Content Control */
+        .form-step-panel {
+            display: none;
+        }
+
+        .form-step-panel.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            font-size: 1.15rem;
+            margin-top: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 600px) {
+            .form-group.full-width { grid-column: span 1; }
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #334155;
+        }
+
+        input[type="text"], input[type="email"], select, textarea {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background-color: #f8fafc;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Policy-Specific Styling Component */
+        .policy-scroll-window {
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 8px;
+            max-height: 350px;
+            overflow-y: scroll;
+            margin-bottom: 25px;
+            font-size: 0.92rem;
+        }
+
+        .highlight-box {
+            background-color: var(--danger-bg);
+            border-left: 4px solid var(--danger-color);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--danger-color);
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 3px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-size: 0.95rem;
+            color: #166534;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* Nav Action Control Buttons */
+        .navigation-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover { background-color: #1e293b; }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #64748b;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+            color: var(--primary-color);
+        }
+
+        .btn:disabled {
+            background-color: #cbd5e1;
+            border-color: #cbd5e1;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
     </style>
+</head>
+<body>
 
-    <nav class="border-b border-slate-200 bg-white/90 backdrop-blur px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-xs">
-        <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-3 group">
-                <div class="h-11 w-11 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center shadow-xs overflow-hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-emerald-600">
-                        <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-1.5V9a3 3 0 00-3-3h-3V4.5a3 3 0 00-3-3H4.5a3 3 0 00-3 3V9a3 3 0 003 3H6v1.5a3 3 0 003 3h3V18a3 3 0 003 3h4.5zM6 10.5H4.5a1.5 1.5 0 01-1.5-1.5V4.5a1.5 1.5 0 011.5-1.5H9a1.5 1.5 0 011.5 1.5V6H9a3 3 0 00-3 3v1.5z" />
-                    </svg>
-                </div>
-                <div>
-                    <span class="text-xl font-black tracking-tight text-slate-900">GreenACC</span>
-                    <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase font-mono">By Green Bananas</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="flex flex-wrap items-center gap-3">
-            <div class="flex flex-col">
-                <label class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-1">Operating Region</label>
-                <select class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs">
-                    <option value="global">🌍 Global (All Countries Listed)</option>
-                    <option value="us">🇺🇸 United States</option>
-                    <option value="ae">🇦🇪 United Arab Emirates</option>
-                    <option value="eg">🇪🇬 Egypt</option>
-                </select>
-            </div>
-
-            <div class="flex flex-col">
-                <label class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-1">System Language Engine</label>
-                <select class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs">
-                    <option value="en-base">🇬🇧 English (Base Environment)</option>
-                    <option value="en-ar">🇬🇧 English + 🇦🇪 العربية (Dual Interface)</option>
-                </select>
-            </div>
-        </div>
-    </nav>
-
-    <div class="max-w-7xl mx-auto p-6 space-y-6">
-        
-        <header class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-            <div>
-                <h2 class="text-xl font-bold text-slate-900">Trading Logistics & AI Contract Orchestration</h2>
-                <p class="text-slate-500 text-sm mt-1">Authorized corporate access strictly monitored. Dynamic 2% automated negotiation fee enforced on final handshake.</p>
-            </div>
-            <div class="flex gap-2">
-                <span class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-mono border border-slate-200">repo: github/greensacc</span>
-                <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-mono font-bold border border-emerald-200">AI Fee: 2% Brokerage</span>
-            </div>
-        </header>
-
-        <div class="relative grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <div class="absolute inset-0 bg-slate-50/40 backdrop-blur-md rounded-2xl z-40 flex items-center justify-center p-4">
-                <div class="bg-white border border-slate-200 shadow-2xl rounded-2xl max-w-lg w-full p-8 text-center space-y-6">
-                    <div class="mx-auto h-14 w-14 bg-amber-50 rounded-full flex items-center justify-center border border-amber-200 text-amber-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v-6.75a2.25 2.25 0 002.25-2.25z" />
-                        </svg>
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <h3 class="text-xl font-extrabold text-slate-900">Protected Corporate Information Vault</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed">
-                            To reveal global trade logistics data and unlock direct bi-directional AI client conversations, you must register and submit papers for an extensive banking audit.
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-left text-xs space-y-2 text-slate-600 font-medium">
-                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> <strong>$20.00 USD</strong> Access Activation Fee Payment</div>
-                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Official Trade Registry & Company Name Submission</div>
-                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span> <strong>24-Hour Mandatory Period</strong> Background Documentation Check</div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                        <button class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 transition tracking-wide uppercase">
-                            Register Company
-                        </button>
-                        <button class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition tracking-wide uppercase">
-                            Pay $20 & Unlock
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="space-y-6 lg:col-span-1 select-none pointer-events-none filter blur-xs">
-                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">Command & CRM Operations</h3>
-                    <button class="w-full py-3 px-4 bg-slate-50 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center text-slate-400">
-                        <span>➕ Add New Partner Profile</span>
-                    </button>
-                    <button class="w-full py-3 px-4 bg-slate-50 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center text-slate-400">
-                        <span>📦 Dispatch Warehouse Stock</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between select-none pointer-events-none filter blur-xs">
-                <div>
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
-                        <div>
-                            <h3 class="text-base font-bold text-slate-900">Automated AI Agent Negotiation</h3>
-                            <p class="text-xs text-slate-400">Continuous background data verification streams.</p>
-                        </div>
-                        <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-200">
-                            2% HANDSHAKE COMMISSION FEE
-                        </span>
-                    </div>
-
-                    <div class="space-y-4 my-2">
-                        <div class="flex flex-col items-end">
-                            <div class="max-w-[85%] bg-slate-100 p-3 rounded-2xl rounded-tr-none text-xs text-slate-400">
-                                Protected conversation details hidden. Pay $20 to review active translated bids.
-                            </div>
-                        </div>
-                        <div class="flex flex-col items-start">
-                            <div class="max-w-[85%] bg-slate-100 p-3 rounded-2xl rounded-tl-none text-xs text-slate-400">
-                                Inbound global client request locked during banking review.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center text-xs font-mono text-slate-400">
-                    <span>CONTRACT ESCROW SECURED BY AUTOMATED AI ASSISTANT</span>
-                    <span class="font-bold">STATUS: LOCKED</span>
-                </div>
-            </div>
-
-        </div>
-
+<div class="onboarding-wizard">
+    
+    <!-- Visual Step Tracker -->
+    <div class="step-indicator-bar">
+        <div class="step-dot active" id="dot1">1<span class="step-label" style="left: -20px;">Company Profiles</span></div>
+        <div class="step-dot" id="dot2">2<span class="step-label" style="left: -15px;">Corporate Signee</span></div>
+        <div class="step-dot" id="dot3">3<span class="step-label" style="left: -35px;">International Law Verification</span></div>
     </div>
+
+    <!-- Central Master Form Wrapper -->
+    <form id="masterOnboardingForm" onsubmit="handleFinalSubmission(event)">
+        
+        <!-- STEP 1: COMPANY REGISTRATION PROFILE -->
+        <div class="form-step-panel active" id="stepPanel1">
+            <h2>Step 1: Corporate Entity Registration</h2>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="companyName">Registered Company Name</label>
+                    <input type="text" id="companyName" placeholder="e.g., Green Bananas General Trading LLC" required>
+                </div>
+                <div class="form-group">
+                    <label for="registrationNumber">Company Registration / EIN / Tax ID Number</label>
+                    <input type="text" id="registrationNumber" placeholder="e.g., 12-3456789" required>
+                </div>
+                <div class="form-group">
+                    <label for="countryJurisdiction">Country of Incorporation Jurisdiction</label>
+                    <select id="countryJurisdiction" required>
+                        <option value="">Select Country...</option>
+                        <option value="US">United States</option>
+                        <option value="AE">United Arab Emirates</option>
+                        <option value="MY">Malaysia</option>
+                        <option value="GB">United Kingdom</option>
+                        <option value="OTHER">Other International Jurisdiction</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label for="corporateAddress">Official Corporate Headquarters Address</label>
+                    <textarea id="corporateAddress" rows="3" placeholder="Street Address, Suite, City, State/Province, Zip Code" required></textarea>
+                </div>
+            </div>
+            <div class="navigation-row">
+                <div></div> <!-- Empty placeholder keeping right alignment -->
+                <button type="button" class="btn btn-primary" onclick="goToStep(2)">Continue to Step 2 &rarr;</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: CORPORATE REPRESENTATIVE DETAILS -->
+        <div class="form-step-panel" id="stepPanel2">
+            <h2>Step 2: Authorized Signee Information</h2>
+            <p style="color: #64748b; margin-bottom: 25px;">Provide details for the legal entity manager or director executing contracts on behalf of the firm.</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="repFirstName">Legal First Name (As visible on Passport/ID)</label>
+                    <input type="text" id="repFirstName" placeholder="John" required>
+                </div>
+                <div class="form-group">
+                    <label for="repLastName">Legal Last Name</label>
+                    <input type="text" id="repLastName" placeholder="Doe" required>
+                </div>
+                <div class="form-group">
+                    <label for="repEmail">Official Corporate Email Address</label>
+                    <input type="email" id="repEmail" placeholder="j.doe@company.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="repPosition">Official Designation / Job Title</label>
+                    <input type="text" id="repPosition" placeholder="e.g., Managing Director" required>
+                </div>
+            </div>
+            <div class="navigation-row">
+                <button type="button" class="btn btn-secondary" onclick="goToStep(1)">&larr; Back to Step 1</button>
+                <button type="button" class="btn btn-primary" onclick="goToStep(3)">Proceed to Compliance Review &rarr;</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: HIGH-AUTHORITY COMPLIANCE POLICY & AGREEMENT SIGN-OFF -->
+        <div class="form-step-panel" id="stepPanel3">
+            <h2>Step 3: Global Regulatory Agreement & Compliance Affirmation</h2>
+            <p style="font-weight: 500;">Review the mandatory financial security and trade enforcement protocols below before activating your legal trading desk access.</p>
+            
+            <!-- Policy Scroll Container -->
+            <div class="policy-scroll-window">
+                <h3 style="margin-top:0;">Global Compliance, Anti-Money Laundering (AML), and Restricted Species Trading Policy</h3>
+                <p style="font-size:0.85rem; color:#64748b; margin-bottom:20px;">Effective Date: June 2026</p>
+                
+                <p>This platform operates strictly under the jurisdiction of international trade laws, financial regulations, and global security standards. We maintain an uncompromising zero-tolerance policy for criminal activity, illicit financing networks, and unauthorized cross-border asset tracking schemes.</p>
+
+                <h4>1. Governance and Legal Framework</h4>
+                <p>This platform is protected, governed, and covered by international law. All execution traces, transaction sequences, user matching logs, and systemic footprints are subject to immediate discovery and enforcement by global regulatory frameworks, including:</p>
+                <ul>
+                    <li><strong>The Financial Action Task Force (FATF)</strong> international directives regarding Anti-Money Laundering (AML) and Counter-Terrorist Financing (CTF).</li>
+                    <li><strong>The United Nations Convention Against Transnational Organized Crime</strong>.</li>
+                    <li><strong>CITES (Convention on International Trade in Endangered Species of Wild Fauna and Flora)</strong> controlling international distribution channels for biological specimens and protected assets.</li>
+                    <li><strong>The United States Bank Secrecy Act (BSA)</strong> and corresponding global cross-border electronic funds surveillance mechanisms.</li>
+                </ul>
+
+                <h4>2. Explicit Prohibition of Dark Web, Laundering, and Illicit Assets</h4>
+                <p>Any exploitation of this system to execute or shelter money laundering loops, route traffic through localized darknet proxies, execute unauthorized assets distribution, or obscure systemic parameters will lead to immediate cancellation and prosecution.</p>
+
+                <h4>3. Structural Controls on Species Trading</h4>
+                <p>Commercial deployment or trading of any protected fauna, flora, or derivatives specified across CITES Appendices without valid international authorization logs uploaded to our registry is forbidden. Asset operations will drop immediately if proper verifications are absent.</p>
+
+                <h4>4. Identity Authentication Requirements</h4>
+                <p>Every active enterprise must complete full identity transparency protocols prior to transaction clearance, which includes validating verifiable corporate registration numbers and authentic source of funds declarations.</p>
+
+                <div class="highlight-box">
+                    <h4>🛑 Security Enforcement & Reporting Trigger</h4>
+                    <p>Upon detection of suspicious anomalies, obscure transaction origins, or unexpected activity vectors, our automated compliance engine will execute the following sequences <strong>instantly, with no prior notice or disclosure of source identifiers to the entity:</strong></p>
+                    <ul>
+                        <li><strong>System Lockdown:</strong> Immediate freeze execution across associated profiles, pending trades, and financial pipelines.</li>
+                        <li><strong>Asset Retention:</strong> Complete structural escrow hold until official validation or a formal international seizure order is logged.</li>
+                        <li><strong>Complete Profiling Compilation:</strong> Aggregate bundle construction of telemetry logs, IP routing sequences, and document sets.</li>
+                        <li><strong>Direct Transnational Handoff:</strong> Transmission of a comprehensive Suspicious Activity Report (SAR) straight to high external authorities, including <strong>INTERPOL, FinCEN, and the United Nations Office on Drugs and Crime (UNODC)</strong>.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Absolute Lock Checkbox Form Controls -->
+            <div class="checkbox-container">
+                <input type="checkbox" id="legalComplianceCheckbox" onchange="toggleFormSubmission()">
+                <label for="legalComplianceCheckbox" class="checkbox-label">
+                    I, as the authorized representative, explicitly declare under global penalty of perjury that our corporate operations are completely transparent, our liquidity stems from verifiable legitimate sources, and we fully consent to real-time algorithmic transaction tracking. I acknowledge that any compliance failure will trigger immediate reporting to <strong>INTERPOL</strong>.
+                </label>
+            </div>
+
+            <div class="navigation-row">
+                <button type="button" class="btn btn-secondary" onclick="goToStep(2)">&larr; Back to Step 2</button>
+                <button type="submit" id="finalSubmitBtn" class="btn btn-primary" style="background-color: var(--success-color);" disabled>Confirm Agreement & Register Company</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // Handles stepping through the wizard and visual dot updates
+    function goToStep(stepNumber) {
+        // Simple form validation logic check before moving past step 1 or 2
+        if (stepNumber === 2) {
+            const compName = document.getElementById('companyName').value;
+            const regNum = document.getElementById('registrationNumber').value;
+            const jurisdiction = document.getElementById('countryJurisdiction').value;
+            const address = document.getElementById('corporateAddress').value;
+            
+            if (!compName || !regNum || !jurisdiction || !address) {
+                alert("Please complete all corporate registration details in Step 1 before proceeding.");
+                return;
+            }
+        }
+        
+        if (stepNumber === 3) {
+            const fName = document.getElementById('repFirstName').value;
+            const lName = document.getElementById('repLastName').value;
+            const email = document.getElementById('repEmail').value;
+            const pos = document.getElementById('repPosition').value;
+            
+            if (!fName || !lName || !email || !pos) {
+                alert("Please complete all representative and signature details in Step 2 before proceeding.");
+                return;
+            }
+        }
+
+        // Toggle visibility of panels
+        document.querySelectorAll('.form-step-panel').forEach(panel => panel.classList.remove('active'));
+        document.getElementById(`stepPanel${stepNumber}`).classList.add('active');
+
+        // Manage indicator states dynamically
+        document.querySelectorAll('.step-dot').forEach((dot, index) => {
+            const currentDotIdx = index + 1;
+            dot.classList.remove('active', 'completed');
+            
+            if (currentDotIdx === stepNumber) {
+                dot.classList.add('active');
+            } else if (currentDotIdx < stepNumber) {
+                dot.classList.add('completed');
+            }
+        });
+    }
+
+    // Handles locking/unlocking the final step submit action button
+    function toggleFormSubmission() {
+        const agreementChecked = document.getElementById('legalComplianceCheckbox').checked;
+        const finalButton = document.getElementById('finalSubmitBtn');
+        finalButton.disabled = !agreementChecked;
+    }
+
+    // Capture payload variables for backend processing pipeline integration
+    function handleFinalSubmission(event) {
+        event.preventDefault();
+        
+        const payload = {
+            company: {
+                name: document.getElementById('companyName').value,
+                regNo: document.getElementById('registrationNumber').value,
+                jurisdiction: document.getElementById('countryJurisdiction').value,
+                hqAddress: document.getElementById('corporateAddress').value
+            },
+            representative: {
+                firstName: document.getElementById('repFirstName').value,
+                lastName: document.getElementById('repLastName').value,
+                email: document.getElementById('repEmail').value,
+                title: document.getElementById('repPosition').value
+            },
+            legalConsentLogged: document.getElementById('legalComplianceCheckbox').checked,
+            timestamp: new Date().toISOString()
+        };
+
+        console.log("Onboarding data package authorized and structured:", payload);
+        
+        // Alert message execution logic
+        alert(`Registration and Compliance Logged Safely for ${payload.company.name}.\n\nYour profile verification package is now linked to global international monitoring logs. Redirecting to trading desk portal layout...`);
+        
+        // To route this directly to a Supabase edge function or a Python backend handler:
+        // fetch('/api/v1/company/register', { method: 'POST', body: JSON.stringify(payload) })
+        // .then(() => window.location.href = "/trading-desk");
+    }
+</script>
 
 </body>
 </html>
