@@ -3,129 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Green ACC | Global Accounting & Trading Platform</title>
-    <style>
-        :root {
-            --green: #1c6b2a;
-            --gold: #d4af37;
-            --black: #111827;
-            --gray: #f3f4f6;
-            --blue: #2563eb;
-            --white: #ffffff;
-            --danger: #b91c1c;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-
-        /* Header & Branding */
-        header { background: linear-gradient(135deg, #0d3d19, var(--green)); color: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--gold); }
-        .trademark-bar { background: var(--black); color: var(--gold); text-align: center; padding: 5px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Portal Container */
-        .portal-wrapper { max-width: 950px; margin: 40px auto; padding: 0 20px; }
-
-        /* Localization Engine */
-        .localization-bar { background: var(--black); color: var(--white); padding: 15px; border-radius: 8px 8px 0 0; display: flex; gap: 20px; justify-content: center; }
-        .localization-bar select { padding: 5px; border-radius: 4px; background: #333; color: white; border: none; }
-
-        /* Main UI */
-        .card { background: var(--white); padding: 40px; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
-        /* Gated Sections */
-        .gated-deal-flow { margin-top: 30px; position: relative; padding: 20px; border: 2px dashed #ccc; border-radius: 8px; }
-        .blur-overlay { filter: blur(5px); pointer-events: none; }
-        .paywall { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-        /* Buttons & Inputs */
-        .btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-green { background: var(--green); color: white; }
-        .btn-gold { background: var(--gold); color: black; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-        
-        .hidden { display: none; }
-    </style>
+    <title>GreenACC — Secure Trading Command & AI Escrow Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen antialiased">
 
-<div class="trademark-bar">Green ACC™ Global Accounting & Trading Operations | All Rights Reserved 2026</div>
-<header>
-    <h1>Green ACC</h1>
-    <p>Precision Logistics • Financial Compliance • Global Trading</p>
-</header>
-
-<div class="portal-wrapper">
-    <div class="localization-bar">
-        <select id="country" onchange="updateLocale()">
-            <option value="US">USA (USD)</option>
-            <option value="AE">UAE (AED)</option>
-            <option value="MY">Malaysia (MYR)</option>
-        </select>
-        <select id="lang">
-            <option>English</option>
-            <option>Arabic</option>
-        </select>
-        <span id="tzDisplay">Timezone: UTC</span>
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 shadow-sm font-mono">
+        <div class="inline-block animate-marquee space-x-8">
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>BANANAS (AGRI/USD): $14.20 <span class="text-emerald-400 ml-1">+1.4%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>FREIGHT INDEX (US-GLBL): $3,450 <span class="text-emerald-400 ml-1">+0.8%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / EGP: 47.85 <span class="text-emerald-400 ml-1">+2.1%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / AED: 3.67 <span class="text-slate-400 ml-1">0.0%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-rose-400 rounded-full mr-2"></span>USD / TRY: 32.45 <span class="text-rose-400 ml-1">-0.5%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / MNT: 3,420 <span class="text-emerald-400 ml-1">+0.2%</span></span>
+        </div>
     </div>
+    <style>
+        @keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+        .animate-marquee { display: inline-block; padding-left: 100%; animation: marquee 30s linear infinite; }
+        .animate-marquee:hover { animation-play-state: paused; }
+    </style>
 
-    <div class="card" id="mainCard">
-        <div id="setupView">
-            <h2>Step 1: Choose Your Operational Sector</h2>
-            <select id="sectorSelect" onchange="loadSectorPolicy()">
-                <option value="AGRI">Agriculture & Commodity Trading</option>
-                <option value="LOGISTICS">Global Supply Chain & Logistics</option>
-            </select>
+    <nav class="border-b border-slate-200 bg-white/90 backdrop-blur px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-xs">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3 group">
+                <div class="h-11 w-11 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center shadow-xs overflow-hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-emerald-600">
+                        <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-1.5V9a3 3 0 00-3-3h-3V4.5a3 3 0 00-3-3H4.5a3 3 0 00-3 3V9a3 3 0 003 3H6v1.5a3 3 0 003 3h3V18a3 3 0 003 3h4.5zM6 10.5H4.5a1.5 1.5 0 01-1.5-1.5V4.5a1.5 1.5 0 011.5-1.5H9a1.5 1.5 0 011.5 1.5V6H9a3 3 0 00-3 3v1.5z" />
+                    </svg>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-tight text-slate-900">GreenACC</span>
+                    <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase font-mono">By Green Bananas</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex flex-col">
+                <label class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-1">Operating Region</label>
+                <select class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs">
+                    <option value="global">🌍 Global (All Countries Listed)</option>
+                    <option value="us">🇺🇸 United States</option>
+                    <option value="ae">🇦🇪 United Arab Emirates</option>
+                    <option value="eg">🇪🇬 Egypt</option>
+                </select>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-1">System Language Engine</label>
+                <select class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs">
+                    <option value="en-base">🇬🇧 English (Base Environment)</option>
+                    <option value="en-ar">🇬🇧 English + 🇦🇪 العربية (Dual Interface)</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-6 space-y-6">
+        
+        <header class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">Trading Logistics & AI Contract Orchestration</h2>
+                <p class="text-slate-500 text-sm mt-1">Authorized corporate access strictly monitored. Dynamic 2% automated negotiation fee enforced on final handshake.</p>
+            </div>
+            <div class="flex gap-2">
+                <span class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-mono border border-slate-200">repo: github/greensacc</span>
+                <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-mono font-bold border border-emerald-200">AI Fee: 2% Brokerage</span>
+            </div>
+        </header>
+
+        <div class="relative grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <div id="policyBox" class="policy-scroll-window" style="height: 150px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+            <div class="absolute inset-0 bg-slate-50/40 backdrop-blur-md rounded-2xl z-40 flex items-center justify-center p-4">
+                <div class="bg-white border border-slate-200 shadow-2xl rounded-2xl max-w-lg w-full p-8 text-center space-y-6">
+                    <div class="mx-auto h-14 w-14 bg-amber-50 rounded-full flex items-center justify-center border border-amber-200 text-amber-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v-6.75a2.25 2.25 0 002.25-2.25z" />
+                        </svg>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-extrabold text-slate-900">Protected Corporate Information Vault</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            To reveal global trade logistics data and unlock direct bi-directional AI client conversations, you must register and submit papers for an extensive banking audit.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-left text-xs space-y-2 text-slate-600 font-medium">
+                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> <strong>$20.00 USD</strong> Access Activation Fee Payment</div>
+                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-2"></span> Official Trade Registry & Company Name Submission</div>
+                        <div class="flex items-center"><span class="w-2 h-2 rounded-full bg-amber-500 mr-2"></span> <strong>24-Hour Mandatory Period</strong> Background Documentation Check</div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <button class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 transition tracking-wide uppercase">
+                            Register Company
+                        </button>
+                        <button class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition tracking-wide uppercase">
+                            Pay $20 & Unlock
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6 lg:col-span-1 select-none pointer-events-none filter blur-xs">
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">Command & CRM Operations</h3>
+                    <button class="w-full py-3 px-4 bg-slate-50 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center text-slate-400">
+                        <span>➕ Add New Partner Profile</span>
+                    </button>
+                    <button class="w-full py-3 px-4 bg-slate-50 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center text-slate-400">
+                        <span>📦 Dispatch Warehouse Stock</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between select-none pointer-events-none filter blur-xs">
+                <div>
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900">Automated AI Agent Negotiation</h3>
+                            <p class="text-xs text-slate-400">Continuous background data verification streams.</p>
+                        </div>
+                        <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-200">
+                            2% HANDSHAKE COMMISSION FEE
+                        </span>
+                    </div>
+
+                    <div class="space-y-4 my-2">
+                        <div class="flex flex-col items-end">
+                            <div class="max-w-[85%] bg-slate-100 p-3 rounded-2xl rounded-tr-none text-xs text-slate-400">
+                                Protected conversation details hidden. Pay $20 to review active translated bids.
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-start">
+                            <div class="max-w-[85%] bg-slate-100 p-3 rounded-2xl rounded-tl-none text-xs text-slate-400">
+                                Inbound global client request locked during banking review.
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-            <button class="btn btn-green" onclick="unlockDeals()">Accept & Continue</button>
+                <div class="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center text-xs font-mono text-slate-400">
+                    <span>CONTRACT ESCROW SECURED BY AUTOMATED AI ASSISTANT</span>
+                    <span class="font-bold">STATUS: LOCKED</span>
+                </div>
+            </div>
+
         </div>
 
-        <div id="dealView" class="gated-deal-flow hidden">
-            <div id="dealContent" class="blur-overlay">
-                <h3>Live Market Deals</h3>
-                <p>Deal ID: GACC-001 | Wheat | 40,000 MT | Status: Available</p>
-                <p>Deal ID: GACC-002 | Machinery | 2 Units | Status: Available</p>
-            </div>
-            
-            <div id="paywall" class="paywall">
-                <h3>Access Gated Content</h3>
-                <p>Requires $20 Compliance Clearance Fee.</p>
-                <button class="btn btn-gold" onclick="processPayment()">Pay $20 & Unlock Deals</button>
-            </div>
-        </div>
     </div>
-</div>
-
-<script>
-    function loadSectorPolicy() {
-        const sector = document.getElementById('sectorSelect').value;
-        const policyBox = document.getElementById('policyBox');
-        if(sector === 'AGRI') {
-            policyBox.innerHTML = "<strong>Agriculture Policy:</strong> You agree to abide by UN FAO standards and phytosanitary regulations. All commodities must be certified non-GMO.";
-        } else {
-            policyBox.innerHTML = "<strong>Logistics Policy:</strong> You agree to international freight tracking standards and transparency in shipping manifests.";
-        }
-    }
-
-    function unlockDeals() {
-        document.getElementById('dealView').classList.remove('hidden');
-    }
-
-    function processPayment() {
-        alert("Redirecting to Green ACC Payment Gateway...");
-        document.getElementById('dealContent').classList.remove('blur-overlay');
-        document.getElementById('paywall').classList.add('hidden');
-    }
-
-    function updateLocale() {
-        const country = document.getElementById('country').value;
-        document.getElementById('tzDisplay').innerText = "Timezone: " + (country === 'US' ? "EST" : country === 'AE' ? "GST" : "MYT");
-    }
-
-    // Initialize
-    loadSectorPolicy();
-</script>
 
 </body>
 </html>
