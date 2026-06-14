@@ -57,3 +57,7 @@ GreenACC is a static website with Supabase backend support for secure trade escr
 - `supabase/functions/createStripeCheckout.js` — creates Stripe Checkout sessions for the $20 entry fee
 - `supabase/functions/createHandshakeSession.js` — handshake & L/C locking logic
 - `success.html`, `cancel.html` — Stripe redirect pages
+- `meeting.html` — Executive Meeting Suite UI (10 isolated rooms)
+- `meeting.js` — client logic for rooms, AV preview, chat and AI integration
+- `meeting.css` — styling for the meeting suite
+- `supabase/functions/aiAgentAnalyze.js` — lightweight AI analysis stub (edge function)
