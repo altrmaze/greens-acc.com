@@ -36,3 +36,24 @@ GreenACC is a static website with Supabase backend support for secure trade escr
 
 - `processEntryFee.js` requires exactly $20.00 USD for fee processing.
 - `processWithdrawal.js` gates withdrawal on handshake confirmation, compliance verification, and three AI agent verifications.
+
+## Stripe & Webhook
+
+- Deploy the Stripe webhook edge function at `supabase/functions/stripeWebhook.js` and set the following environment variables in your Supabase functions config or platform:
+   - `STRIPE_SECRET_KEY` — your Stripe secret key
+   - (Optional) `STRIPE_WEBHOOK_SECRET` — if you add signature verification later
+- The webhook listens for `checkout.session.completed` and verifies the session with Stripe, then marks the `entry_fee_status` as `paid` in the `green_acc_deals` table.
+
+## Deployment notes
+
+- After deploying functions, set these environment variables in the edge functions runtime:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `STRIPE_SECRET_KEY`
+
+## Files added in this update
+
+- `supabase/functions/stripeWebhook.js` — Stripe webhook handler that validates session and patches Supabase
+- `supabase/functions/createStripeCheckout.js` — creates Stripe Checkout sessions for the $20 entry fee
+- `supabase/functions/createHandshakeSession.js` — handshake & L/C locking logic
+- `success.html`, `cancel.html` — Stripe redirect pages
