@@ -1,7 +1,55 @@
 // Minimal Meeting Suite client
-// Uses Supabase edge functions for room management and AI analysis
+// Uses Supabase edge functions for room management, AI analysis, and Supabase Realtime for signaling
 
 const functionHost = '/supabase/functions';
+
+// Supabase realtime signaling (optional) - initialize if config provided
+let supabase = null;
+let supabaseSubscription = null;
+const clientId = (() => {
+  try { return crypto.randomUUID(); } catch (e) { return `client-${Date.now()}-${Math.floor(Math.random()*10000)}`; }
+})();
+
+function initSupabase() {
+  const cfg = window.SUPABASE_CONFIG;
+  if (!cfg || !cfg.url || !cfg.anonKey) return null;
+  try {
+    supabase = window.supabase.createClient(cfg.url, cfg.anonKey);
+    console.info('Supabase client initialized for signaling');
+    return supabase;
+  } catch (err) {
+    console.warn('Failed to init Supabase', err);
+    supabase = null;
+    return null;
+  }
+}
+
+async function subscribeToSignals(roomId, onSignal) {
+  if (!supabase) return null;
+  // unsubscribe previous
+  try { if (supabaseSubscription) await supabaseSubscription.unsubscribe(); } catch (e) {}
+  const filter = `room_id=eq.${roomId}`;
+  supabaseSubscription = supabase
+    .channel(`room_signals:${roomId}`)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'meeting_signals', filter }, (payload) => {
+      const rec = payload.record || payload.new || payload;
+      if (!rec) return;
+      onSignal(rec);
+    })
+    .subscribe();
+  return supabaseSubscription;
+}
+
+async function createSignal(roomId, senderId, targetId, type, data) {
+  if (!supabase) return null;
+  try {
+    const resp = await supabase.from('meeting_signals').insert([{ room_id: roomId, sender_id: senderId, target_id: targetId, signal_type: type, signal_data: data }]);
+    return resp;
+  } catch (err) {
+    console.warn('Failed to create signal', err);
+    return null;
+  }
+}
 
 // UI elements
 const roomsGrid = document.getElementById('rooms-grid');
@@ -80,12 +128,53 @@ async function joinRoom() {
     video.playsInline = true;
     video.srcObject = localStream;
     videoGrid.appendChild(video);
-    // For demo, we will not wire a full signaling server. Instead we show local preview and enable chat/AI.
+    // initialize Supabase for signaling if configured
+    initSupabase();
+    if (supabase) {
+      await subscribeToSignals(activeRoom.id, handleIncomingSignal);
+    }
     appendChat('You joined the room. Local AV enabled.');
     // Notify AI agents of join event
     postAiEvent({ type: 'join', room: activeRoom.id, text: 'Participant joined the room.' });
+    // create a simple-peer and announce offer via Supabase signaling
+    const peer = new SimplePeer({ initiator: true, trickle: true, stream: localStream });
+    peers[clientId] = peer;
+    peer.on('signal', async data => {
+      // broadcast offer via signaling table
+      await createSignal(activeRoom.id, clientId, null, 'offer', data);
+    });
+    peer.on('stream', remoteStream => {
+      const rv = document.createElement('video'); rv.autoplay = true; rv.playsInline = true; rv.srcObject = remoteStream; videoGrid.appendChild(rv);
+    });
+    peer.on('error', e => console.warn('Peer error', e));
   } catch (err) {
     appendChat('Failed to access media: ' + err.message);
+  }
+}
+
+async function handleIncomingSignal(rec) {
+  try {
+    if (!rec || rec.sender_id === clientId) return;
+    const sender = rec.sender_id;
+    const type = rec.signal_type;
+    const data = rec.signal_data;
+    // if we don't have a peer for this sender, create a listener peer
+    if (!peers[sender]) {
+      const peer = new SimplePeer({ initiator: false, trickle: true, stream: localStream });
+      peers[sender] = peer;
+      peer.on('signal', async d => {
+        await createSignal(activeRoom.id, clientId, sender, 'answer', d);
+      });
+      peer.on('stream', remoteStream => {
+        const rv = document.createElement('video'); rv.autoplay = true; rv.playsInline = true; rv.srcObject = remoteStream; videoGrid.appendChild(rv);
+      });
+      peer.on('error', e => console.warn('Peer error', e));
+    }
+    const peer = peers[sender];
+    // signal the peer with incoming data
+    try { peer.signal(data); } catch (e) { console.warn('Signal apply failed', e); }
+  } catch (err) {
+    console.error('handleIncomingSignal error', err);
   }
 }
 

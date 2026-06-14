@@ -61,3 +61,21 @@ GreenACC is a static website with Supabase backend support for secure trade escr
 - `meeting.js` — client logic for rooms, AV preview, chat and AI integration
 - `meeting.css` — styling for the meeting suite
 - `supabase/functions/aiAgentAnalyze.js` — lightweight AI analysis stub (edge function)
+
+## Meeting Suite realtime signaling
+
+The Meeting Suite can use Supabase Realtime for WebRTC signaling. To enable it:
+
+1. Set `window.SUPABASE_CONFIG` in `meeting.html` (or inject dynamically) with your Supabase project URL and anon key:
+
+```html
+<script>
+   window.SUPABASE_CONFIG = { url: 'https://your-project.supabase.co', anonKey: 'YOUR_SUPABASE_ANON_KEY' };
+</script>
+```
+
+2. Apply the database schema in `supabase/schema.sql` which includes the `meeting_signals` table used for offer/answer/candidate exchange.
+
+3. Deploy the Supabase Realtime and ensure anon key allows realtime subscriptions for authenticated or public users as appropriate.
+
+Security note: For production, use Supabase Auth to sign in users and avoid exposing elevated keys on the client. Consider creating ephemeral tokens or server-side signaling proxies.

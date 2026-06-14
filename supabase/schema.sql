@@ -29,3 +29,16 @@ create table if not exists public.green_acc_deals (
 create index if not exists idx_green_acc_deals_lc_reference_number on public.green_acc_deals (lc_reference_number);
 create index if not exists idx_green_acc_deals_buyer_id on public.green_acc_deals (buyer_id);
 create index if not exists idx_green_acc_deals_seller_id on public.green_acc_deals (seller_id);
+
+-- Signaling table for meeting suite (used for WebRTC offer/answer/candidates via Supabase Realtime)
+create table if not exists public.meeting_signals (
+  id uuid primary key default gen_random_uuid(),
+  room_id text not null,
+  sender_id text not null,
+  target_id text,
+  signal_type text not null,
+  signal_data jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_meeting_signals_room_id on public.meeting_signals (room_id);
