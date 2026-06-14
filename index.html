@@ -122,6 +122,63 @@
                             <p id="payment-step" class="text-sm text-slate-700 mb-4">Ready to start the secure payment preparation.</p>
                             <button id="next-payment-step" class="w-full inline-flex justify-center px-4 py-3 bg-emerald-600 text-white rounded-xl text-xs font-semibold uppercase tracking-wide hover:bg-emerald-700 transition">Next Payment Step</button>
                         </div>
+                        <div class="rounded-3xl bg-white border border-slate-200 p-6 text-slate-700 shadow-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+                                <div>
+                                    <p class="text-[10px] uppercase tracking-[0.35em] text-slate-400 font-semibold mb-1">Activation Workflow</p>
+                                    <h3 class="text-lg font-bold text-slate-900">Deal activation & L/C lock</h3>
+                                </div>
+                                <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700 border border-emerald-100">Minimal corporate</span>
+                            </div>
+                            <div class="grid gap-3">
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    <label class="space-y-2 text-xs text-slate-500 font-semibold uppercase tracking-[0.24em]">
+                                        <span>Deal amount *</span>
+                                        <input id="deal-amount-input" type="number" step="0.01" value="1000.00" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-500" />
+                                    </label>
+                                    <label class="space-y-2 text-xs text-slate-500 font-semibold uppercase tracking-[0.24em]">
+                                        <span>Deal ID *</span>
+                                        <input id="deal-id-input" type="text" placeholder="Deal UUID" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-500" />
+                                    </label>
+                                </div>
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    <label class="space-y-2 text-xs text-slate-500 font-semibold uppercase tracking-[0.24em]">
+                                        <span>Buyer ID *</span>
+                                        <input id="buyer-id-input" type="text" placeholder="Buyer UUID" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-500" />
+                                    </label>
+                                    <label class="space-y-2 text-xs text-slate-500 font-semibold uppercase tracking-[0.24em]">
+                                        <span>LC reference</span>
+                                        <input id="lc-reference-input" type="text" placeholder="LCR-0001" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-emerald-500" />
+                                    </label>
+                                </div>
+                                <div class="grid gap-3 sm:grid-cols-3">
+                                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700">
+                                        <p class="font-bold text-slate-900 mb-2">AI audit</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span id="agent1-status" class="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700">1 pending</span>
+                                            <span id="agent2-status" class="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700">2 pending</span>
+                                            <span id="agent3-status" class="rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700">3 pending</span>
+                                        </div>
+                                    </div>
+                                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700">
+                                        <p class="font-bold text-slate-900 mb-2">Commission</p>
+                                        <p id="commission-amount-text" class="text-base font-semibold text-slate-900">$0.00</p>
+                                        <p class="mt-1 text-[11px] text-slate-500">2% handshake fee</p>
+                                    </div>
+                                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700">
+                                        <p class="font-bold text-slate-900 mb-2">Deal status</p>
+                                        <p id="deal-progress-text" class="text-base font-semibold text-slate-900">pending</p>
+                                        <p class="mt-1 text-[11px] text-slate-500">Progress of transaction flow</p>
+                                    </div>
+                                </div>
+                                <div class="grid gap-3 sm:grid-cols-3">
+                                    <button id="process-entry-fee" class="w-full px-4 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-emerald-700 transition">Process $20 entry fee</button>
+                                    <button id="process-handshake" class="w-full px-4 py-3 bg-slate-900 text-white rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-slate-800 transition">Create L/C & lock 2%</button>
+                                    <button id="trigger-withdrawal" class="w-full px-4 py-3 bg-slate-100 text-slate-900 rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-slate-200 transition">Safe withdrawal</button>
+                                </div>
+                                <p class="text-[11px] text-slate-500">This workflow connects Supabase deal records with Stripe commission checkout and secure escrow logic.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="rounded-2xl bg-slate-50 p-5 border border-slate-200 shadow-sm">
@@ -280,6 +337,138 @@
         const checkHandshake = document.getElementById('check-handshake');
         const nextPaymentStep = document.getElementById('next-payment-step');
         const paymentStepDisplay = document.getElementById('payment-step');
+        const dealIdInput = document.getElementById('deal-id-input');
+        const buyerIdInput = document.getElementById('buyer-id-input');
+        const dealAmountInput = document.getElementById('deal-amount-input');
+        const lcReferenceInput = document.getElementById('lc-reference-input');
+        const processEntryFee = document.getElementById('process-entry-fee');
+        const processHandshake = document.getElementById('process-handshake');
+        const triggerWithdrawal = document.getElementById('trigger-withdrawal');
+        const entryFeeStatusText = document.getElementById('entry-fee-status-text');
+        const handshakeStatusText = document.getElementById('handshake-status-text');
+        const complianceStatusText = document.getElementById('compliance-status-text');
+        const escrowStatusText = document.getElementById('escrow-status-text');
+        const agent1Status = document.getElementById('agent1-status');
+        const agent2Status = document.getElementById('agent2-status');
+        const agent3Status = document.getElementById('agent3-status');
+        const commissionAmountText = document.getElementById('commission-amount-text');
+        const dealProgressText = document.getElementById('deal-progress-text');
+
+        const functionHost = '/supabase/functions';
+
+        const dealStatus = {
+            entry_fee_status: 'pending',
+            handshake_status: 'pending',
+            compliance_status: 'pending',
+            escrow_status: 'locked',
+            funds_locked: true,
+            ai_agent_status: {
+                agent1: 'pending',
+                agent2: 'pending',
+                agent3: 'pending'
+            }
+        };
+
+        function updateDealStatusUI() {
+            entryFeeStatusText.textContent = dealStatus.entry_fee_status;
+            handshakeStatusText.textContent = dealStatus.handshake_status;
+            complianceStatusText.textContent = dealStatus.compliance_status;
+            escrowStatusText.textContent = dealStatus.escrow_status;
+            dealProgressText.textContent = dealStatus.handshake_status === 'confirmed' ? 'locked' : dealStatus.escrow_status;
+            agent1Status.textContent = `1 ${dealStatus.ai_agent_status.agent1}`;
+            agent2Status.textContent = `2 ${dealStatus.ai_agent_status.agent2}`;
+            agent3Status.textContent = `3 ${dealStatus.ai_agent_status.agent3}`;
+            agent1Status.className = `rounded-full px-2 py-1 text-[11px] font-semibold ${dealStatus.ai_agent_status.agent1 === 'verified' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : dealStatus.ai_agent_status.agent1 === 'rejected' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`;
+            agent2Status.className = `rounded-full px-2 py-1 text-[11px] font-semibold ${dealStatus.ai_agent_status.agent2 === 'verified' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : dealStatus.ai_agent_status.agent2 === 'rejected' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`;
+            agent3Status.className = `rounded-full px-2 py-1 text-[11px] font-semibold ${dealStatus.ai_agent_status.agent3 === 'verified' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : dealStatus.ai_agent_status.agent3 === 'rejected' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`;
+        }
+
+        function getDealPayload() {
+            return {
+                deal_id: dealIdInput.value.trim(),
+                payer_id: buyerIdInput.value.trim(),
+                amount: Number(dealAmountInput.value || 0),
+                lc_reference_number: lcReferenceInput.value.trim()
+            };
+        }
+
+        function formatUsd(value) {
+            return `$${Number(value).toFixed(2)}`;
+        }
+
+        async function handleEntryFee() {
+            const payload = getDealPayload();
+            if (!payload.deal_id || !payload.payer_id) {
+                appendLog('Entry fee processing requires both deal ID and buyer ID.', 'warning');
+                return;
+            }
+            const response = await fetch(`${functionHost}/processEntryFee`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                appendLog(`Entry fee failed: ${data.error || response.statusText}`, 'alert');
+                return;
+            }
+            dealStatus.entry_fee_status = 'paid';
+            dealStatus.compliance_status = 'pending';
+            updateDealStatusUI();
+            appendLog('Entry fee processed and recorded in the deal status.', 'success');
+        }
+
+        async function handleHandshake() {
+            const payload = getDealPayload();
+            if (!payload.deal_id || !payload.payer_id || payload.amount <= 0) {
+                appendLog('Handshake creation requires deal ID, buyer ID, and a valid amount.', 'warning');
+                return;
+            }
+            const response = await fetch(`${functionHost}/createHandshakeSession`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                appendLog(`Handshake failed: ${data.error || response.statusText}`, 'alert');
+                return;
+            }
+            dealStatus.handshake_status = 'confirmed';
+            dealStatus.escrow_status = 'locked';
+            dealStatus.entry_fee_status = 'paid';
+            commissionAmountText.textContent = formatUsd(data.commission_amount ?? 0);
+            updateDealStatusUI();
+            appendLog('Digital letter of credit created and the handshake commission is locked.', 'success');
+            if (data.session_url) {
+                window.location.href = data.session_url;
+                return;
+            }
+        }
+
+        async function handleWithdrawal() {
+            const payload = { deal_id: dealIdInput.value.trim() };
+            if (!payload.deal_id) {
+                appendLog('Withdrawal requires a valid deal ID.', 'warning');
+                return;
+            }
+            const response = await fetch(`${functionHost}/processWithdrawal`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                appendLog(`Withdrawal trigger failed: ${data.error || response.statusText}`, 'alert');
+                return;
+            }
+            dealStatus.escrow_status = 'released';
+            dealStatus.funds_locked = false;
+            dealStatus.safe_withdrawal_ready = true;
+            updateDealStatusUI();
+            appendLog('Withdrawal request accepted; escrow release is being executed.', 'success');
+            showConversation(`Withdrawal ready for LC ${data.lc_reference_number || 'unknown'}. Net payout is ${formatUsd(data.payout_amount ?? 0)}.`, 'System');
+        }
 
         const reports = [
             'AI Sentinel detected a short-interest surge in agriculture futures and escalated to analyst review.',
@@ -418,12 +607,15 @@
                 appendLog('Final handshake flagged for review due to negotiation inconsistency.', 'alert');
                 setStatus('Handshake Risk · Analyst Intervention Required', 'bg-rose-50 text-rose-700 border border-rose-200');
                 agentSummary.textContent = 'The AI has identified a handshake issue and is holding the deal until analysts validate the final terms.';
+                dealStatus.handshake_status = 'rejected';
             } else {
                 showConversation(languageTemplates[languageSelect.value].handshake, 'System');
                 appendLog('Handshake check passed. The deal is ready for the final analyst decision.', 'success');
                 setStatus('Handshake Clear · Final Decision Pending', 'bg-emerald-50 text-emerald-700 border border-emerald-200');
                 agentSummary.textContent = 'All parties are aligned and the secure handshake is ready for settlement.';
+                dealStatus.handshake_status = 'confirmed';
             }
+            updateDealStatusUI();
         });
 
         simulateAlert.addEventListener('click', () => {
@@ -431,6 +623,8 @@
             appendLog(report, 'alert');
             setStatus('Alert Raised · Analyst Review Required', 'bg-rose-50 text-rose-700 border border-rose-200');
             agentSummary.textContent = 'The AI agent has detected an urgent anomaly and has escalated the decision to human analysts.';
+            dealStatus.compliance_status = 'pending';
+            updateDealStatusUI();
         });
 
         runAnalysis.addEventListener('click', () => {
@@ -440,12 +634,21 @@
                 appendLog('Deep analysis complete; final recommendation queued for analyst approval.', 'warning');
                 setStatus('Ready · Awaiting Final Decision', 'bg-emerald-50 text-emerald-700 border border-emerald-200');
                 agentSummary.textContent = 'Agent findings are ready for final decision-making after analyst review.';
+                dealStatus.compliance_status = 'verified';
+                dealStatus.ai_agent_status = { agent1: 'verified', agent2: 'verified', agent3: 'verified' };
+                updateDealStatusUI();
             }, 1800);
         });
+
+        processEntryFee.addEventListener('click', handleEntryFee);
+        processHandshake.addEventListener('click', handleHandshake);
+        triggerWithdrawal.addEventListener('click', handleWithdrawal);
 
         window.addEventListener('load', () => {
             updateLocalTime();
             paymentStepDisplay.textContent = `Step 1: ${paymentSteps[0]}`;
+            commissionAmountText.textContent = formatUsd(0);
+            updateDealStatusUI();
             appendLog('AI monitoring agent initialized. Watching agriculture, real estate, and stock market signals.', 'info');
             appendLog('Secure trade policy in effect: No illegal transactions, no money laundering, no sanction violations.', 'warning');
         });
