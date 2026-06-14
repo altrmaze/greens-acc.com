@@ -1,9 +1,11 @@
 {
   "name": "green-acc",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "build": "mkdir -p dist && cp index.html dist/",
-    "start": "npm run build && python3 -m http.server 5000 --directory dist"
+    "start": "npm run build && python3 -m http.server 5000 --directory dist",
+    "test": "node --check supabase/functions/processEntryFee.js supabase/functions/processWithdrawal.js && node -e \"import { readFileSync } from 'fs'; const sql = readFileSync('supabase/schema.sql', 'utf8'); if (!sql.includes('green_acc_deals')) throw new Error('Supabase schema missing green_acc_deals table'); if (!sql.includes('entry_fee_status')) throw new Error('Schema missing entry_fee_status field'); console.log('Validation passed');\""
   }
 }
 
