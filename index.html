@@ -73,6 +73,42 @@
             </div>
         </header>
 
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">AI Sentinel Command Center</h3>
+                    <p class="text-sm text-slate-500">Monitoring agriculture, real estate, stock market and global trade risk. Reports anomalies, shortness warnings, and escalates the final decision to human analysts.</p>
+                </div>
+                <span id="agent-status" class="inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Active · All Systems Nominal</span>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="rounded-2xl bg-slate-50 p-4 border border-slate-200">
+                    <p class="text-xs uppercase tracking-[0.2em] text-slate-400 font-bold mb-3">Current Agent Focus</p>
+                    <ul class="space-y-3 text-sm text-slate-700">
+                        <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Secure agriculture supply chain alerts</li>
+                        <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Real estate compliance and liquidity monitoring</li>
+                        <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Stock market shortness and risk signal detection</li>
+                        <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Automated reporting to analyst review queue</li>
+                    </ul>
+                </div>
+                <div class="rounded-2xl bg-slate-50 p-4 border border-slate-200">
+                    <p class="text-xs uppercase tracking-[0.2em] text-slate-400 font-bold mb-3">Latest AI Report</p>
+                    <div id="agent-log" class="min-h-[160px] overflow-y-auto rounded-2xl bg-white p-4 text-sm leading-6 text-slate-700 border border-slate-200 shadow-sm">
+                        <p class="text-slate-500">Initializing monitoring systems...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div class="flex flex-wrap gap-3">
+                    <button id="simulate-alert" class="px-4 py-3 bg-slate-900 text-white rounded-xl text-xs font-semibold uppercase tracking-wide hover:bg-slate-800 transition">Simulate Alert</button>
+                    <button id="run-analysis" class="px-4 py-3 bg-emerald-600 text-white rounded-xl text-xs font-semibold uppercase tracking-wide hover:bg-emerald-700 transition">Run Deep Analysis</button>
+                </div>
+                <p id="agent-summary" class="text-xs text-slate-500">The agent continues to watch shorting, liquidity, and security compliance across all markets.</p>
+            </div>
+        </section>
+
         <div class="relative grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <div class="absolute inset-0 bg-slate-50/40 backdrop-blur-md rounded-2xl z-40 flex items-center justify-center p-4">
@@ -155,5 +191,56 @@
 
     </div>
 
+    <script>
+        const agentStatus = document.getElementById('agent-status');
+        const agentLog = document.getElementById('agent-log');
+        const agentSummary = document.getElementById('agent-summary');
+        const simulateAlert = document.getElementById('simulate-alert');
+        const runAnalysis = document.getElementById('run-analysis');
+
+        const reports = [
+            'AI Sentinel detected a short-interest surge in agriculture futures and escalated to analyst review.',
+            'Real estate liquidity alert triggered: cross-border asset verification failure for a major contract.',
+            'Stock market risk engine flagged a heavy shortness event in emerging market equities.',
+            'Security agent logged unusual supply chain activity for commodities trading and generated an analyst warning.',
+            'Automated compliance monitor reported an exposure gap in export finance while maintaining secure custody status.'
+        ];
+
+        function appendLog(message, level = 'info') {
+            const entry = document.createElement('p');
+            entry.className = 'mb-3';
+            entry.textContent = `${new Date().toLocaleTimeString()} — ${message}`;
+            if (level === 'warning') entry.classList.add('text-amber-700');
+            if (level === 'alert') entry.classList.add('text-rose-600');
+            agentLog.appendChild(entry);
+            agentLog.scrollTop = agentLog.scrollHeight;
+        }
+
+        function setStatus(text, colorClass) {
+            agentStatus.textContent = text;
+            agentStatus.className = `inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold ${colorClass}`;
+        }
+
+        simulateAlert.addEventListener('click', () => {
+            const report = reports[Math.floor(Math.random() * reports.length)];
+            appendLog(report, 'alert');
+            setStatus('Alert Raised · Analyst Review Required', 'bg-rose-50 text-rose-700 border border-rose-200');
+            agentSummary.textContent = 'The AI agent has detected an urgent anomaly and has escalated the decision to human analysts.';
+        });
+
+        runAnalysis.addEventListener('click', () => {
+            setStatus('Analyzing · Deep Market Synthesis', 'bg-blue-50 text-blue-700 border border-blue-200');
+            appendLog('AI agent is performing deep analysis across agriculture, real estate, and stock exposures...', 'info');
+            setTimeout(() => {
+                appendLog('Deep analysis complete; final recommendation queued for analyst approval.', 'warning');
+                setStatus('Ready · Awaiting Final Decision', 'bg-emerald-50 text-emerald-700 border border-emerald-200');
+                agentSummary.textContent = 'Agent findings are ready for final decision-making after analyst review.';
+            }, 1800);
+        });
+
+        window.addEventListener('load', () => {
+            appendLog('AI monitoring agent initialized. Watching agriculture, real estate, and stock market signals.', 'info');
+        });
+    </script>
 </body>
 </html>
