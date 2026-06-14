@@ -424,6 +424,21 @@
                 appendLog('Handshake creation requires deal ID, buyer ID, and a valid amount.', 'warning');
                 return;
             }
+            // Check global risk before creating handshake
+            try {
+                if (window.checkGlobalRiskBeforeHandshake) {
+                    const risk = await window.checkGlobalRiskBeforeHandshake();
+                    if (risk && risk.active) {
+                        appendLog('Handshake blocked: critical global event detected. Please review AI recommendations.', 'alert');
+                        // If the meeting UI is present, show its modal (it will also have dispatched events)
+                        window.dispatchEvent(new CustomEvent('handshakeBlocked', { detail: risk }));
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn('Risk check failed', e);
+            }
+
             const response = await fetch(`${functionHost}/createHandshakeSession`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

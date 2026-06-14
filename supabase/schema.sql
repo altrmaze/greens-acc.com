@@ -42,3 +42,27 @@ create table if not exists public.meeting_signals (
 );
 
 create index if not exists idx_meeting_signals_room_id on public.meeting_signals (room_id);
+
+-- Global news feed for emergency interceptor
+create table if not exists public.global_news (
+  id uuid primary key default gen_random_uuid(),
+  source text,
+  title text,
+  summary text,
+  category text,
+  severity text,
+  metadata jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.global_risk_flags (
+  id uuid primary key default gen_random_uuid(),
+  news_id uuid references public.global_news(id) on delete set null,
+  scope text not null default 'global', -- can be room-specific later
+  active boolean not null default true,
+  reason text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_global_news_created_at on public.global_news (created_at);
+create index if not exists idx_global_risk_flags_scope on public.global_risk_flags (scope);

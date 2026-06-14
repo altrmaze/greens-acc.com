@@ -21,6 +21,10 @@
       </div>
     </header>
 
+    <!-- Global News Ticker (Realtime) -->
+    <div id="global-news-ticker" class="news-ticker mb-4" aria-live="polite"></div>
+
+
     <section class="grid gap-6 lg:grid-cols-2">
       <div class="space-y-4">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
@@ -42,6 +46,18 @@
       <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <h2 class="text-lg font-bold mb-2">Active Room</h2>
         <div id="active-room" class="space-y-4">
+          <!-- Emergency Modal -->
+          <div id="emergency-modal" class="emergency-modal hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div class="emergency-content bg-white rounded-xl p-6 max-w-2xl w-full">
+              <h2 id="emergency-title" class="text-xl font-bold text-rose-600">Critical Global Event</h2>
+              <p id="emergency-body" class="mt-2 text-sm text-slate-700">An important event was detected that may affect the current handshake or transaction.</p>
+              <div class="mt-4 flex gap-3 justify-end">
+                <button id="emergency-halt" class="px-4 py-2 bg-rose-600 text-white rounded-lg">Halt Handshake</button>
+                <button id="emergency-suggest" class="px-4 py-2 bg-emerald-600 text-white rounded-lg">Apply Agent Suggestion</button>
+                <button id="emergency-dismiss" class="px-4 py-2 bg-slate-100 rounded-lg">Dismiss</button>
+              </div>
+            </div>
+          </div>
           <div id="room-header" class="flex items-center justify-between">
             <div>
               <h3 id="active-room-title" class="text-xl font-semibold">No room selected</h3>

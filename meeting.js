@@ -24,6 +24,132 @@ function initSupabase() {
   }
 }
 
+// ----- Global news ticker & risk subscriptions -----
+let globalRiskActive = false;
+let currentRisk = null;
+
+async function initNewsAndRisk() {
+  if (!supabase) return;
+  try {
+    // initial news load
+    const { data: news, error: newsErr } = await supabase.from('global_news').select('*').order('created_at', { ascending: false }).limit(50);
+    if (!newsErr && Array.isArray(news)) renderTicker(news.reverse());
+
+    // subscribe to new incoming news
+    supabase
+      .channel('global_news:public')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_news' }, payload => {
+        const rec = payload.record || payload.new || payload;
+        if (!rec) return;
+        prependTickerItem(rec);
+      })
+      .subscribe();
+
+    // subscribe to risk flags
+    supabase
+      .channel('global_risk_flags:public')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_risk_flags' }, payload => {
+        const rec = payload.record || payload.new || payload;
+        if (!rec) return;
+        if (rec.active) handleRiskFlag(rec);
+      })
+      .subscribe();
+  } catch (e) {
+    console.warn('initNewsAndRisk failed', e);
+  }
+}
+
+function renderTicker(newsList) {
+  const ticker = document.getElementById('global-news-ticker');
+  if (!ticker) return;
+  const items = newsList.map(n => `[${(n.source||'src').toUpperCase()}] ${n.title}`).join(' \u00A0 • \u00A0 ');
+  ticker.innerHTML = `<div class="ticker-track">${escapeHtml(items)}</div>`;
+}
+
+function prependTickerItem(item) {
+  const ticker = document.getElementById('global-news-ticker');
+  if (!ticker) return;
+  const track = ticker.querySelector('.ticker-track');
+  const newItem = `[${(item.source||'src').toUpperCase()}] ${item.title}`;
+  if (track) track.textContent = `${newItem} \u00A0 • \u00A0 ${track.textContent}`;
+  else ticker.innerHTML = `<div class="ticker-track">${escapeHtml(newItem)}</div>`;
+}
+
+function handleRiskFlag(flagRec) {
+  globalRiskActive = true;
+  currentRisk = flagRec;
+  showEmergencyModal(flagRec.reason || 'Critical event detected');
+  // optionally notify AI agents to generate suggestions
+  postAiEvent({ type: 'risk_alert', room: activeRoom?.id, text: flagRec.reason || '', metadata: flagRec });
+}
+
+function clearRisk() {
+  globalRiskActive = false;
+  currentRisk = null;
+  hideEmergencyModal();
+}
+
+function showEmergencyModal(message) {
+  const modal = document.getElementById('emergency-modal');
+  if (!modal) return;
+  const body = document.getElementById('emergency-body');
+  const title = document.getElementById('emergency-title');
+  title.textContent = 'Critical Global Event';
+  body.textContent = message;
+  modal.classList.remove('hidden');
+}
+
+function hideEmergencyModal() {
+  const modal = document.getElementById('emergency-modal');
+  if (!modal) return;
+  modal.classList.add('hidden');
+}
+
+// expose helper for handshake checks
+window.checkGlobalRiskBeforeHandshake = async function () {
+  if (!supabase) initSupabase();
+  try {
+    const { data, error } = await supabase.from('global_risk_flags').select('*').eq('active', true).limit(1);
+    if (error) return { ok: true, active: false };
+    if (Array.isArray(data) && data.length > 0) return { ok: false, active: true, flag: data[0] };
+    return { ok: true, active: false };
+  } catch (e) {
+    console.warn('checkGlobalRiskBeforeHandshake error', e);
+    return { ok: true, active: false };
+  }
+};
+
+// Listen for global handshake attempts from other UI components
+window.addEventListener('attemptHandshake', async (ev) => {
+  const res = await window.checkGlobalRiskBeforeHandshake();
+  if (!res.ok || res.active) {
+    // dispatch blocked event and show modal
+    const blocked = new CustomEvent('handshakeBlocked', { detail: res });
+    window.dispatchEvent(blocked);
+    if (res.flag) handleRiskFlag(res.flag);
+  } else {
+    window.dispatchEvent(new CustomEvent('handshakeAllowed'));
+  }
+});
+
+// modal action wiring
+document.addEventListener('click', (e) => {
+  const target = e.target;
+  if (!target) return;
+  if (target.id === 'emergency-halt') {
+    // Halt handshake: dispatch a global halt event
+    window.dispatchEvent(new CustomEvent('handshakeHalted', { detail: { reason: currentRisk } }));
+    appendChat('Handshake halted due to critical global event.', 'AI');
+  }
+  if (target.id === 'emergency-suggest') {
+    // Ask AI agents for a suggested mitigation and show it
+    postAiEvent({ type: 'request_mitigation', room: activeRoom?.id, text: currentRisk?.reason || 'Please propose mitigation' });
+  }
+  if (target.id === 'emergency-dismiss') {
+    clearRisk();
+  }
+});
+
 async function subscribeToSignals(roomId, onSignal) {
   if (!supabase) return null;
   // unsubscribe previous
@@ -246,6 +372,8 @@ uploadFileBtn.addEventListener('click', uploadFile);
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchRooms();
+  initSupabase();
+  initNewsAndRisk();
 });
 
 // simple heartbeat to AI agent statuses (demo)
