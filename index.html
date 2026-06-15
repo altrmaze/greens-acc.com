@@ -455,10 +455,19 @@
             commissionAmountText.textContent = formatUsd(data.commission_amount ?? 0);
             updateDealStatusUI();
             appendLog('Digital letter of credit created and the handshake commission is locked.', 'success');
-            if (data.session_url) {
-                window.location.href = data.session_url;
-                return;
-            }
+            
+            // Redirect to announcement page with deal details
+            setTimeout(() => {
+                const params = new URLSearchParams({
+                    deal_id: payload.deal_id,
+                    buyer_name: payload.payer_id,
+                    seller_name: 'Counterparty',
+                    region: regionSelect.value,
+                    lc_ref: lcReferenceInput.value || 'LCR-TBD',
+                    amount: payload.amount
+                });
+                window.location.href = `/announce.html?${params.toString()}`;
+            }, 1500);
         }
 
         async function handleWithdrawal() {

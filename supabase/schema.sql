@@ -66,3 +66,18 @@ create table if not exists public.global_risk_flags (
 
 create index if not exists idx_global_news_created_at on public.global_news (created_at);
 create index if not exists idx_global_risk_flags_scope on public.global_risk_flags (scope);
+
+-- Deal announcements and syndication tracking
+create table if not exists public.deal_announcements (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  press_release text,
+  social_posts jsonb,
+  syndication_status text not null default 'draft', -- draft, preview, published, failed
+  syndication_metadata jsonb,
+  published_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_deal_announcements_deal_id on public.deal_announcements (deal_id);
+create index if not exists idx_deal_announcements_status on public.deal_announcements (syndication_status);
