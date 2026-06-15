@@ -24,6 +24,26 @@
     <!-- Global News Ticker (Realtime) -->
     <div id="global-news-ticker" class="news-ticker mb-4" aria-live="polite"></div>
 
+    <!-- Compliance Monitoring Indicator -->
+    <div id="compliance-indicator" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-xs text-blue-700">
+      <span class="font-semibold">🔒 GreenACC AI Legal Compliance Monitor Active</span> — This meeting is monitored by advanced AI compliance agents trained on OFAC, EU sanctions, and global trade law. All parties are protected.
+    </div>
+
+    <!-- Kill Switch Modal (Hidden by default) -->
+    <div id="kill-switch-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-red-900/50 hidden">
+      <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 p-8 text-center space-y-4 border-4 border-red-600">
+        <div class="text-5xl">⚠️</div>
+        <h2 class="text-2xl font-bold text-red-600">MEETING TERMINATED</h2>
+        <p id="kill-switch-message" class="text-lg text-slate-700">This conversation has been terminated due to a critical international trade compliance violation.</p>
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-800 text-left">
+          <p class="font-semibold mb-2">Compliance Violation Detected:</p>
+          <p id="violation-details">See compliance logs for details.</p>
+        </div>
+        <p class="text-xs text-slate-500">The AI Compliance Lawyer has enforced this kill switch automatically. Your session has been logged with compliance authorities.</p>
+        <button onclick="location.href='/';" class="px-6 py-3 bg-slate-900 text-white rounded-lg font-semibold">Return to Dashboard</button>
+      </div>
+    </div>
+
 
     <section class="grid gap-6 lg:grid-cols-2">
       <div class="space-y-4">
@@ -39,6 +59,19 @@
             <button id="create-room" class="px-4 py-2 bg-emerald-600 text-white rounded-lg">Create new room</button>
             <button id="list-rooms" class="px-4 py-2 bg-slate-100 rounded-lg">Refresh rooms</button>
             <div id="global-status" class="ml-auto text-sm text-slate-500">Ready</div>
+          </div>
+        </div>
+
+        <!-- Instant Secure Room Creation -->
+        <div class="bg-gradient-to-r from-emerald-50 to-blue-50 p-6 rounded-2xl border border-emerald-200 shadow-sm">
+          <h2 class="text-lg font-bold mb-3">Instant Secure Entry (No Registration)</h2>
+          <p class="text-sm text-slate-600 mb-4">Create a temporary encrypted meeting room for global giants. $20 session fee required. Crypto room token auto-generated.</p>
+          <div class="flex gap-3">
+            <input id="instant-company-name" type="text" placeholder="Your Company Name" class="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+            <button id="generate-instant-room-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700">Generate Link</button>
+          </div>
+          <div id="instant-room-output" class="mt-3 text-xs text-slate-600 hidden">
+            <p class="font-mono bg-slate-100 p-2 rounded">Share this link: <span id="share-link"></span></p>
           </div>
         </div>
       </div>
@@ -121,6 +154,24 @@
             <div class="mt-2 flex gap-2">
               <input id="file-input" type="file" />
               <button id="upload-file" class="px-3 py-2 bg-emerald-600 text-white rounded-lg">Upload</button>
+            </div>
+          </div>
+
+          <!-- AI Executive Secretary Tools -->
+          <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <h4 class="font-bold text-slate-900 mb-3">AI Executive Secretary Suite</h4>
+            <div class="space-y-3 text-sm">
+              <div class="flex gap-2">
+                <input id="doc-query" type="text" placeholder="Ask the secretary (e.g., 'Summarize this contract' or 'Find liability clauses')" class="flex-1 rounded border border-slate-200 px-3 py-2" />
+                <button id="secretary-query-btn" class="px-3 py-2 bg-blue-600 text-white rounded">Ask Secretary</button>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button id="doc-summarize-btn" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs">Summarize</button>
+                <button id="doc-parse-btn" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs">Parse Clauses</button>
+                <button id="currency-calc-btn" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs">Currency/Tariff</button>
+                <button id="whiteboard-btn" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 rounded text-xs">Whiteboard</button>
+              </div>
+              <div id="secretary-output" class="hidden mt-2 p-2 bg-white rounded border border-slate-200 text-xs max-h-[150px] overflow-y-auto"></div>
             </div>
           </div>
         </div>

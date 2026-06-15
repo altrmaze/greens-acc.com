@@ -81,3 +81,65 @@ create table if not exists public.deal_announcements (
 
 create index if not exists idx_deal_announcements_deal_id on public.deal_announcements (deal_id);
 create index if not exists idx_deal_announcements_status on public.deal_announcements (syndication_status);
+
+-- Instant meeting rooms with crypto tokens and session fees
+create table if not exists public.instant_rooms (
+  id uuid primary key default gen_random_uuid(),
+  room_token text not null unique,
+  room_name text,
+  creator_company text,
+  participant_company text,
+  encryption_key text,
+  session_fee_status text not null default 'pending', -- pending, paid, expired
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null default (now() + interval '24 hours'),
+  is_active boolean not null default true
+);
+
+-- Document references (pointers to external files, not storing files)
+create table if not exists public.document_references (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid references public.instant_rooms(id) on delete cascade,
+  document_name text,
+  document_type text, -- pdf, docx, spreadsheet, contract, blueprint
+  source_url text,
+  oauth_provider text, -- gdrive, onedrive, etc (optional)
+  encryption_metadata jsonb,
+  uploaded_by text,
+  created_at timestamptz not null default now()
+);
+
+-- Compliance monitoring logs
+create table if not exists public.compliance_logs (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid references public.instant_rooms(id) on delete cascade,
+  violation_type text, -- tariff_bypass, illegal_commodity, sanction_violation, export_control, etc
+  severity text not null default 'warning', -- warning, critical, kill_switch
+  description text,
+  detected_content text,
+  legal_citation text,
+  ai_recommendation text,
+  is_resolved boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+-- Room session state (tracks compliance status and kill switch)
+create table if not exists public.room_sessions (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid references public.instant_rooms(id) on delete cascade,
+  session_status text not null default 'active', -- active, suspended, killed, completed
+  compliance_flags jsonb,
+  kill_switch_triggered boolean not null default false,
+  kill_switch_reason text,
+  handshake_allowed boolean not null default true,
+  payment_allowed boolean not null default true,
+  last_ai_check timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_instant_rooms_token on public.instant_rooms (room_token);
+create index if not exists idx_instant_rooms_active on public.instant_rooms (is_active);
+create index if not exists idx_document_references_room on public.document_references (room_id);
+create index if not exists idx_compliance_logs_room on public.compliance_logs (room_id);
+create index if not exists idx_compliance_logs_severity on public.compliance_logs (severity);
+create index if not exists idx_room_sessions_status on public.room_sessions (session_status);

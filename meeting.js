@@ -380,3 +380,203 @@ document.addEventListener('DOMContentLoaded', () => {
 setInterval(() => {
   ai1Status.textContent = 'active'; ai2Status.textContent = 'active'; ai3Status.textContent = 'active';
 }, 5000);
+
+// ----- INSTANT SECURE ROOM CREATION -----
+let currentRoomToken = null;
+let currentEncryptionKey = null;
+
+async function generateInstantRoom() {
+  const companyName = document.getElementById('instant-company-name').value.trim();
+  if (!companyName) {
+    alert('Please enter your company name');
+    return;
+  }
+
+  const btn = document.getElementById('generate-instant-room-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  try {
+    const response = await fetch(`${functionHost}/generateInstantRoom`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ creator_company: companyName })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to generate room');
+    }
+
+    currentRoomToken = data.room_token;
+    currentEncryptionKey = data.encryption_key;
+
+    const output = document.getElementById('instant-room-output');
+    const link = document.getElementById('share-link');
+    link.textContent = data.share_link;
+    output.classList.remove('hidden');
+
+    appendChat(`Instant room created! Share this link for instant entry: ${data.share_link}. $20 session fee required.`, 'System');
+    btn.textContent = 'Generate Link';
+    btn.disabled = false;
+  } catch (err) {
+    alert(`Error: ${err.message}`);
+    btn.textContent = 'Generate Link';
+    btn.disabled = false;
+  }
+}
+
+// ----- DOCUMENT BRIDGE & FILE STREAMING -----
+async function registerDocument() {
+  if (!activeRoom) {
+    alert('Select a room first');
+    return;
+  }
+
+  const docName = prompt('Document name (e.g., contract.pdf):');
+  if (!docName) return;
+
+  try {
+    const response = await fetch(`${functionHost}/documentBridge`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        room_id: activeRoom.id,
+        document_name: docName,
+        document_type: docName.includes('contract') ? 'contract' : 'document',
+        uploaded_by: clientId
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to register document');
+    }
+
+    appendChat(`Document "${docName}" registered for secure streaming. Ready for instant recall.`, 'System');
+  } catch (err) {
+    appendChat(`Document bridge error: ${err.message}`, 'System');
+  }
+}
+
+// ----- AI EXECUTIVE SECRETARY TOOLS -----
+async function runSecretaryCommand(action, query) {
+  const output = document.getElementById('secretary-output');
+  output.classList.remove('hidden');
+  output.textContent = 'Processing...';
+
+  try {
+    const response = await fetch(`${functionHost}/aiSecretaryTools`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: action,
+        document_text: query || 'Sample contract content',
+        query: query || 'Please summarize',
+        currency_pair: query || 'USD/EUR'
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Secretary error');
+    }
+
+    // Format and display result
+    let html = `<strong>${action}:</strong><br>`;
+    if (data.result) {
+      if (action === 'summarize') {
+        html += `<p>📄 ${data.result.executive_summary}</p>`;
+        html += `<p>Reading time: ${data.result.reading_time_minutes} min, ${data.result.word_count} words</p>`;
+      } else if (action === 'parse') {
+        html += `<p>Found ${data.result.matching_clauses.length} relevant clauses</p>`;
+        html += `<p>⚠️ ${data.result.potential_weaknesses.length} potential weaknesses identified</p>`;
+      } else if (action === 'calculate') {
+        html += `<p>💱 ${data.result.currency_pair}: ${data.result.exchange_rate}</p>`;
+        html += `<p>Tariff: ${data.result.tariff_estimate.estimated_total_cost}</p>`;
+      }
+    }
+
+    output.innerHTML = html;
+  } catch (err) {
+    output.innerHTML = `<span class="text-red-600">Error: ${err.message}</span>`;
+  }
+}
+
+// ----- AI COMPLIANCE LAWYER & KILL SWITCH -----
+let killSwitchActive = false;
+
+async function runComplianceCheck() {
+  if (!activeRoom) return;
+
+  try {
+    const convoText = Array.from(document.querySelectorAll('#chat-log div')).map(d => d.textContent).join('\n');
+
+    const response = await fetch(`${functionHost}/aiComplianceLawyer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        room_id: activeRoom.id,
+        conversation_text: convoText,
+        document_content: ''
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.kill_switch_triggered) {
+      triggerKillSwitch(data.kill_switch_reason, data.violations);
+    } else if (data.violations_detected > 0) {
+      appendChat(`⚠️ Compliance warning: ${data.violations_detected} issue(s) detected. Review immediately.`, 'Compliance AI');
+    }
+  } catch (err) {
+    console.warn('Compliance check error', err);
+  }
+}
+
+function triggerKillSwitch(reason, violations) {
+  killSwitchActive = true;
+  const modal = document.getElementById('kill-switch-modal');
+  const message = document.getElementById('kill-switch-message');
+  const details = document.getElementById('violation-details');
+
+  message.textContent = reason || 'This conversation has been terminated due to a compliance violation.';
+  details.innerHTML = violations.map(v => `<strong>${v.violation_type}:</strong> ${v.description}`).join('<br>');
+
+  modal.classList.remove('hidden');
+
+  // Disable handshake and payment
+  window.dispatchEvent(new CustomEvent('killSwitchTriggered', { detail: { reason, violations } }));
+}
+
+// Wire up event listeners
+document.getElementById('generate-instant-room-btn').addEventListener('click', generateInstantRoom);
+document.getElementById('upload-file').addEventListener('click', function() {
+  if (document.getElementById('file-input').files.length > 0) {
+    registerDocument();
+  }
+});
+
+document.getElementById('secretary-query-btn').addEventListener('click', () => {
+  const query = document.getElementById('doc-query').value;
+  runSecretaryCommand('parse', query);
+});
+
+document.getElementById('doc-summarize-btn').addEventListener('click', () => {
+  runSecretaryCommand('summarize', '');
+});
+
+document.getElementById('doc-parse-btn').addEventListener('click', () => {
+  runSecretaryCommand('parse', 'Find key liability clauses');
+});
+
+document.getElementById('currency-calc-btn').addEventListener('click', () => {
+  runSecretaryCommand('calculate', 'USD/EUR');
+});
+
+document.getElementById('whiteboard-btn').addEventListener('click', () => {
+  appendChat('Opening shared whiteboard...', 'System');
+});
+
+// Periodic compliance monitoring (every 30 seconds)
+setInterval(runComplianceCheck, 30000);
