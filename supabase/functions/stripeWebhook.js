@@ -11,8 +11,6 @@ export async function POST(request) {
   const event = await request.json();
 
   try {
-    const type = event.type || (event?.data?.object?.object || null);
-
     if (event.type === 'checkout.session.completed' || (event.data && event.data.object && event.data.object.payment_status === 'paid')) {
       const session = event.data.object;
       const sessionId = session.id;

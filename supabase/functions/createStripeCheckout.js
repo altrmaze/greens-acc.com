@@ -57,7 +57,7 @@ export async function POST(request) {
   }
 
   const patchEndpoint = `${supabaseUrl}/rest/v1/green_acc_deals?id=eq.${encodeURIComponent(dealId)}`;
-  await fetch(patchEndpoint, {
+  const patchResp = await fetch(patchEndpoint, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -73,6 +73,10 @@ export async function POST(request) {
       last_updated: new Date().toISOString()
     })
   });
+  if (!patchResp.ok) {
+    const patchErr = await patchResp.json().catch(() => ({}));
+    return new Response(JSON.stringify({ error: 'Stripe session created but failed to update deal record', details: patchErr }), { status: 502 });
+  }
 
   return new Response(JSON.stringify({ message: 'Stripe checkout session created', session_url: stripeData.url }), { status: 200 });
 }
