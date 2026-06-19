@@ -34,11 +34,7 @@
                 </div>
                 <div>
                     <span class="text-xl font-black tracking-tight text-slate-900">GreensACC</span>
-<<<<<<< HEAD
                     <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase font-mono">Secure Access & Compliance Command</span>
-=======
-                    <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase font-mono">Secure Trade Platform</span>
->>>>>>> origin/copilot/guiding-pr-agent
                 </div>
             </div>
         </div>
@@ -239,19 +235,11 @@
                                     </div>
                                 </div>
                                 <div class="grid gap-3 sm:grid-cols-3">
-<<<<<<< HEAD
                                     <button id="process-entry-fee" class="w-full px-4 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-emerald-700 transition">Pay $20 access fee</button>
                                     <button id="process-handshake" class="w-full px-4 py-3 bg-slate-900 text-white rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-slate-800 transition">Create L/C & lock 2%</button>
                                     <button id="trigger-withdrawal" class="w-full px-4 py-3 bg-slate-100 text-slate-900 rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-slate-200 transition">Safe withdrawal</button>
                                 </div>
                                 <p class="text-[11px] text-slate-500">The $20.00 GreensACC access fee is separate from the deal amount. Supabase still drives the existing handshake, commission, and escrow workflow buttons.</p>
-=======
-                                    <button id="process-entry-fee" class="w-full px-4 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-emerald-700 transition">Pay $20 Entry Fee</button>
-                                    <button id="process-handshake" class="w-full px-4 py-3 bg-slate-900 text-white rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-slate-800 transition">Create L/C & lock 2%</button>
-                                    <button id="trigger-withdrawal" class="w-full px-4 py-3 bg-slate-100 text-slate-900 rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-slate-200 transition">Safe withdrawal</button>
-                                </div>
-                                <p class="text-[11px] text-slate-500">This workflow connects GreensACC deal records with Stripe commission checkout and secure escrow logic. The $20.00 entry fee is a flat access charge and is not deducted from the deal amount.</p>
->>>>>>> origin/copilot/guiding-pr-agent
                             </div>
                         </div>
                     </div>
@@ -445,29 +433,8 @@
             }
         };
 
-<<<<<<< HEAD
         function setTextContent(node, value) {
             if (node) node.textContent = value;
-=======
-        function updateDealStatusUI() {
-            if (entryFeeStatusText) entryFeeStatusText.textContent = dealStatus.entry_fee_status;
-            if (handshakeStatusText) handshakeStatusText.textContent = dealStatus.handshake_status;
-            if (complianceStatusText) complianceStatusText.textContent = dealStatus.compliance_status;
-            if (escrowStatusText) escrowStatusText.textContent = dealStatus.escrow_status;
-            if (dealProgressText) dealProgressText.textContent = dealStatus.handshake_status === 'confirmed' ? 'locked' : dealStatus.escrow_status;
-            if (agent1Status) {
-                agent1Status.textContent = `1 ${dealStatus.ai_agent_status.agent1}`;
-                agent1Status.className = `rounded-full px-2 py-1 text-[11px] font-semibold ${dealStatus.ai_agent_status.agent1 === 'verified' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : dealStatus.ai_agent_status.agent1 === 'rejected' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`;
-            }
-            if (agent2Status) {
-                agent2Status.textContent = `2 ${dealStatus.ai_agent_status.agent2}`;
-                agent2Status.className = `rounded-full px-2 py-1 text-[11px] font-semibold ${dealStatus.ai_agent_status.agent2 === 'verified' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : dealStatus.ai_agent_status.agent2 === 'rejected' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`;
-            }
-            if (agent3Status) {
-                agent3Status.textContent = `3 ${dealStatus.ai_agent_status.agent3}`;
-                agent3Status.className = `rounded-full px-2 py-1 text-[11px] font-semibold ${dealStatus.ai_agent_status.agent3 === 'verified' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : dealStatus.ai_agent_status.agent3 === 'rejected' ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`;
-            }
->>>>>>> origin/copilot/guiding-pr-agent
         }
 
         function setClassName(node, value) {
@@ -531,14 +498,9 @@
         }
 
         async function handleEntryFee() {
-<<<<<<< HEAD
-            const payload = getEntryFeePayload();
-            if (!payload.deal_id || !payload.payer_id) {
-=======
             const deal_id = dealIdInput ? dealIdInput.value.trim() : '';
             const payer_id = buyerIdInput ? buyerIdInput.value.trim() : '';
             if (!deal_id || !payer_id) {
->>>>>>> origin/copilot/guiding-pr-agent
                 appendLog('Entry fee processing requires both deal ID and buyer ID.', 'warning');
                 return;
             }
@@ -812,19 +774,9 @@
             }, 1800);
         });
 
-<<<<<<< HEAD
         addDomListener(processEntryFee, 'click', handleEntryFee);
         addDomListener(processHandshake, 'click', handleHandshake);
         addDomListener(triggerWithdrawal, 'click', handleWithdrawal);
-
-        window.addEventListener('load', () => {
-            updateLocalTime();
-            setTextContent(paymentStepDisplay, `Step 1: ${paymentSteps[0]}`);
-            setTextContent(commissionAmountText, formatUsd(0));
-=======
-        if (processEntryFee) processEntryFee.addEventListener('click', handleEntryFee);
-        if (processHandshake) processHandshake.addEventListener('click', handleHandshake);
-        if (triggerWithdrawal) triggerWithdrawal.addEventListener('click', handleWithdrawal);
 
         const dealAmountDisplay = document.getElementById('deal-amount-display');
         if (dealAmountInput && dealAmountDisplay) {
@@ -835,10 +787,9 @@
 
         window.addEventListener('load', () => {
             updateLocalTime();
-            if (paymentStepDisplay) paymentStepDisplay.textContent = `Step 1: ${paymentSteps[0]}`;
-            if (commissionAmountText) commissionAmountText.textContent = formatUsd(0);
-            if (dealAmountDisplay && dealAmountInput) dealAmountDisplay.textContent = formatUsd(dealAmountInput.value || 0);
->>>>>>> origin/copilot/guiding-pr-agent
+            setTextContent(paymentStepDisplay, `Step 1: ${paymentSteps[0]}`);
+            setTextContent(commissionAmountText, formatUsd(0));
+            if (dealAmountDisplay && dealAmountInput) setTextContent(dealAmountDisplay, formatUsd(dealAmountInput.value || 0));
             updateDealStatusUI();
             appendLog('AI monitoring agent initialized. Watching agriculture, real estate, and stock market signals.', 'info');
             appendLog('Secure trade policy in effect: No illegal transactions, no money laundering, no sanction violations.', 'warning');
