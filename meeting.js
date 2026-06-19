@@ -580,3 +580,166 @@ document.getElementById('whiteboard-btn').addEventListener('click', () => {
 
 // Periodic compliance monitoring (every 30 seconds)
 setInterval(runComplianceCheck, 30000);
+
+// ============================================================
+// GREENS ACC FRAMEWORK — Negotiation State & Presence Layer
+// ============================================================
+// These functions provide the client-side interface for the
+// meeting negotiation state machine backed by Supabase.
+
+const negotiationFunctionHost = '/functions';
+
+// Negotiation state for the current room
+let negotiationState = {
+  phase: 'discovery',
+  proposed_terms: null,
+  counter_terms: null,
+  agreed_terms: null,
+  last_actor: null
+};
+
+// Announce presence when joining a room
+async function announcePresence(roomId, participantName, company, role) {
+  try {
+    await fetch(negotiationFunctionHost + '/meetingNegotiationState', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'join',
+        room_id: roomId,
+        participant_id: clientId,
+        participant_name: participantName || 'Anonymous',
+        company: company || null,
+        role: role || 'observer'
+      })
+    });
+  } catch (err) {
+    console.warn('[Greens ACC] Presence announcement unavailable', err.message);
+  }
+}
+
+// Send presence heartbeat every 20 seconds to signal liveness
+let _presenceHeartbeatInterval = null;
+function startPresenceHeartbeat(roomId) {
+  if (_presenceHeartbeatInterval) clearInterval(_presenceHeartbeatInterval);
+  _presenceHeartbeatInterval = setInterval(async () => {
+    try {
+      await fetch(negotiationFunctionHost + '/meetingNegotiationState', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'heartbeat', room_id: roomId, participant_id: clientId })
+      });
+    } catch (_) { /* silent — best-effort heartbeat */ }
+  }, 20000);
+}
+
+// Stop heartbeat and announce departure
+async function announceLeave(roomId) {
+  if (_presenceHeartbeatInterval) { clearInterval(_presenceHeartbeatInterval); _presenceHeartbeatInterval = null; }
+  try {
+    await fetch(negotiationFunctionHost + '/meetingNegotiationState', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'leave', room_id: roomId, participant_id: clientId })
+    });
+  } catch (_) { /* silent */ }
+}
+
+// Propose negotiation terms and advance phase
+async function proposeNegotiationTerms(roomId, terms) {
+  try {
+    const resp = await fetch(negotiationFunctionHost + '/meetingNegotiationState', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'propose_terms',
+        room_id: roomId,
+        participant_id: clientId,
+        negotiation_phase: 'proposal',
+        proposed_terms: terms
+      })
+    });
+    if (resp.ok) {
+      negotiationState.phase = 'proposal';
+      negotiationState.proposed_terms = terms;
+      negotiationState.last_actor = clientId;
+      console.info('[Greens ACC] Terms proposed, phase → proposal');
+    }
+  } catch (err) {
+    console.warn('[Greens ACC] propose_terms unavailable', err.message);
+  }
+}
+
+// Accept terms and finalize the negotiation
+async function acceptNegotiationTerms(roomId, agreedTerms) {
+  try {
+    const resp = await fetch(negotiationFunctionHost + '/meetingNegotiationState', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'accept_terms',
+        room_id: roomId,
+        participant_id: clientId,
+        negotiation_phase: 'agreed',
+        agreed_terms: agreedTerms || negotiationState.proposed_terms
+      })
+    });
+    if (resp.ok) {
+      negotiationState.phase = 'agreed';
+      negotiationState.agreed_terms = agreedTerms;
+      console.info('[Greens ACC] Terms accepted, phase → agreed');
+    }
+  } catch (err) {
+    console.warn('[Greens ACC] accept_terms unavailable', err.message);
+  }
+}
+
+// Log a custom room event (file share, whiteboard open, etc.)
+async function logRoomEvent(roomId, eventType, eventPayload) {
+  try {
+    await fetch(negotiationFunctionHost + '/meetingNegotiationState', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'log_event',
+        room_id: roomId,
+        participant_id: clientId,
+        event_type: eventType,
+        payload: eventPayload || {}
+      })
+    });
+  } catch (_) { /* best-effort */ }
+}
+
+// Subscribe to live negotiation state changes via Supabase Realtime
+function subscribeNegotiationState(roomId) {
+  if (!supabase || !roomId) return;
+  supabase
+    .channel('negotiation:' + roomId)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'meeting_negotiations',
+      filter: 'room_id=eq.' + roomId
+    }, payload => {
+      const rec = payload.new || payload.record;
+      if (!rec) return;
+      negotiationState.phase = rec.negotiation_phase;
+      negotiationState.last_actor = rec.last_actor;
+      console.info('[Greens ACC] Negotiation phase update received:', rec.negotiation_phase);
+      // TODO: surface phase change in meeting UI
+    })
+    .subscribe();
+}
+
+// Expose negotiation helpers on window for integration with meeting.html UI
+window.greensAcc = Object.assign(window.greensAcc || {}, {
+  announcePresence,
+  announceLeave,
+  startPresenceHeartbeat,
+  proposeNegotiationTerms,
+  acceptNegotiationTerms,
+  logRoomEvent,
+  subscribeNegotiationState,
+  getNegotiationState: () => Object.assign({}, negotiationState)
+});
