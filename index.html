@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GreenACC — Secure Trade Escrow &amp; AI-Monitored Handshake Platform</title>
-  <meta name="description" content="Enterprise-grade deal orchestration with AI-monitored handshake workflows, real-time OFAC compliance, instant encrypted meeting rooms." />
+  <title>greens ACC — Secure Enterprise Trade Escrow Platform</title>
+  <meta name="description" content="Enterprise-grade deal orchestration with digital verification workflows, automated compliance utilities, and secure transaction suites." />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght=300;400;500;600;700;800;900&display=swap');
     * { font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif; }
 
     .hero-gradient {
@@ -48,23 +48,6 @@
     .tab-panel         { display:none; }
     .tab-panel.active  { display:block; }
 
-    .agent-verified { background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3); color:#34d399; }
-    .agent-pending  { background:rgba(251,191,36,.1);  border:1px solid rgba(251,191,36,.3);  color:#fbbf24; }
-    .agent-failed   { background:rgba(239,68,68,.1);   border:1px solid rgba(239,68,68,.3);   color:#f87171; }
-
-    .modal-overlay { background:rgba(0,0,0,.7); backdrop-filter:blur(4px); }
-    .modal-enter   { animation:modalIn .3s cubic-bezier(.34,1.56,.64,1); }
-    @keyframes modalIn {
-      from { opacity:0; transform:scale(.9) translateY(20px); }
-      to   { opacity:1; transform:scale(1)  translateY(0); }
-    }
-    .kill-screen { background:rgba(239,68,68,.05); border:1px solid rgba(239,68,68,.3); }
-
-    .feature-card { transition:transform .25s ease,box-shadow .25s ease; }
-    .feature-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 20px rgba(16,185,129,.08); }
-
-    .progress-fill { transition:width 1.2s cubic-bezier(.4,0,.2,1); }
-
     ::-webkit-scrollbar       { width:6px; }
     ::-webkit-scrollbar-track { background:#0a0f1a; }
     ::-webkit-scrollbar-thumb { background:#1e3a2f; border-radius:4px; }
@@ -76,17 +59,15 @@
 <body class="bg-[#020d18] text-slate-200 antialiased min-h-screen">
 
 <!-- ═══ NAVIGATION ═══ -->
-<nav id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b border-transparent"
-     style="background:rgba(2,13,24,.7);backdrop-filter:blur(16px)">
+<nav id="navbar" class="fixed top-0 inset-x-0 z-50 border-b border-transparent" style="background:rgba(2,13,24,.7); backdrop-filter:blur(16px)">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
 
-      <!-- Logo -->
+      <!-- Unified Brand Logo -->
       <div class="flex items-center space-x-3">
         <div class="relative">
           <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
-            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="M12 2L2 7l10 5 10-5-10-5z"/>
               <path d="M2 17l10 5 10-5"/>
               <path d="M2 12l10 5 10-5"/>
@@ -95,30 +76,23 @@
           <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#020d18] animate-pulse"></span>
         </div>
         <div>
-          <span class="font-bold text-white text-lg tracking-tight">Green<span class="text-emerald-400">ACC</span></span>
+          <span class="font-bold text-white text-lg tracking-tight">greens<span class="text-emerald-400"> ACC</span></span>
           <p class="text-[10px] text-slate-500 leading-none">Enterprise Trade Escrow</p>
         </div>
       </div>
 
-      <!-- Desktop links -->
+      <!-- Navigation Links -->
       <div class="hidden md:flex items-center space-x-1">
-        <a href="#dashboard"    class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Dashboard</a>
-        <a href="#features"     class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Features</a>
+        <a href="#dashboard" class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Dashboard</a>
+        <a href="#features" class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Features</a>
         <a href="#instant-rooms" class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Instant Rooms</a>
-        <a href="meeting.html"  class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition flex items-center gap-1">
-          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
-          </svg>
-          Meeting Suite
-        </a>
-        <a href="announce.html" class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Announce</a>
       </div>
 
-      <!-- CTA -->
+      <!-- Call to Action -->
       <div class="flex items-center gap-3">
         <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-xs text-emerald-400 font-medium">Live Platform</span>
+          <span class="text-xs text-emerald-400 font-medium">Platform Live</span>
         </div>
         <a href="#dashboard" class="btn-glow px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold rounded-xl text-sm transition-all">
           Start Deal &rarr;
@@ -128,33 +102,32 @@
   </div>
 </nav>
 
-<!-- ═══ NEWS TICKER ═══ -->
+<!-- ═══ SYSTEM STATUS TICKER ═══ -->
 <div id="news-ticker-bar" class="fixed top-16 inset-x-0 z-40 bg-slate-900/90 border-b border-slate-800/60 py-1.5 backdrop-blur-sm">
   <div class="flex items-center gap-3 px-4">
-    <span class="flex-shrink-0 text-[10px] font-bold uppercase tracking-widest text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 rounded">LIVE</span>
+    <span class="flex-shrink-0 text-[10px] font-bold uppercase tracking-widest text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 rounded">SYSTEM</span>
     <div class="ticker-wrap flex-1">
       <div class="ticker-track text-xs text-slate-400 font-medium" id="ticker-content">
-        &bull; GreenACC Platform Online &mdash; All AI Agents Nominal &nbsp;&nbsp;&nbsp;
-        &bull; Trade Escrow Active &mdash; OFAC Compliance Engine Running &nbsp;&nbsp;&nbsp;
-        &bull; Instant Encrypted Meeting Rooms Available &mdash; No Registration Required &nbsp;&nbsp;&nbsp;
-        &bull; 3-Agent AI Verification System Operational &nbsp;&nbsp;&nbsp;
-        &bull; L/C Locking Service Active &mdash; 2% Commission Rate &nbsp;&nbsp;&nbsp;
-        &bull; Global Risk Monitoring Engaged &mdash; EU/US Sanctions Screening Live &nbsp;&nbsp;&nbsp;
+        &bull; greens ACC Escrow Architecture Secure &nbsp;&nbsp;&nbsp;
+        &bull; Cryptographic Handshake Nodes Active &nbsp;&nbsp;&nbsp;
+        &bull; Secure Trade Protocols Engaged &mdash; Protected Environment &nbsp;&nbsp;&nbsp;
+        &bull; Flat Entry Fee System Active &nbsp;&nbsp;&nbsp;
       </div>
     </div>
-    <span id="risk-indicator" class="flex-shrink-0 text-[10px] font-semibold text-emerald-400">&bull; CLEAR</span>
+    <span id="risk-indicator" class="flex-shrink-0 text-[10px] font-semibold text-emerald-400">&bull; ONLINE</span>
   </div>
 </div>
 
-<!-- ═══ HERO ═══ -->
+<!-- ═══ HERO SECTION ═══ -->
 <section class="hero-gradient grid-overlay relative pt-36 pb-20 px-4 overflow-hidden">
   <div class="absolute top-20 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
   <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-emerald-400/5 rounded-full blur-3xl pointer-events-none"></div>
+  
   <div class="max-w-6xl mx-auto text-center relative z-10">
-
+    <!-- Compliant Badging -->
     <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
       <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-      <span class="text-sm text-emerald-400 font-medium">Trusted by Global Enterprises &middot; Toyota &middot; Nissan &middot; Fortune 500</span>
+      <span class="text-sm text-emerald-400 font-medium">B2B Trade & Secure Liquidity Infrastructure</span>
     </div>
 
     <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-tight mb-6">
@@ -163,20 +136,18 @@
     </h1>
 
     <p class="max-w-2xl mx-auto text-slate-400 text-lg sm:text-xl leading-relaxed mb-10">
-      Enterprise-grade deal orchestration with AI-monitored handshake workflows,
-      real-time OFAC compliance, and instant encrypted meeting rooms &mdash; zero tedious registration.
+      Enterprise-grade deal orchestration featuring smart-monitored handshake workflows, 
+      automated internal compliance tracking, and immediate peer-to-peer negotiation rooms.
     </p>
 
     <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-      <a href="#dashboard"
-         class="btn-glow inline-flex items-center justify-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-2xl text-base transition-all shadow-lg shadow-emerald-500/20">
+      <a href="#dashboard" class="btn-glow inline-flex items-center justify-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-2xl text-base transition-all shadow-lg shadow-emerald-500/20">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
         </svg>
         Create Deal &mdash; $20 Entry
       </a>
-      <a href="#instant-rooms"
-         class="inline-flex items-center justify-center gap-2 px-8 py-4 glass-light hover:bg-white/10 text-white font-semibold rounded-2xl text-base transition-all">
+      <a href="#instant-rooms" class="inline-flex items-center justify-center gap-2 px-8 py-4 glass-light hover:bg-white/10 text-white font-semibold rounded-2xl text-base transition-all">
         <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.869V15.13a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
         </svg>
@@ -184,7 +155,7 @@
       </a>
     </div>
 
-    <!-- Stats -->
+    <!-- Scalable Architecture Benchmarks -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
       <div class="glass rounded-2xl p-5 glow-emerald">
         <div class="text-3xl font-black text-emerald-400">$20</div>
@@ -195,8 +166,8 @@
         <div class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">Commission Rate</div>
       </div>
       <div class="glass rounded-2xl p-5">
-        <div class="text-3xl font-black text-white">3x</div>
-        <div class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">AI Agent Verify</div>
+        <div class="text-3xl font-black text-white">3-Stage</div>
+        <div class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">Verification Steps</div>
       </div>
       <div class="glass rounded-2xl p-5">
         <div class="text-3xl font-black text-emerald-400">24h</div>
@@ -206,28 +177,21 @@
   </div>
 </section>
 
-<!-- ═══ DASHBOARD ═══ -->
+<!-- ═══ DASHBOARD SECTION ═══ -->
 <section id="dashboard" class="py-16 px-4">
   <div class="max-w-6xl mx-auto">
-    <div class="text-center mb-10">
-      <h2 class="text-3xl font-bold text-white mb-2">Deal Dashboard</h2>
-      <p class="text-slate-400">Create deals, initiate handshakes, and track escrow status in real-time.</p>
-    </div>
-
-    <!-- Tabs -->
+    
+    <!-- Tab Controls -->
     <div class="flex flex-wrap gap-2 mb-6 p-1 glass rounded-2xl max-w-xl mx-auto">
       <button class="tab-btn active flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border border-transparent transition-all" data-tab="create">
         + New Deal
       </button>
       <button class="tab-btn flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border border-transparent text-slate-400 hover:text-white transition-all" data-tab="handshake">
-        Handshake
-      </button>
-      <button class="tab-btn flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border border-transparent text-slate-400 hover:text-white transition-all" data-tab="status">
-        Deal Status
+        Handshake Suite
       </button>
     </div>
 
-    <!-- TAB: Create Deal -->
+    <!-- Tab 1: Create Deal -->
     <div class="tab-panel active" id="tab-create">
       <div class="max-w-2xl mx-auto glass rounded-2xl p-8 border border-emerald-500/10">
         <div class="flex items-center gap-3 mb-6">
@@ -237,108 +201,166 @@
             </svg>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Create New Deal</h3>
-            <p class="text-xs text-slate-500">Activate escrow with a flat $20 entry fee</p>
+            <h3 class="text-lg font-bold text-white">Initialize New Escrow</h3>
+            <p class="text-xs text-slate-500">Secure entry verification with fixed configuration billing</p>
           </div>
         </div>
 
         <form id="deal-form" class="space-y-5">
           <div class="grid sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Buyer ID / Company</label>
-              <input id="buyer-id" type="text" placeholder="e.g. CORP-7821 or Acme Ltd."
-                class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition"/>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Counterparty / Buyer Reference</label>
+              <input id="buyer-id" type="text" placeholder="e.g. Unique Corporate Reference"
+                class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition"/>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Deal Amount (USD)</label>
-              <div class="relative">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">$</span>
-                <input id="deal-amount" type="number" min="1" step="0.01" placeholder="500000.00"
-                  class="w-full pl-8 pr-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition"/>
-              </div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Deal Volume Asset Value (USD)</label>
+              <input id="deal-amount" type="number" min="1" step="0.01" placeholder="500000.00"
+                class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition"/>
             </div>
           </div>
 
-          <div class="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Region</label>
-              <select id="deal-region" class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition">
-                <option value="US">United States</option>
-                <option value="EU">European Union</option>
-                <option value="APAC">Asia Pacific</option>
-                <option value="ME">Middle East</option>
-                <option value="LATAM">Latin America</option>
-                <option value="AFRICA">Africa</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Currency</label>
-              <select id="deal-currency" class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition">
-                <option value="USD">USD &mdash; US Dollar</option>
-                <option value="EUR">EUR &mdash; Euro</option>
-                <option value="GBP">GBP &mdash; British Pound</option>
-                <option value="JPY">JPY &mdash; Japanese Yen</option>
-                <option value="CNY">CNY &mdash; Chinese Yuan</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">L/C Reference Number <span class="text-slate-600">(optional)</span></label>
-            <input id="lc-ref" type="text" placeholder="e.g. LC-2025-09-XXYY"
-              class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition"/>
-          </div>
-
-          <!-- Fee breakdown -->
           <div class="p-4 rounded-xl border border-slate-700/40 bg-slate-800/30">
-            <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3">Fee Breakdown</p>
-            <div class="space-y-2">
-              <div class="flex justify-between text-sm">
-                <span class="text-slate-400">Activation / Entry Fee</span>
-                <span class="text-white font-semibold">$20.00 USD</span>
-              </div>
-              <div class="flex justify-between text-sm">
-                <span class="text-slate-400">Handshake Commission <span class="text-slate-600">(on deal amount)</span></span>
-                <span id="commission-preview" class="text-emerald-400 font-semibold">&mdash;</span>
-              </div>
-              <div class="h-px bg-slate-700/50 my-2"></div>
-              <div class="flex justify-between text-sm font-semibold">
-                <span class="text-white">Due Now</span>
-                <span class="text-emerald-400">$20.00 USD</span>
-              </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-400">Processing Configuration Entry Fee</span>
+              <span class="text-white font-semibold">$20.00 USD</span>
+            </div>
+            <div class="flex justify-between text-sm mt-1">
+              <span class="text-slate-400">Handshake System Commission (2%)</span>
+              <span id="commission-preview" class="text-emerald-400 font-semibold">—</span>
             </div>
           </div>
 
-          <button type="submit" id="create-deal-btn"
-            class="btn-glow w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Activate Deal &mdash; Pay $20 Entry Fee
+          <button type="submit" class="btn-glow w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-xl transition-all text-sm">
+            Activate Secure Escrow Record
           </button>
           <div id="create-status" class="hidden text-sm text-center rounded-xl p-3"></div>
         </form>
       </div>
     </div>
 
-    <!-- TAB: Handshake -->
+    <!-- Tab 2: Handshake Suite -->
     <div class="tab-panel" id="tab-handshake">
       <div class="max-w-2xl mx-auto glass rounded-2xl p-8 border border-blue-500/10">
         <div class="flex items-center gap-3 mb-6">
           <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
             <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0"/>
             </svg>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Initiate Handshake</h3>
-            <p class="text-xs text-slate-500">Lock Letter of Credit &amp; confirm escrow with 2% commission</p>
+            <h3 class="text-lg font-bold text-white">Execute Mutual Handshake</h3>
+            <p class="text-xs text-slate-500">Lock conditional ledgers and allocate trade records safely</p>
           </div>
         </div>
 
         <form id="handshake-form" class="space-y-5">
           <div>
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Deal ID</label>
-            <input id="hs-deal-id" type="text" placeholder="UUID from deal activation"
-              class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 font-mono transition"/>
-         
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Active Deal Token / ID</label>
+            <input id="hs-deal-id" type="text" placeholder="Paste generated escrow system ID key"
+              class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm font-mono focus:outline-none focus:border-blue-500/50 transition"/>
+          </div>
+          <button type="submit" class="w-full py-4 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-xl text-sm transition-all">
+            Commit Handshake Terms
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ APPLICATION SCRIPTS ═══ -->
+<script>
+  // 1. Initialize Supabase Connection
+  const supabaseUrl = 'YOUR_SUPABASE_URL'; 
+  const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+  const supabase = window.supabase ? window.supabase.createClient(supabaseUrl, supabaseKey) : null;
+
+  const dealAmountInput = document.getElementById('deal-amount');
+  const commissionPreview = document.getElementById('commission-preview');
+  const dealForm = document.getElementById('deal-form');
+  const createStatus = document.getElementById('create-status');
+
+  // 2. Real-Time Dynamic Commission Calculations (2%)
+  if (dealAmountInput) {
+    dealAmountInput.addEventListener('input', () => {
+      const value = parseFloat(dealAmountInput.value);
+      if (!isNaN(value) && value > 0) {
+        const calculatedCommission = value * 0.02;
+        commissionPreview.textContent = `$${calculatedCommission.toFixed(2)} USD`;
+      } else {
+        commissionPreview.textContent = '—';
+      }
+    });
+  }
+
+  // 3. Database Ingestion Event Handler
+  if (dealForm) {
+    dealForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      createStatus.className = "text-sm text-center rounded-xl p-3 hidden";
+      
+      const buyerId = document.getElementById('buyer-id').value.trim();
+      const amount = parseFloat(dealAmountInput.value);
+
+      if (!buyerId || isNaN(amount) || amount <= 0) {
+        showFeedback('Please provide clean data inputs for both referencing fields.', 'error');
+        return;
+      }
+
+      showFeedback('Queueing database operations...', 'info');
+
+      if (!supabase) {
+        showFeedback('Client initialization incomplete. Configure real Supabase keys to process data.', 'error');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('deals')
+          .insert([{ 
+            buyer_reference: buyerId, 
+            deal_value: amount, 
+            status: 'pending', 
+            created_at: new Date().toISOString() 
+          }])
+          .select();
+
+        if (error) throw error;
+        showFeedback(`Escrow record deployed successfully! Ref: ${data[0].id}`, 'success');
+        dealForm.reset();
+        commissionPreview.textContent = '—';
+      } catch (err) {
+        showFeedback(`Operational failure: ${err.message}`, 'error');
+      }
+    });
+  }
+
+  function showFeedback(msg, classification) {
+    createStatus.classList.remove('hidden');
+    if (classification === 'error') {
+      createStatus.className = "text-sm text-center rounded-xl p-3 bg-red-500/10 border border-red-500/30 text-red-400";
+    } else if (classification === 'success') {
+      createStatus.className = "text-sm text-center rounded-xl p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400";
+    } else {
+      createStatus.className = "text-sm text-center rounded-xl p-3 bg-slate-800 border border-slate-700 text-slate-300";
+    }
+    createStatus.textContent = msg;
+  }
+
+  // 4. Tab Interface Switch Manager
+  document.querySelectorAll('.tab-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+      
+      button.classList.add('active');
+      const connectionId = button.getAttribute('data-tab');
+      document.getElementById(`tab-${connectionId}`).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
