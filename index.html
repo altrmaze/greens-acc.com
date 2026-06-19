@@ -3,10 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreenACC — Secure Trading Command & AI Escrow Hub برعاية ايمن وامين يلا يا حبيب خلينا ندور </title>
+    <title>GreenACC — Global B2B Trade & AI Escrow Command</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<!--
+  GreenACC — Core Index
+  Architecture: Vanilla HTML + Tailwind CSS CDN + Supabase edge-function fetch calls.
+  Sections:
+    1. Market Ticker
+    2. Navigation
+    3. Hero Dashboard Header
+    4. B2B Meeting Room Gateway   ($20 isolation fee + room links)
+    5. Deal Activation & AI Triple-Agent Core
+    6. Compliance & Security Layer (kill switch, compliance monitor)
+    7. Supply Chain & Global Marketplace
+    8. Certified Laboratory Network
+    9. AI Sentinel Command Center
+-->
 <body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen antialiased">
+
+<!-- ═══════════════════════════════════════════════════════
+     1. MARKET TICKER
+════════════════════════════════════════════════════════ -->
+<style>
+    @keyframes marquee { 0% { transform: translate3d(0,0,0); } 100% { transform: translate3d(-50%,0,0); } }
+    .animate-marquee { display:inline-block; padding-left:100%; animation: marquee 34s linear infinite; }
+    .animate-marquee:hover { animation-play-state: paused; }
+    .status-badge { display:inline-flex; align-items:center; gap:0.35rem; padding:0.2rem 0.65rem; border-radius:9999px; font-size:0.7rem; font-weight:700; }
+    .status-loading { background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; }
+    .status-success { background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; }
+    .status-error   { background:#fff1f2; color:#be123c; border:1px solid #fecdd3; }
+    .status-warning { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
+    .status-active  { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+    .kill-switch-active { border-color: #dc2626 !important; background: #fff1f2 !important; }
+</style>
 
     <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 shadow-sm font-mono">
         <div class="inline-block animate-marquee space-x-8">
