@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greens ACC — Supply Chain Engine</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen antialiased">
+
+  <!-- Navigation -->
+  <nav class="border-b border-slate-200 bg-white/90 backdrop-blur px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+    <div class="flex items-center space-x-3">
+      <div class="h-9 w-9 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-emerald-600">
+          <path d="M3.375 4.5C2.339 4.5 1.5 5.34 1.5 6.375V13.5h12V6.375c0-1.036-.84-1.875-1.875-1.875h-8.25zM13.5 15h-12v2.625c0 1.035.84 1.875 1.875 1.875H5.25a3.375 3.375 0 006.75 0h2.25a1.875 1.875 0 001.875-1.875V15z" />
+          <path d="M8.25 19.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0zM15.75 6.75a.75.75 0 00-.75.75v11.25c0 .087.015.17.042.248a3 3 0 005.958.464c.853-.175 1.522-.935 1.464-1.883a18.659 18.659 0 00-3.732-10.104 1.837 1.837 0 00-1.47-.725H15.75z" />
+          <path d="M19.5 19.5a1.5 1.5 0 10-3 0 1.5 1.5 0 003 0z" />
+        </svg>
+      </div>
+      <div>
+        <span class="text-lg font-black tracking-tight text-slate-900">Greens ACC</span>
+        <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase font-mono">Supply Chain Engine</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/" class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-700">Dashboard</a>
+      <a href="/meeting.html" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">Meeting Rooms</a>
+      <a href="/compliance-monitor.html" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">Compliance Monitor</a>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto p-6 space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Supply Chain Engine</h1>
+        <p class="text-sm text-slate-500 mt-1">Track trade shipments, milestones, and logistics events across global corridors.</p>
+      </div>
+      <button id="new-shipment-btn" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 text-sm">
+        + New Shipment
+      </button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-xs text-slate-500 font-mono uppercase tracking-wider">Total Shipments</p>
+        <p id="stat-total" class="text-3xl font-black text-slate-900 mt-1">—</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-xs text-slate-500 font-mono uppercase tracking-wider">In Transit</p>
+        <p id="stat-transit" class="text-3xl font-black text-emerald-600 mt-1">—</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-xs text-slate-500 font-mono uppercase tracking-wider">Customs Hold</p>
+        <p id="stat-hold" class="text-3xl font-black text-amber-500 mt-1">—</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-xs text-slate-500 font-mono uppercase tracking-wider">Exceptions</p>
+        <p id="stat-exception" class="text-3xl font-black text-rose-500 mt-1">—</p>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+
+      <!-- Shipments Table -->
+      <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="font-bold text-slate-900">Shipments</h2>
+          <button id="refresh-btn" class="text-xs text-slate-400 hover:text-emerald-600 font-mono">↻ Refresh</button>
+        </div>
+        <div id="shipments-list" class="divide-y divide-slate-50 max-h-[480px] overflow-y-auto">
+          <div class="px-6 py-8 text-center text-slate-400 text-sm">Loading shipments...</div>
+        </div>
+      </div>
+
+      <!-- Create Shipment Form -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm" id="create-form-panel">
+        <div class="px-6 py-4 border-b border-slate-100">
+          <h2 class="font-bold text-slate-900">Create Shipment</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Registers a new shipment and seeds milestone checkpoints.</p>
+        </div>
+        <div class="p-6 space-y-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Tracking Number *</label>
+            <input id="f-tracking" type="text" placeholder="GSACC-2024-001" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Origin *</label>
+              <input id="f-origin" type="text" placeholder="EG" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Destination *</label>
+              <input id="f-dest" type="text" placeholder="AE" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+            </div>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Carrier</label>
+            <input id="f-carrier" type="text" placeholder="MSC / Maersk / FedEx" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Commodity</label>
+            <input id="f-commodity" type="text" placeholder="Fresh Produce — Bananas" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">HS Code</label>
+              <input id="f-hs" type="text" placeholder="0803.90" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Incoterms</label>
+              <select id="f-incoterms" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+                <option value="">Select</option>
+                <option>FOB</option><option>CIF</option><option>EXW</option>
+                <option>DDP</option><option>FCA</option><option>CFR</option>
+              </select>
+            </div>
+          </div>
+          <button id="create-shipment-submit" class="w-full py-2.5 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 text-sm">
+            Create Shipment
+          </button>
+          <div id="create-result" class="hidden text-xs p-3 rounded-lg"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Milestone Timeline Panel (shown when shipment selected) -->
+    <div id="milestone-panel" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-slate-900">Milestone Timeline</h2>
+          <p id="milestone-subtitle" class="text-xs text-slate-500 mt-0.5"></p>
+        </div>
+        <button id="close-milestone" class="text-xs text-slate-400 hover:text-rose-500 font-mono">✕ Close</button>
+      </div>
+      <div id="milestone-list" class="p-6"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Greens ACC — Supply Chain Engine client
+    // Configure Supabase: set window.SUPABASE_CONFIG before this script or inject dynamically
+    const cfg = window.SUPABASE_CONFIG || { url: 'https://your-project.supabase.co', anonKey: 'YOUR_SUPABASE_ANON_KEY' };
+    let supabase = null;
+    try { supabase = window.supabase.createClient(cfg.url, cfg.anonKey); } catch(e) { console.warn('Supabase init skipped', e); }
+
+    const statusColors = {
+      pending: 'bg-slate-100 text-slate-600',
+      in_transit: 'bg-blue-100 text-blue-700',
+      customs_hold: 'bg-amber-100 text-amber-700',
+      cleared: 'bg-teal-100 text-teal-700',
+      delivered: 'bg-emerald-100 text-emerald-700',
+      exception: 'bg-rose-100 text-rose-700',
+      cancelled: 'bg-slate-200 text-slate-500'
+    };
+
+    const milestoneLabels = {
+      origin_pickup: 'Origin Pickup',
+      export_clearance: 'Export Customs',
+      origin_port_departure: 'Port Departure',
+      in_transit_waypoint: 'In-Transit Waypoint',
+      destination_port_arrival: 'Port Arrival',
+      import_clearance: 'Import Customs',
+      final_delivery: 'Final Delivery'
+    };
+
+    const milestoneStatusIcon = {
+      pending: '○', in_progress: '◑', completed: '●', failed: '✕', skipped: '—'
+    };
+
+    async function loadShipments() {
+      if (!supabase) { renderEmpty(); return; }
+      const { data, error } = await supabase
+        .from('supply_shipments')
+        .select('id,tracking_number,origin_country,destination_country,carrier,status,created_at')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) { renderEmpty('Error loading shipments'); return; }
+      renderShipments(data || []);
+      updateStats(data || []);
+    }
+
+    function updateStats(shipments) {
+      document.getElementById('stat-total').textContent = shipments.length;
+      document.getElementById('stat-transit').textContent = shipments.filter(s => s.status === 'in_transit').length;
+      document.getElementById('stat-hold').textContent = shipments.filter(s => s.status === 'customs_hold').length;
+      document.getElementById('stat-exception').textContent = shipments.filter(s => s.status === 'exception').length;
+    }
+
+    function renderShipments(shipments) {
+      const container = document.getElementById('shipments-list');
+      if (!shipments.length) { renderEmpty(); return; }
+      container.innerHTML = shipments.map(s => {
+        const badge = statusColors[s.status] || 'bg-slate-100 text-slate-600';
+        return '<div class="px-6 py-4 hover:bg-slate-50 cursor-pointer flex items-center justify-between group" onclick="loadMilestones('' + s.id + '','' + s.tracking_number + '')">' +
+          '<div class="min-w-0">' +
+          '<p class="font-mono text-sm font-semibold text-slate-900 truncate">' + s.tracking_number + '</p>' +
+          '<p class="text-xs text-slate-500 mt-0.5">' + (s.carrier || 'Unknown carrier') + ' · ' + s.origin_country + ' → ' + s.destination_country + '</p>' +
+          '</div>' +
+          '<div class="flex items-center gap-2">' +
+          '<span class="px-2 py-0.5 rounded-full text-xs font-semibold ' + badge + '">' + s.status + '</span>' +
+          '<span class="text-slate-300 group-hover:text-slate-500 text-sm">›</span>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function renderEmpty(msg) {
+      document.getElementById('shipments-list').innerHTML =
+        '<div class="px-6 py-8 text-center text-slate-400 text-sm">' + (msg || 'No shipments found. Create your first shipment →') + '</div>';
+      ['stat-total','stat-transit','stat-hold','stat-exception'].forEach(id => {
+        document.getElementById(id).textContent = '0';
+      });
+    }
+
+    async function loadMilestones(shipmentId, trackingNumber) {
+      if (!supabase) return;
+      const { data, error } = await supabase
+        .from('supply_milestones')
+        .select('*')
+        .eq('shipment_id', shipmentId)
+        .order('created_at', { ascending: true });
+
+      const panel = document.getElementById('milestone-panel');
+      const subtitle = document.getElementById('milestone-subtitle');
+      const list = document.getElementById('milestone-list');
+      subtitle.textContent = 'Shipment: ' + trackingNumber;
+
+      if (error || !data || !data.length) {
+        list.innerHTML = '<p class="text-sm text-slate-400">No milestones found for this shipment.</p>';
+        panel.classList.remove('hidden');
+        return;
+      }
+
+      list.innerHTML = '<div class="flex flex-wrap gap-4">' +
+        data.map((m, i) => {
+          const icon = milestoneStatusIcon[m.milestone_status] || '○';
+          const label = milestoneLabels[m.milestone_type] || m.milestone_type;
+          const done = m.milestone_status === 'completed';
+          return '<div class="flex items-center gap-2">' +
+            (i > 0 ? '<div class="w-6 h-px bg-slate-200"></div>' : '') +
+            '<div class="flex flex-col items-center">' +
+            '<span class="text-lg ' + (done ? 'text-emerald-500' : 'text-slate-300') + '">' + icon + '</span>' +
+            '<span class="text-xs text-slate-600 font-medium mt-1 whitespace-nowrap">' + label + '</span>' +
+            '<span class="text-xs text-slate-400">' + (m.milestone_status) + '</span>' +
+            '</div></div>';
+        }).join('') +
+        '</div>';
+      panel.classList.remove('hidden');
+    }
+
+    document.getElementById('close-milestone').addEventListener('click', () => {
+      document.getElementById('milestone-panel').classList.add('hidden');
+    });
+
+    document.getElementById('refresh-btn').addEventListener('click', loadShipments);
+
+    document.getElementById('create-shipment-submit').addEventListener('click', async () => {
+      const tracking = document.getElementById('f-tracking').value.trim();
+      const origin = document.getElementById('f-origin').value.trim();
+      const dest = document.getElementById('f-dest').value.trim();
+      const carrier = document.getElementById('f-carrier').value.trim();
+      const commodity = document.getElementById('f-commodity').value.trim();
+      const hs = document.getElementById('f-hs').value.trim();
+      const incoterms = document.getElementById('f-incoterms').value;
+      const result = document.getElementById('create-result');
+
+      if (!tracking || !origin || !dest) {
+        result.className = 'text-xs p-3 rounded-lg bg-rose-50 text-rose-700';
+        result.textContent = 'Tracking number, origin, and destination are required.';
+        result.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const resp = await fetch('/functions/supplyChainCreateShipment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tracking_number: tracking, origin_country: origin, destination_country: dest,
+            carrier, commodity_description: commodity, hs_code: hs, incoterms })
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          result.className = 'text-xs p-3 rounded-lg bg-emerald-50 text-emerald-700';
+          result.textContent = 'Shipment created: ' + data.tracking_number;
+          result.classList.remove('hidden');
+          loadShipments();
+          ['f-tracking','f-origin','f-dest','f-carrier','f-commodity','f-hs'].forEach(id => {
+            document.getElementById(id).value = '';
+          });
+        } else {
+          result.className = 'text-xs p-3 rounded-lg bg-rose-50 text-rose-700';
+          result.textContent = data.error || 'Failed to create shipment';
+          result.classList.remove('hidden');
+        }
+      } catch (err) {
+        result.className = 'text-xs p-3 rounded-lg bg-amber-50 text-amber-700';
+        result.textContent = 'Edge function not connected — schema ready for deployment. (' + err.message + ')';
+        result.classList.remove('hidden');
+      }
+    });
+
+    // Real-time subscription to supply_shipments changes
+    if (supabase) {
+      supabase.channel('supply_shipments_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'supply_shipments' }, () => loadShipments())
+        .subscribe();
+    }
+
+    loadShipments();
+  </script>
+</body>
+</html>

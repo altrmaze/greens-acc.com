@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Greens ACC — AI Legal Compliance Monitor</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen antialiased">
+
+  <!-- Navigation -->
+  <nav class="border-b border-slate-200 bg-white/90 backdrop-blur px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+    <div class="flex items-center space-x-3">
+      <div class="h-9 w-9 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-emerald-600">
+          <path fill-rule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div>
+        <span class="text-lg font-black tracking-tight text-slate-900">Greens ACC</span>
+        <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase font-mono">AI Legal Compliance Monitor</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/" class="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-700">Dashboard</a>
+      <a href="/meeting.html" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">Meeting Rooms</a>
+      <a href="/supply-chain.html" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200">Supply Chain</a>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto p-6 space-y-6">
+
+    <!-- Header -->
+    <div>
+      <h1 class="text-2xl font-extrabold text-slate-900">AI Legal Compliance Monitor</h1>
+      <p class="text-sm text-slate-500 mt-1">Automated compliance workflow engine — sanctions screening, tariff classification, export controls, and document verification.</p>
+    </div>
+
+    <!-- Compliance Status Banner -->
+    <div id="compliance-banner" class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
+      <span class="text-2xl">🔒</span>
+      <div>
+        <p class="font-semibold text-blue-800 text-sm">Greens ACC Compliance Engine Active</p>
+        <p class="text-xs text-blue-600 mt-0.5">All transactions are screened against OFAC SDN, EU Sanctions Reg. 833/2014, EAR, ITAR, and Wassenaar Arrangement. Human review gateways are enforced for critical findings.</p>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-xs text-slate-500 font-mono uppercase tracking-wider">Total Runs</p>
+        <p id="stat-runs" class="text-3xl font-black text-slate-900 mt-1">—</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-xs text-slate-500 font-mono uppercase tracking-wider">Completed</p>
+        <p id="stat-completed" class="text-3xl font-black text-emerald-600 mt-1">—</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-xs text-slate-500 font-mono uppercase tracking-wider">Failed</p>
+        <p id="stat-failed" class="text-3xl font-black text-rose-500 mt-1">—</p>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-4">
+        <p class="text-xs text-slate-500 font-mono uppercase tracking-wider">Human Review</p>
+        <p id="stat-human" class="text-3xl font-black text-amber-500 mt-1">—</p>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+
+      <!-- Run Compliance Check Form -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div class="px-6 py-4 border-b border-slate-100">
+          <h2 class="font-bold text-slate-900">Run Compliance Check</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Trigger a new compliance workflow with verification gateways.</p>
+        </div>
+        <div class="p-6 space-y-3">
+          <div>
+            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Scope</label>
+            <select id="f-scope" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
+              <option value="full">Full Scan (All Gateways)</option>
+              <option value="sanctions">Sanctions Screen Only</option>
+              <option value="tariff">Tariff Classification Only</option>
+              <option value="export_control">Export Control Check</option>
+              <option value="document">Document Verification</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Room ID (optional)</label>
+            <input id="f-room-id" type="text" placeholder="uuid" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono" />
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Content to Screen</label>
+            <textarea id="f-content" rows="4" placeholder="Paste transaction text, document content, or deal terms to screen..." class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+          </div>
+          <div>
+            <label class="text-xs font-semibold text-slate-600 uppercase tracking-wider">Triggered By</label>
+            <input id="f-triggered-by" type="text" placeholder="user@example.com or system" class="mt-1 w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500" />
+          </div>
+          <button id="run-check-btn" class="w-full py-2.5 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 text-sm">
+            Run Compliance Check
+          </button>
+          <div id="run-result" class="hidden text-xs p-3 rounded-lg"></div>
+        </div>
+      </div>
+
+      <!-- Recent Runs -->
+      <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <h2 class="font-bold text-slate-900">Recent Compliance Runs</h2>
+          <button id="refresh-runs" class="text-xs text-slate-400 hover:text-emerald-600 font-mono">↻ Refresh</button>
+        </div>
+        <div id="runs-list" class="divide-y divide-slate-50 max-h-[540px] overflow-y-auto flex-1">
+          <div class="px-6 py-8 text-center text-slate-400 text-sm">Loading compliance runs...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Selected Run Detail -->
+    <div id="run-detail-panel" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-slate-900">Check Results</h2>
+          <p id="run-detail-subtitle" class="text-xs text-slate-500 mt-0.5"></p>
+        </div>
+        <button id="close-run-detail" class="text-xs text-slate-400 hover:text-rose-500 font-mono">✕ Close</button>
+      </div>
+      <div id="run-detail-checks" class="p-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const cfg = window.SUPABASE_CONFIG || { url: 'https://your-project.supabase.co', anonKey: 'YOUR_SUPABASE_ANON_KEY' };
+    let supabase = null;
+    try { supabase = window.supabase.createClient(cfg.url, cfg.anonKey); } catch(e) { console.warn('Supabase init skipped', e); }
+
+    const runStatusColors = {
+      queued: 'bg-slate-100 text-slate-600',
+      running: 'bg-blue-100 text-blue-700',
+      completed: 'bg-emerald-100 text-emerald-700',
+      failed: 'bg-rose-100 text-rose-700',
+      aborted: 'bg-slate-200 text-slate-500'
+    };
+
+    const checkStatusColors = {
+      pass: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+      fail: 'bg-rose-50 border-rose-200 text-rose-800',
+      warning: 'bg-amber-50 border-amber-200 text-amber-800',
+      pending: 'bg-slate-50 border-slate-200 text-slate-600',
+      skipped: 'bg-slate-100 border-slate-200 text-slate-400'
+    };
+
+    const checkStatusIcon = { pass: '✓', fail: '✕', warning: '⚠', pending: '○', skipped: '—' };
+
+    const checkTypeLabels = {
+      sanctions_screen: 'Sanctions Screen',
+      tariff_classification: 'Tariff Classification',
+      export_license: 'Export License',
+      dual_use: 'Dual-Use Control',
+      document_verify: 'Document Verification'
+    };
+
+    async function loadRuns() {
+      if (!supabase) { renderEmptyRuns(); return; }
+      const { data, error } = await supabase
+        .from('compliance_runs')
+        .select('id,run_status,scope,triggered_by,total_checks,passed_checks,failed_checks,created_at,result_summary')
+        .order('created_at', { ascending: false })
+        .limit(30);
+      if (error) { renderEmptyRuns('Error loading runs'); return; }
+      renderRuns(data || []);
+      updateStats(data || []);
+    }
+
+    function updateStats(runs) {
+      document.getElementById('stat-runs').textContent = runs.length;
+      document.getElementById('stat-completed').textContent = runs.filter(r => r.run_status === 'completed').length;
+      document.getElementById('stat-failed').textContent = runs.filter(r => r.run_status === 'failed').length;
+      // Human review count from result_summary
+      const humanCount = runs.filter(r => r.result_summary && r.result_summary.requires_human_review).length;
+      document.getElementById('stat-human').textContent = humanCount;
+    }
+
+    function renderRuns(runs) {
+      const container = document.getElementById('runs-list');
+      if (!runs.length) { renderEmptyRuns(); return; }
+      container.innerHTML = runs.map(r => {
+        const badge = runStatusColors[r.run_status] || 'bg-slate-100 text-slate-600';
+        const ts = new Date(r.created_at).toLocaleString();
+        return '<div class="px-6 py-4 hover:bg-slate-50 cursor-pointer flex items-center justify-between group" onclick="loadRunDetail('' + r.id + '','' + r.scope + '')">' +
+          '<div class="min-w-0">' +
+          '<div class="flex items-center gap-2">' +
+          '<span class="px-2 py-0.5 rounded-full text-xs font-semibold ' + badge + '">' + r.run_status + '</span>' +
+          '<span class="text-xs font-mono text-slate-500">' + r.scope + '</span>' +
+          '</div>' +
+          '<p class="text-xs text-slate-400 mt-0.5">' + ts + ' · by ' + (r.triggered_by || 'system') + '</p>' +
+          '</div>' +
+          '<div class="flex items-center gap-3 text-xs font-mono">' +
+          '<span class="text-emerald-600">' + (r.passed_checks || 0) + ' pass</span>' +
+          '<span class="text-rose-500">' + (r.failed_checks || 0) + ' fail</span>' +
+          '<span class="text-slate-300 group-hover:text-slate-500">›</span>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    function renderEmptyRuns(msg) {
+      document.getElementById('runs-list').innerHTML =
+        '<div class="px-6 py-8 text-center text-slate-400 text-sm">' + (msg || 'No compliance runs yet. Run a check to get started.') + '</div>';
+      ['stat-runs','stat-completed','stat-failed','stat-human'].forEach(id => document.getElementById(id).textContent = '0');
+    }
+
+    async function loadRunDetail(runId, scope) {
+      if (!supabase) return;
+      const { data, error } = await supabase
+        .from('compliance_checks')
+        .select('*')
+        .eq('run_id', runId)
+        .order('created_at', { ascending: true });
+
+      const panel = document.getElementById('run-detail-panel');
+      const subtitle = document.getElementById('run-detail-subtitle');
+      const checksContainer = document.getElementById('run-detail-checks');
+      subtitle.textContent = 'Run ID: ' + runId + ' · Scope: ' + scope;
+
+      if (error || !data || !data.length) {
+        checksContainer.innerHTML = '<p class="text-sm text-slate-400 col-span-3">No check results available for this run.</p>';
+        panel.classList.remove('hidden');
+        panel.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      checksContainer.innerHTML = data.map(c => {
+        const colorClass = checkStatusColors[c.check_status] || 'bg-slate-50 border-slate-200 text-slate-600';
+        const icon = checkStatusIcon[c.check_status] || '?';
+        const label = checkTypeLabels[c.check_type] || c.check_type;
+        return '<div class="border rounded-xl p-4 ' + colorClass + '">' +
+          '<div class="flex items-center justify-between mb-2">' +
+          '<span class="font-semibold text-sm">' + label + '</span>' +
+          '<span class="text-lg font-black">' + icon + '</span>' +
+          '</div>' +
+          '<p class="text-xs mb-1">' + (c.finding || '—') + '</p>' +
+          (c.legal_reference ? '<p class="text-xs opacity-70 mt-1">📖 ' + c.legal_reference + '</p>' : '') +
+          (c.recommendation ? '<p class="text-xs opacity-70 mt-1">→ ' + c.recommendation + '</p>' : '') +
+          (c.requires_human_review ? '<p class="text-xs mt-2 font-semibold">👤 Human review required</p>' : '') +
+          '</div>';
+      }).join('');
+
+      panel.classList.remove('hidden');
+      panel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById('close-run-detail').addEventListener('click', () => {
+      document.getElementById('run-detail-panel').classList.add('hidden');
+    });
+
+    document.getElementById('refresh-runs').addEventListener('click', loadRuns);
+
+    document.getElementById('run-check-btn').addEventListener('click', async () => {
+      const scope = document.getElementById('f-scope').value;
+      const roomId = document.getElementById('f-room-id').value.trim() || null;
+      const content = document.getElementById('f-content').value.trim();
+      const triggeredBy = document.getElementById('f-triggered-by').value.trim() || 'manual';
+      const result = document.getElementById('run-result');
+
+      if (!roomId && !content) {
+        result.className = 'text-xs p-3 rounded-lg bg-amber-50 text-amber-700';
+        result.textContent = 'Provide a room ID or content to screen.';
+        result.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const resp = await fetch('/functions/complianceRunWorkflow', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ room_id: roomId, scope, content, triggered_by: triggeredBy })
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          const color = data.run_status === 'failed' ? 'rose' : 'emerald';
+          result.className = 'text-xs p-3 rounded-lg bg-' + color + '-50 text-' + color + '-700';
+          result.textContent = 'Run complete: ' + data.passed_checks + ' pass, ' + data.failed_checks + ' fail — ' + data.run_status;
+          result.classList.remove('hidden');
+          loadRuns();
+        } else {
+          result.className = 'text-xs p-3 rounded-lg bg-rose-50 text-rose-700';
+          result.textContent = data.error || 'Failed to run compliance check';
+          result.classList.remove('hidden');
+        }
+      } catch (err) {
+        result.className = 'text-xs p-3 rounded-lg bg-amber-50 text-amber-700';
+        result.textContent = 'Edge function not connected — schema ready for deployment. (' + err.message + ')';
+        result.classList.remove('hidden');
+      }
+    });
+
+    // Real-time subscription
+    if (supabase) {
+      supabase.channel('compliance_runs_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'compliance_runs' }, () => loadRuns())
+        .subscribe();
+    }
+
+    loadRuns();
+  </script>
+</body>
+</html>
