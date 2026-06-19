@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenACC — Secure Trade Escrow &amp; AI-Monitored Handshake Platform</title>
+  <meta name="description" content="Enterprise-grade deal orchestration with AI-monitored handshake workflows, real-time OFAC compliance, instant encrypted meeting rooms." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    * { font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif; }
+
+    .hero-gradient {
+      background: linear-gradient(135deg,#020d18 0%,#031a14 30%,#042d20 60%,#020d18 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 10s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .grid-overlay {
+      background-image:
+        linear-gradient(rgba(16,185,129,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(16,185,129,.04) 1px,transparent 1px);
+      background-size: 40px 40px;
+    }
+    .glow-emerald { box-shadow: 0 0 40px rgba(16,185,129,.15),0 0 80px rgba(16,185,129,.05); }
+    .glow-text    { text-shadow: 0 0 30px rgba(16,185,129,.4); }
+    .btn-glow:hover { box-shadow: 0 0 25px rgba(16,185,129,.5); }
+    .glass       { background:rgba(255,255,255,.03); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.06); }
+    .glass-light { background:rgba(255,255,255,.05); backdrop-filter:blur(8px);  border:1px solid rgba(255,255,255,.08); }
+
+    .ticker-wrap  { overflow:hidden; white-space:nowrap; }
+    .ticker-track { display:inline-block; padding-left:100%; animation:ticker 32s linear infinite; }
+    @keyframes ticker {
+      from { transform:translateX(0); }
+      to   { transform:translateX(-100%); }
+    }
+
+    .tab-btn.active {
+      background:rgba(16,185,129,.15);
+      color:#34d399;
+      border-color:rgba(16,185,129,.4);
+    }
+    .tab-panel         { display:none; }
+    .tab-panel.active  { display:block; }
+
+    .agent-verified { background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3); color:#34d399; }
+    .agent-pending  { background:rgba(251,191,36,.1);  border:1px solid rgba(251,191,36,.3);  color:#fbbf24; }
+    .agent-failed   { background:rgba(239,68,68,.1);   border:1px solid rgba(239,68,68,.3);   color:#f87171; }
+
+    .modal-overlay { background:rgba(0,0,0,.7); backdrop-filter:blur(4px); }
+    .modal-enter   { animation:modalIn .3s cubic-bezier(.34,1.56,.64,1); }
+    @keyframes modalIn {
+      from { opacity:0; transform:scale(.9) translateY(20px); }
+      to   { opacity:1; transform:scale(1)  translateY(0); }
+    }
+    .kill-screen { background:rgba(239,68,68,.05); border:1px solid rgba(239,68,68,.3); }
+
+    .feature-card { transition:transform .25s ease,box-shadow .25s ease; }
+    .feature-card:hover { transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 20px rgba(16,185,129,.08); }
+
+    .progress-fill { transition:width 1.2s cubic-bezier(.4,0,.2,1); }
+
+    ::-webkit-scrollbar       { width:6px; }
+    ::-webkit-scrollbar-track { background:#0a0f1a; }
+    ::-webkit-scrollbar-thumb { background:#1e3a2f; border-radius:4px; }
+    ::-webkit-scrollbar-thumb:hover { background:#10b981; }
+
+    html { scroll-behavior:smooth; }
+  </style>
+</head>
+<body class="bg-[#020d18] text-slate-200 antialiased min-h-screen">
+
+<!-- ═══ NAVIGATION ═══ -->
+<nav id="navbar" class="fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b border-transparent"
+     style="background:rgba(2,13,24,.7);backdrop-filter:blur(16px)">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="relative">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+              <path d="M2 17l10 5 10-5"/>
+              <path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#020d18] animate-pulse"></span>
+        </div>
+        <div>
+          <span class="font-bold text-white text-lg tracking-tight">Green<span class="text-emerald-400">ACC</span></span>
+          <p class="text-[10px] text-slate-500 leading-none">Enterprise Trade Escrow</p>
+        </div>
+      </div>
+
+      <!-- Desktop links -->
+      <div class="hidden md:flex items-center space-x-1">
+        <a href="#dashboard"    class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Dashboard</a>
+        <a href="#features"     class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Features</a>
+        <a href="#instant-rooms" class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Instant Rooms</a>
+        <a href="meeting.html"  class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+          </svg>
+          Meeting Suite
+        </a>
+        <a href="announce.html" class="px-3 py-2 text-sm text-slate-400 hover:text-emerald-400 rounded-lg hover:bg-emerald-500/5 transition">Announce</a>
+      </div>
+
+      <!-- CTA -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs text-emerald-400 font-medium">Live Platform</span>
+        </div>
+        <a href="#dashboard" class="btn-glow px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold rounded-xl text-sm transition-all">
+          Start Deal &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ NEWS TICKER ═══ -->
+<div id="news-ticker-bar" class="fixed top-16 inset-x-0 z-40 bg-slate-900/90 border-b border-slate-800/60 py-1.5 backdrop-blur-sm">
+  <div class="flex items-center gap-3 px-4">
+    <span class="flex-shrink-0 text-[10px] font-bold uppercase tracking-widest text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 rounded">LIVE</span>
+    <div class="ticker-wrap flex-1">
+      <div class="ticker-track text-xs text-slate-400 font-medium" id="ticker-content">
+        &bull; GreenACC Platform Online &mdash; All AI Agents Nominal &nbsp;&nbsp;&nbsp;
+        &bull; Trade Escrow Active &mdash; OFAC Compliance Engine Running &nbsp;&nbsp;&nbsp;
+        &bull; Instant Encrypted Meeting Rooms Available &mdash; No Registration Required &nbsp;&nbsp;&nbsp;
+        &bull; 3-Agent AI Verification System Operational &nbsp;&nbsp;&nbsp;
+        &bull; L/C Locking Service Active &mdash; 2% Commission Rate &nbsp;&nbsp;&nbsp;
+        &bull; Global Risk Monitoring Engaged &mdash; EU/US Sanctions Screening Live &nbsp;&nbsp;&nbsp;
+      </div>
+    </div>
+    <span id="risk-indicator" class="flex-shrink-0 text-[10px] font-semibold text-emerald-400">&bull; CLEAR</span>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero-gradient grid-overlay relative pt-36 pb-20 px-4 overflow-hidden">
+  <div class="absolute top-20 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-emerald-400/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="max-w-6xl mx-auto text-center relative z-10">
+
+    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
+      <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+      <span class="text-sm text-emerald-400 font-medium">Trusted by Global Enterprises &middot; Toyota &middot; Nissan &middot; Fortune 500</span>
+    </div>
+
+    <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-tight mb-6">
+      Secure Trade Escrow<br/>
+      <span class="text-emerald-400 glow-text">Powered by AI</span>
+    </h1>
+
+    <p class="max-w-2xl mx-auto text-slate-400 text-lg sm:text-xl leading-relaxed mb-10">
+      Enterprise-grade deal orchestration with AI-monitored handshake workflows,
+      real-time OFAC compliance, and instant encrypted meeting rooms &mdash; zero tedious registration.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+      <a href="#dashboard"
+         class="btn-glow inline-flex items-center justify-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-2xl text-base transition-all shadow-lg shadow-emerald-500/20">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Create Deal &mdash; $20 Entry
+      </a>
+      <a href="#instant-rooms"
+         class="inline-flex items-center justify-center gap-2 px-8 py-4 glass-light hover:bg-white/10 text-white font-semibold rounded-2xl text-base transition-all">
+        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.869V15.13a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+        </svg>
+        Instant Meeting Room
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+      <div class="glass rounded-2xl p-5 glow-emerald">
+        <div class="text-3xl font-black text-emerald-400">$20</div>
+        <div class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">Flat Entry Fee</div>
+      </div>
+      <div class="glass rounded-2xl p-5">
+        <div class="text-3xl font-black text-white">2%</div>
+        <div class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">Commission Rate</div>
+      </div>
+      <div class="glass rounded-2xl p-5">
+        <div class="text-3xl font-black text-white">3x</div>
+        <div class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">AI Agent Verify</div>
+      </div>
+      <div class="glass rounded-2xl p-5">
+        <div class="text-3xl font-black text-emerald-400">24h</div>
+        <div class="text-xs text-slate-500 mt-1 font-medium uppercase tracking-wider">Room Expiry</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DASHBOARD ═══ -->
+<section id="dashboard" class="py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="text-3xl font-bold text-white mb-2">Deal Dashboard</h2>
+      <p class="text-slate-400">Create deals, initiate handshakes, and track escrow status in real-time.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex flex-wrap gap-2 mb-6 p-1 glass rounded-2xl max-w-xl mx-auto">
+      <button class="tab-btn active flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border border-transparent transition-all" data-tab="create">
+        + New Deal
+      </button>
+      <button class="tab-btn flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border border-transparent text-slate-400 hover:text-white transition-all" data-tab="handshake">
+        Handshake
+      </button>
+      <button class="tab-btn flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border border-transparent text-slate-400 hover:text-white transition-all" data-tab="status">
+        Deal Status
+      </button>
+    </div>
+
+    <!-- TAB: Create Deal -->
+    <div class="tab-panel active" id="tab-create">
+      <div class="max-w-2xl mx-auto glass rounded-2xl p-8 border border-emerald-500/10">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Create New Deal</h3>
+            <p class="text-xs text-slate-500">Activate escrow with a flat $20 entry fee</p>
+          </div>
+        </div>
+
+        <form id="deal-form" class="space-y-5">
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Buyer ID / Company</label>
+              <input id="buyer-id" type="text" placeholder="e.g. CORP-7821 or Acme Ltd."
+                class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Deal Amount (USD)</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">$</span>
+                <input id="deal-amount" type="number" min="1" step="0.01" placeholder="500000.00"
+                  class="w-full pl-8 pr-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition"/>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Region</label>
+              <select id="deal-region" class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition">
+                <option value="US">United States</option>
+                <option value="EU">European Union</option>
+                <option value="APAC">Asia Pacific</option>
+                <option value="ME">Middle East</option>
+                <option value="LATAM">Latin America</option>
+                <option value="AFRICA">Africa</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Currency</label>
+              <select id="deal-currency" class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500/50 transition">
+                <option value="USD">USD &mdash; US Dollar</option>
+                <option value="EUR">EUR &mdash; Euro</option>
+                <option value="GBP">GBP &mdash; British Pound</option>
+                <option value="JPY">JPY &mdash; Japanese Yen</option>
+                <option value="CNY">CNY &mdash; Chinese Yuan</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">L/C Reference Number <span class="text-slate-600">(optional)</span></label>
+            <input id="lc-ref" type="text" placeholder="e.g. LC-2025-09-XXYY"
+              class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition"/>
+          </div>
+
+          <!-- Fee breakdown -->
+          <div class="p-4 rounded-xl border border-slate-700/40 bg-slate-800/30">
+            <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-3">Fee Breakdown</p>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-400">Activation / Entry Fee</span>
+                <span class="text-white font-semibold">$20.00 USD</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-400">Handshake Commission <span class="text-slate-600">(on deal amount)</span></span>
+                <span id="commission-preview" class="text-emerald-400 font-semibold">&mdash;</span>
+              </div>
+              <div class="h-px bg-slate-700/50 my-2"></div>
+              <div class="flex justify-between text-sm font-semibold">
+                <span class="text-white">Due Now</span>
+                <span class="text-emerald-400">$20.00 USD</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="create-deal-btn"
+            class="btn-glow w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Activate Deal &mdash; Pay $20 Entry Fee
+          </button>
+          <div id="create-status" class="hidden text-sm text-center rounded-xl p-3"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB: Handshake -->
+    <div class="tab-panel" id="tab-handshake">
+      <div class="max-w-2xl mx-auto glass rounded-2xl p-8 border border-blue-500/10">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Initiate Handshake</h3>
+            <p class="text-xs text-slate-500">Lock Letter of Credit &amp; confirm escrow with 2% commission</p>
+          </div>
+        </div>
+
+        <form id="handshake-form" class="space-y-5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Deal ID</label>
+            <input id="hs-deal-id" type="text" placeholder="UUID from deal activation"
+              class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 font-mono transition"/>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Payer ID</label>
+              <input id="hs-payer-id" type="text" placeholder="Your buyer / payer ID"
+                class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Deal Amount (USD)</label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">$</span>
+                <input id="hs-amount" type="number" min="1" step="0.01" placeholder="500000.00"
+                  class="w-full pl-8 pr-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition"/>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">L/C Reference Number</label>
+            <input id="hs-lc-ref" type="text" placeholder="e.g. LC-2025-09-XXYY"
+              class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition"/>
+          </div>
+          <div id="hs-commission-box" class="hidden p-4 rounded-xl border border-blue-500/20 bg-blue-500/5">
+            <p class="text-xs text-blue-400 font-semibold mb-1">Commission Preview (2%)</p>
+            <p class="text-xl font-black text-white" id="hs-commission-val">&mdash;</p>
+            <p class="text-xs text-slate-500 mt-0.5">Locked in escrow until all 3 AI agents verify</p>
+          </div>
+          <button type="submit" id="handshake-btn"
+            class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+            </svg>
+            Confirm Handshake &amp; Lock L/C
+          </button>
+          <div id="handshake-status" class="hidden text-sm text-center rounded-xl p-3"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB: Deal Status -->
+    <div class="tab-panel" id="tab-status">
+      <div class="max-w-3xl mx-auto space-y-4">
+        <div class="glass rounded-2xl p-6 border border-slate-700/30">
+          <div class="flex gap-3">
+            <input id="lookup-deal-id" type="text" placeholder="Enter Deal UUID to look up status..."
+              class="flex-1 px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 font-mono transition"/>
+            <button id="lookup-btn"
+              class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold rounded-xl text-sm transition-all whitespace-nowrap">
+              Look Up
+            </button>
+          </div>
+        </div>
+
+        <div id="deal-status-card" class="hidden glass rounded-2xl p-6 border border-emerald-500/10 space-y-5">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Deal ID</p>
+              <p id="ds-deal-id" class="font-mono text-sm text-white"></p>
+            </div>
+            <span id="ds-handshake-badge" class="px-3 py-1 rounded-full text-xs font-bold"></span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="p-3 bg-slate-800/40 rounded-xl">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Amount</p>
+              <p id="ds-amount" class="text-sm font-bold text-white"></p>
+            </div>
+            <div class="p-3 bg-slate-800/40 rounded-xl">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Entry Fee</p>
+              <p id="ds-entry-fee" class="text-sm font-bold"></p>
+            </div>
+            <div class="p-3 bg-slate-800/40 rounded-xl">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Escrow</p>
+              <p id="ds-escrow" class="text-sm font-bold"></p>
+            </div>
+            <div class="p-3 bg-slate-800/40 rounded-xl">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Compliance</p>
+              <p id="ds-compliance" class="text-sm font-bold"></p>
+            </div>
+            <div class="p-3 bg-slate-800/40 rounded-xl">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Commission</p>
+              <p id="ds-commission" class="text-sm font-bold text-emerald-400"></p>
+            </div>
+            <div class="p-3 bg-slate-800/40 rounded-xl">
+              <p class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Region</p>
+              <p id="ds-region" class="text-sm font-bold text-white"></p>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-xs text-slate-500 uppercase tracking-wider mb-3">AI Agent Verification</p>
+            <div class="flex gap-3 flex-wrap" id="agents-row">
+              <div id="ds-agent1" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold agent-pending">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clip-rule="evenodd"/></svg>
+                <span>Agent 1 &mdash; Pending</span>
+              </div>
+              <div id="ds-agent2" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold agent-pending">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clip-rule="evenodd"/></svg>
+                <span>Agent 2 &mdash; Pending</span>
+              </div>
+              <div id="ds-agent3" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold agent-pending">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clip-rule="evenodd"/></svg>
+                <span>Agent 3 &mdash; Pending</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs text-slate-500 mb-2">
+              <span class="uppercase tracking-wider">Escrow Pipeline</span>
+              <span id="ds-pipeline-pct" class="font-semibold text-emerald-400">0%</span>
+            </div>
+            <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="ds-pipeline-bar" class="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full progress-fill" style="width:0%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-600 mt-1">
+              <span>Entry Fee</span><span>Handshake</span><span>AI Verify</span><span>Release</span>
+            </div>
+          </div>
+
+          <div id="ds-actions" class="flex gap-3 flex-wrap"></div>
+        </div>
+
+        <div id="lookup-status" class="hidden text-sm text-center rounded-xl p-3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ═══ -->
+<section id="features" class="py-20 px-4 bg-slate-900/40">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-12">
+      <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3 block">Platform Capabilities</span>
+      <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Everything You Need to Close Deals Safely</h2>
+      <p class="text-slate-400 max-w-2xl mx-auto">GreenACC combines the simplicity of Google Meet with the compliance rigor of enterprise banking.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <div class="feature-card glass rounded-2xl p-6 border border-slate-700/30">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white mb-2">Smart Escrow</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Funds locked automatically until all 3 AI agents verify compliance, handshake is confirmed, and compliance status is clean.</p>
+        <div class="mt-4 flex items-center gap-2 text-xs text-emerald-400 font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>OFAC / Sanctions Screened
+        </div>
+      </div>
+
+      <div class="feature-card glass rounded-2xl p-6 border border-slate-700/30">
+        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white mb-2">Triple AI Verification</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Three independent AI agents cross-verify every deal &mdash; trade compliance, financial integrity, and regulatory clearance &mdash; before funds release.</p>
+        <div class="mt-4 flex items-center gap-2 text-xs text-blue-400 font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>Agent 1 &middot; Agent 2 &middot; Agent 3
+        </div>
+      </div>
+
+      <div class="feature-card glass rounded-2xl p-6 border border-slate-700/30">
+        <div class="w-12 h-12 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white mb-2">L/C Locking</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Digital Letter of Credit locking with 2% handshake commission. Immutable deal record with full audit trail from activation to settlement.</p>
+        <div class="mt-4 flex items-center gap-2 text-xs text-violet-400 font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>2% Commission &middot; Immutable Record
+        </div>
+      </div>
+
+      <div class="feature-card glass rounded-2xl p-6 border border-slate-700/30">
+        <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.069A1 1 0 0121 8.869V15.13a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white mb-2">Instant Encrypted Rooms</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Generate cryptographic room tokens instantly &mdash; no account creation. Share with counterparty for immediate access to secure AV negotiation space.</p>
+        <div class="mt-4 flex items-center gap-2 text-xs text-orange-400 font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>AES-256-GCM &middot; 24h Expiry
+        </div>
+      </div>
+
+      <div class="feature-card glass rounded-2xl p-6 border border-slate-700/30">
+        <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white mb-2">AI Compliance Lawyer</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">Real-time OFAC screening, EU sanctions, ITAR/EAR export control monitoring every 30 seconds. Automatic kill switch on critical violations.</p>
+        <div class="mt-4 flex items-center gap-2 text-xs text-red-400 font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>Kill Switch Active
+        </div>
+      </div>
+
+      <div class="feature-card glass rounded-2xl p-6 border border-slate-700/30">
+        <div class="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center mb-4">
+          <svg class="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white mb-2">Global Media Broadcast</h3>
+        <p class="text-sm text-slate-400 leading-relaxed">One-click PR distribution to Bloomberg, Reuters, TechCrunch, LinkedIn, and X. AI-generated press releases with automatic sensitive data masking.</p>
+        <div class="mt-4 flex items-center gap-2 text-xs text-teal-400 font-semibold">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-400"></span>Data Masking &middot; Multi-Outlet Syndication
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ INSTANT ROOMS ═══ -->
+<section id="instant-rooms" class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+      <div>
+        <span class="text-xs font-bold text-orange-400 uppercase tracking-widest mb-4 block">Enterprise Meeting Suite</span>
+        <h2 class="text-3xl sm:text-4xl font-black text-white mb-4">Zero Registration.<br/>Instant Secure Rooms.</h2>
+        <p class="text-slate-400 text-lg mb-6 leading-relaxed">
+          Generate a cryptographic room token in seconds and share it with your counterparty.
+          Encrypted AV, document bridge, and AI secretary included.
+        </p>
+        <ul class="space-y-3 mb-8">
+          <li class="flex items-start gap-3">
+            <span class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center">
+              <svg class="w-2.5 h-2.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            </span>
+            <span class="text-slate-300 text-sm">Virtual Desk Data Bridge &mdash; stream Google Drive, OneDrive, Dropbox files without storing them on our servers</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center">
+              <svg class="w-2.5 h-2.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            </span>
+            <span class="text-slate-300 text-sm">AI Executive Secretary &mdash; contract summarization, clause parsing, financial calculator, whiteboard &amp; spreadsheet</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center">
+              <svg class="w-2.5 h-2.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            </span>
+            <span class="text-slate-300 text-sm">Compliance monitoring every 30 seconds &mdash; OFAC, EU sanctions, ITAR/EAR export controls enforced automatically</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full bg-orange-500/10 border border-orange-500/30 flex items-center justify-center">
+              <svg class="w-2.5 h-2.5 text-orange-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            </span>
+            <span class="text-slate-300 text-sm">10 isolated meeting rooms &middot; Live global news ticker &middot; Emergency risk interceptor</span>
+          </li>
+        </ul>
+        <a href="meeting.html" class="inline-flex items-center gap-2 px-6 py-3 border border-orange-500/30 text-orange-400 hover:bg-orange-500/5 rounded-xl text-sm font-semibold transition">
+          Open Full Meeting Suite &rarr;
+        </a>
+      </div>
+
+      <!-- Room generator card -->
+      <div class="glass rounded-2xl p-8 border border-orange-500/10" style="box-shadow:0 0 40px rgba(249,115,22,.08)">
+        <h3 class="text-lg font-bold text-white mb-1">Generate Instant Room</h3>
+        <p class="text-xs text-slate-500 mb-6">No registration required &middot; $20 session fee applies upon entry</p>
+
+        <form id="room-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Your Company Name</label>
+            <input id="room-company" type="text" placeholder="e.g. Toyota Motor Corp."
+              class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Counterparty Email <span class="text-slate-600">(optional)</span></label>
+            <input id="room-email" type="email" placeholder="counterparty@company.com"
+              class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700/50 rounded-xl text-white text-sm placeholder-slate-600 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 transition"/>
+          </div>
+          <button type="submit" id="room-btn"
+            class="w-full py-4 bg-orange-500 hover:bg-orange-400 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            Generate Secure Room Token
+          </button>
+        </form>
+
+        <div id="room-result" class="hidden mt-6 space-y-3">
+          <div class="h-px bg-slate-700/50"></div>
+          <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Your Encrypted Room</p>
+          <div class="flex items-center gap-2 p-3 bg-slate-800/60 rounded-xl border border-slate-700/40">
+            <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <span id="room-token-display" class="flex-1 font-mono text-xs text-emerald-400 break-all"></span>
+          </div>
+          <div class="flex items-center gap-2 p-3 bg-slate-800/60 rounded-xl border border-slate-700/40">
+            <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+            </svg>
+            <span id="room-share-link" class="flex-1 text-xs text-slate-400 break-all"></span>
+            <button id="copy-link-btn" class="flex-shrink-0 px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs text-white transition">Copy</button>
+          </div>
+          <a id="join-room-btn" href="#" class="block w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-sm text-center transition">
+            Join Meeting Room &rarr;
+          </a>
+        </div>
+        <div id="room-status" class="hidden mt-4 text-sm text-center rounded-xl p-3"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="py-20 px-4 bg-slate-900/40">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-14">
+      <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3 block">Deal Lifecycle</span>
+      <h2 class="text-3xl sm:text-4xl font-black text-white">From Handshake to Settlement</h2>
+    </div>
+    <div class="grid sm:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
+          <span class="text-emerald-400 font-black text-lg">1</span>
+        </div>
+        <h4 class="font-bold text-white text-sm mb-2">Activate Deal</h4>
+        <p class="text-slate-500 text-xs leading-relaxed">Pay $20 flat entry fee. Deal ID is generated and escrow is initialized.</p>
+      </div>
+      <div>
+        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center mx-auto mb-4">
+          <span class="text-blue-400 font-black text-lg">2</span>
+        </div>
+        <h4 class="font-bold text-white text-sm mb-2">Lock L/C</h4>
+        <p class="text-slate-500 text-xs leading-relaxed">Handshake session confirms deal. 2% commission locked with Letter of Credit.</p>
+      </div>
+      <div>
+        <div class="w-12 h-12 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center mx-auto mb-4">
+          <span class="text-violet-400 font-black text-lg">3</span>
+        </div>
+        <h4 class="font-bold text-white text-sm mb-2">AI Verification</h4>
+        <p class="text-slate-500 text-xs leading-relaxed">All 3 AI agents verify compliance, financial integrity, and regulatory clearance.</p>
+      </div>
+      <div>
+        <div class="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center mx-auto mb-4">
+          <span class="text-teal-400 font-black text-lg">4</span>
+        </div>
+        <h4 class="font-bold text-white text-sm mb-2">Release &amp; Announce</h4>
+        <p class="text-slate-500 text-xs leading-relaxed">Escrow released. Optional global media broadcast via press release engine.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TRUST BADGES ═══ -->
+<section class="py-16 px-4">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="glass rounded-2xl p-5 text-center border border-slate-700/30">
+        <div class="text-2xl mb-2">&#128737;&#65039;</div>
+        <p class="text-xs font-bold text-white mb-1">OFAC Compliant</p>
+        <p class="text-[10px] text-slate-500">Automated SDN &amp; sanctions screening on every deal</p>
+      </div>
+      <div class="glass rounded-2xl p-5 text-center border border-slate-700/30">
+        <div class="text-2xl mb-2">&#128272;</div>
+        <p class="text-xs font-bold text-white mb-1">AES-256-GCM</p>
+        <p class="text-[10px] text-slate-500">End-to-end encryption on all meeting rooms and documents</p>
+      </div>
+      <div class="glass rounded-2xl p-5 text-center border border-slate-700/30">
+        <div class="text-2xl mb-2">&#9889;</div>
+        <p class="text-xs font-bold text-white mb-1">Zero Storage Policy</p>
+        <p class="text-[10px] text-slate-500">Documents streamed from source &mdash; nothing stored on our servers</p>
+      </div>
+      <div class="glass rounded-2xl p-5 text-center border border-slate-700/30">
+        <div class="text-2xl mb-2">&#128203;</div>
+        <p class="text-xs font-bold text-white mb-1">Full Audit Trail</p>
+        <p class="text-[10px] text-slate-500">Every compliance event, payment step, and AI decision logged immutably</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EMERGENCY MODAL ═══ -->
+<div id="emergency-modal" class="fixed inset-0 z-[999] hidden items-center justify-center modal-overlay" style="display:none">
+  <div class="max-w-lg w-full mx-4 modal-enter">
+    <div class="kill-screen rounded-2xl p-8 bg-slate-900/95 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center">
+          <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-black text-red-400 text-lg">&#9888; GLOBAL RISK ALERT</h3>
+          <p class="text-xs text-slate-500">Compliance Engine Triggered</p>
+        </div>
+      </div>
+      <p id="emergency-msg" class="text-slate-300 text-sm mb-6 leading-relaxed">A critical global risk flag has been raised. New handshakes are temporarily blocked pending review.</p>
+      <button id="dismiss-emergency" class="w-full py-3 bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 text-red-400 font-semibold rounded-xl text-sm transition">
+        Acknowledge &amp; Dismiss
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="border-t border-slate-800/50 py-12 px-4 mt-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid sm:grid-cols-4 gap-8 mb-10">
+      <div class="sm:col-span-2">
+        <div class="flex items-center space-x-3 mb-4">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <span class="font-bold text-white text-lg">Green<span class="text-emerald-400">ACC</span></span>
+        </div>
+        <p class="text-sm text-slate-500 leading-relaxed max-w-xs">Enterprise-grade trade escrow and AI-monitored deal orchestration for global companies. Trusted by Toyota, Nissan, and Fortune 500 firms.</p>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Platform</p>
+        <ul class="space-y-2">
+          <li><a href="#dashboard"     class="text-sm text-slate-500 hover:text-emerald-400 transition">Dashboard</a></li>
+          <li><a href="meeting.html"   class="text-sm text-slate-500 hover:text-emerald-400 transition">Meeting Suite</a></li>
+          <li><a href="announce.html"  class="text-sm text-slate-500 hover:text-emerald-400 transition">Announcement Engine</a></li>
+          <li><a href="#instant-rooms" class="text-sm text-slate-500 hover:text-emerald-400 transition">Instant Rooms</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Compliance</p>
+        <ul class="space-y-2 text-sm text-slate-500">
+          <li>OFAC / SDN Screening</li>
+          <li>EU Sanctions Monitoring</li>
+          <li>ITAR / EAR Export Controls</li>
+          <li>Tariff Compliance Engine</li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-slate-800/50 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-xs text-slate-600">&copy; 2025 GreenACC. All rights reserved.</p>
+      <p class="text-xs text-slate-600">Powered by Supabase &middot; Stripe &middot; AI Agents</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ JAVASCRIPT ═══ -->
+<script>
+(function () {
+  'use strict';
+
+  var SUPABASE_URL = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || '';
+  var SUPABASE_ANON_KEY = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.anonKey) || '';
+  var FUNCTIONS_BASE = SUPABASE_URL ? SUPABASE_URL + '/functions/v1' : '';
+
+  /* ── Sticky nav ── */
+  window.addEventListener('scroll', function () {
+    var nav = document.getElementById('navbar');
+    if (window.scrollY > 10) {
+      nav.style.borderColor = 'rgba(255,255,255,0.05)';
+      nav.style.background = 'rgba(2,13,24,0.95)';
+    } else {
+      nav.style.borderColor = 'transparent';
+      nav.style.background = 'rgba(2,13,24,0.7)';
+    }
+  });
+
+  /* ── Tabs ── */
+  document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.tab-btn').forEach(function (b) {
+        b.classList.remove('active');
+        b.classList.add('text-slate-400');
+      });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+      btn.classList.add('active');
+      btn.classList.remove('text-slate-400');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ── Commission preview (create) ── */
+  document.getElementById('deal-amount').addEventListener('input', function () {
+    var amt = parseFloat(this.value);
+    var el = document.getElementById('commission-preview');
+    el.textContent = amt > 0 ? '$' + (amt * 0.02).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '\u2014';
+  });
+
+  /* ── Commission preview (handshake) ── */
+  document.getElementById('hs-amount').addEventListener('input', function () {
+    var amt = parseFloat(this.value);
+    var box = document.getElementById('hs-commission-box');
+    var val = document.getElementById('hs-commission-val');
+    if (amt > 0) {
+      val.textContent = (amt * 0.02).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      box.classList.remove('hidden');
+    } else {
+      box.classList.add('hidden');
+    }
+  });
+
+  /* ── Status helper ── */
+  function showStatus(id, msg, type) {
+    var el = document.getElementById(id);
+    var base = 'text-sm text-center rounded-xl p-3 border ';
+    if (type === 'success') el.className = base + 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+    else if (type === 'error') el.className = base + 'bg-red-500/10 text-red-400 border-red-500/20';
+    else el.className = base + 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+    el.textContent = msg;
+    el.classList.remove('hidden');
+  }
+
+  function setLoading(btnId, loading) {
+    var btn = document.getElementById(btnId);
+    if (loading) {
+      btn.disabled = true;
+      btn.dataset.orig = btn.innerHTML;
+      btn.innerHTML = '<svg class="w-4 h-4 animate-spin inline mr-1" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>Processing\u2026';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = btn.dataset.orig;
+    }
+  }
+
+  /* ── Create Deal ── */
+  document.getElementById('deal-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var buyerId   = document.getElementById('buyer-id').value.trim();
+    var amount    = parseFloat(document.getElementById('deal-amount').value);
+    var region    = document.getElementById('deal-region').value;
+    var currency  = document.getElementById('deal-currency').value;
+    var lcRef     = document.getElementById('lc-ref').value.trim();
+
+    if (!buyerId) { showStatus('create-status', 'Please enter a Buyer ID or Company name.', 'error'); return; }
+    if (!amount || amount <= 0) { showStatus('create-status', 'Please enter a valid deal amount.', 'error'); return; }
+
+    if (!FUNCTIONS_BASE) {
+      showStatus('create-status',
+        '\u2713 Demo mode \u2014 configure window.SUPABASE_CONFIG to connect. Commission preview: $' +
+        (amount * 0.02).toFixed(2), 'info');
+      return;
+    }
+
+    setLoading('create-deal-btn', true);
+    try {
+      var res = await fetch(FUNCTIONS_BASE + '/createStripeCheckout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+        body: JSON.stringify({ buyer_id: buyerId, amount_total: amount, region: region, currency: currency, lc_reference_number: lcRef || null })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create checkout session');
+      if (data.url) {
+        showStatus('create-status', 'Redirecting to secure payment\u2026', 'info');
+        setTimeout(function () { window.location.href = data.url; }, 800);
+      } else {
+        showStatus('create-status', '\u2713 Deal initiated. ID: ' + (data.deal_id || data.id || 'see console'), 'success');
+      }
+    } catch (err) {
+      showStatus('create-status', '\u26a0 ' + err.message, 'error');
+    } finally {
+      setLoading('create-deal-btn', false);
+    }
+  });
+
+  /* ── Handshake ── */
+  document.getElementById('handshake-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var dealId  = document.getElementById('hs-deal-id').value.trim();
+    var payerId = document.getElementById('hs-payer-id').value.trim();
+    var amount  = parseFloat(document.getElementById('hs-amount').value);
+    var lcRef   = document.getElementById('hs-lc-ref').value.trim();
+
+    if (!dealId)  { showStatus('handshake-status', 'Deal ID is required.', 'error'); return; }
+    if (!payerId) { showStatus('handshake-status', 'Payer ID is required.', 'error'); return; }
+    if (!amount || amount <= 0) { showStatus('handshake-status', 'Deal amount is required.', 'error'); return; }
+
+    if (!FUNCTIONS_BASE) {
+      showStatus('handshake-status',
+        '\u2713 Demo mode \u2014 Handshake would lock L/C with ' +
+        (amount * 0.02).toLocaleString('en-US', { style: 'currency', currency: 'USD' }) +
+        ' commission for deal ' + dealId, 'info');
+      return;
+    }
+
+    setLoading('handshake-btn', true);
+    try {
+      var res = await fetch(FUNCTIONS_BASE + '/createHandshakeSession', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+        body: JSON.stringify({ deal_id: dealId, payer_id: payerId, amount: amount, lc_reference_number: lcRef || null })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Handshake failed');
+      var comm = (data.commission_amount || amount * 0.02).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+      showStatus('handshake-status', '\u2713 Handshake confirmed! Commission ' + comm + ' locked. Escrow active.', 'success');
+    } catch (err) {
+      showStatus('handshake-status', '\u26a0 ' + err.message, 'error');
+    } finally {
+      setLoading('handshake-btn', false);
+    }
+  });
+
+  /* ── Deal Lookup ── */
+  document.getElementById('lookup-btn').addEventListener('click', async function () {
+    var dealId = document.getElementById('lookup-deal-id').value.trim();
+    if (!dealId) { showStatus('lookup-status', 'Please enter a Deal UUID.', 'error'); return; }
+
+    if (!SUPABASE_URL) {
+      showStatus('lookup-status', 'Demo mode \u2014 configure window.SUPABASE_CONFIG to look up live deals.', 'info');
+      return;
+    }
+
+    var btn = document.getElementById('lookup-btn');
+    btn.disabled = true; btn.textContent = 'Searching\u2026';
+    document.getElementById('lookup-status').classList.add('hidden');
+    document.getElementById('deal-status-card').classList.add('hidden');
+
+    try {
+      var res = await fetch(SUPABASE_URL + '/rest/v1/green_acc_deals?id=eq.' + encodeURIComponent(dealId) + '&select=*', {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+      });
+      var deals = await res.json();
+      if (!res.ok || !Array.isArray(deals) || deals.length === 0) throw new Error('Deal not found');
+      renderDealStatus(deals[0]);
+    } catch (err) {
+      showStatus('lookup-status', '\u26a0 ' + err.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = 'Look Up';
+    }
+  });
+
+  function renderDealStatus(deal) {
+    document.getElementById('deal-status-card').classList.remove('hidden');
+    document.getElementById('ds-deal-id').textContent = deal.id;
+    document.getElementById('ds-amount').textContent = '$' + Number(deal.amount_total).toLocaleString('en-US', { minimumFractionDigits: 2 }) + ' ' + deal.currency;
+    document.getElementById('ds-region').textContent = deal.region;
+    document.getElementById('ds-commission').textContent = '$' + Number(deal.handshake_commission_amount || deal.amount_total * 0.02).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+    var feeEl = document.getElementById('ds-entry-fee');
+    feeEl.textContent = deal.entry_fee_status;
+    feeEl.className = 'text-sm font-bold ' + (deal.entry_fee_status === 'paid' ? 'text-emerald-400' : 'text-yellow-400');
+
+    var escEl = document.getElementById('ds-escrow');
+    escEl.textContent = deal.escrow_status;
+    escEl.className = 'text-sm font-bold ' + (deal.escrow_status === 'locked' ? 'text-blue-400' : deal.escrow_status === 'released' ? 'text-emerald-400' : 'text-slate-400');
+
+    var compEl = document.getElementById('ds-compliance');
+    compEl.textContent = deal.compliance_status;
+    compEl.className = 'text-sm font-bold ' + (deal.compliance_status === 'verified' ? 'text-emerald-400' : deal.compliance_status === 'failed' ? 'text-red-400' : 'text-yellow-400');
+
+    var hsBadge = document.getElementById('ds-handshake-badge');
+    hsBadge.textContent = deal.handshake_status;
+    hsBadge.className = 'px-3 py-1 rounded-full text-xs font-bold ' +
+      (deal.handshake_status === 'confirmed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+       deal.handshake_status === 'rejected'  ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+       'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20');
+
+    var agents = deal.ai_agent_status || {};
+    ['agent1', 'agent2', 'agent3'].forEach(function (a, i) {
+      var el = document.getElementById('ds-' + a);
+      var st = agents[a] || 'pending';
+      el.className = 'flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold ' +
+        (st === 'verified' ? 'agent-verified' : st === 'failed' ? 'agent-failed' : 'agent-pending');
+      el.querySelector('span').textContent = 'Agent ' + (i + 1) + ' \u2014 ' + st.charAt(0).toUpperCase() + st.slice(1);
+    });
+
+    var pct = 0;
+    if (deal.entry_fee_status === 'paid') pct += 25;
+    if (deal.handshake_status === 'confirmed') pct += 25;
+    var verifiedCount = ['agent1', 'agent2', 'agent3'].filter(function (x) { return agents[x] === 'verified'; }).length;
+    pct += Math.round(verifiedCount / 3 * 25);
+    if (deal.safe_withdrawal_ready) pct = 100;
+    document.getElementById('ds-pipeline-bar').style.width = pct + '%';
+    document.getElementById('ds-pipeline-pct').textContent = pct + '%';
+
+    var actDiv = document.getElementById('ds-actions');
+    actDiv.innerHTML = '';
+    if (deal.handshake_status !== 'confirmed') {
+      var btn = document.createElement('button');
+      btn.className = 'px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition';
+      btn.textContent = 'Initiate Handshake \u2192';
+      btn.onclick = function () {
+        document.getElementById('hs-deal-id').value = deal.id;
+        document.querySelector('[data-tab="handshake"]').click();
+        document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth' });
+      };
+      actDiv.appendChild(btn);
+    }
+    if (deal.handshake_status === 'confirmed') {
+      var link = document.createElement('a');
+      link.href = 'announce.html?deal_id=' + deal.id + '&lc_ref=' + (deal.lc_reference_number || '') + '&region=' + deal.region;
+      link.className = 'px-4 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition inline-block';
+      link.textContent = '\uD83D\uDCE2 Announce Deal';
+      actDiv.appendChild(link);
+    }
+  }
+
+  /* ── Instant Room Generator ── */
+  document.getElementById('room-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var company = document.getElementById('room-company').value.trim();
+    var email   = document.getElementById('room-email').value.trim();
+
+    if (!company) { showStatus('room-status', 'Company name is required.', 'error'); return; }
+
+    if (!FUNCTIONS_BASE) {
+      var mockToken = Array.from({ length: 24 }, function () { return Math.floor(Math.random() * 16).toString(16); }).join('');
+      var mockLink = window.location.origin + '/meeting.html?room_token=' + mockToken + '&fee_required=true';
+      document.getElementById('room-token-display').textContent = mockToken;
+      document.getElementById('room-share-link').textContent = mockLink;
+      document.getElementById('join-room-btn').href = mockLink;
+      document.getElementById('room-result').classList.remove('hidden');
+      document.getElementById('room-status').classList.add('hidden');
+      return;
+    }
+
+    setLoading('room-btn', true);
+    try {
+      var res = await fetch(FUNCTIONS_BASE + '/generateInstantRoom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY },
+        body: JSON.stringify({ creator_company: company, participant_email: email || null })
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create room');
+      document.getElementById('room-token-display').textContent = data.room_token;
+      document.getElementById('room-share-link').textContent = data.share_link;
+      document.getElementById('join-room-btn').href = data.share_link;
+      document.getElementById('room-result').classList.remove('hidden');
+      document.getElementById('room-status').classList.add('hidden');
+    } catch (err) {
+      showStatus('room-status', '\u26a0 ' + err.message, 'error');
+    } finally {
+      setLoading('room-btn', false);
+    }
+  });
+
+  /* ── Copy link ── */
+  document.getElementById('copy-link-btn').addEventListener('click', function () {
+    var link = document.getElementById('room-share-link').textContent;
+    navigator.clipboard.writeText(link).then(function () {
+      var btn = document.getElementById('copy-link-btn');
+      btn.textContent = '\u2713 Copied';
+      setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+    });
+  });
+
+  /* ── Emergency modal ── */
+  document.getElementById('dismiss-emergency').addEventListener('click', function () {
+    document.getElementById('emergency-modal').style.display = 'none';
+  });
+
+  /* ── Global Risk Check ── */
+  async function checkGlobalRisk() {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
+    try {
+      var res = await fetch(SUPABASE_URL + '/rest/v1/global_risk_flags?active=eq.true&order=created_at.desc&limit=1', {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+      });
+      var flags = await res.json();
+      if (Array.isArray(flags) && flags.length > 0) {
+        var flag = flags[0];
+        document.getElementById('emergency-msg').textContent = flag.reason || 'A critical global risk flag is active. New handshakes are temporarily blocked.';
+        document.getElementById('emergency-modal').style.display = 'flex';
+        var ri = document.getElementById('risk-indicator');
+        ri.textContent = '\u25cf RISK ACTIVE';
+        ri.className = 'flex-shrink-0 text-[10px] font-semibold text-red-400 animate-pulse';
+      }
+    } catch (_) { /* non-fatal */ }
+  }
+
+  window.checkGlobalRiskBeforeHandshake = checkGlobalRisk;
+
+  /* ── Supabase Realtime ticker ── */
+  function initRealtime() {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY || typeof window.supabase === 'undefined') return;
+    var client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    client.channel('global_news')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_news' }, function (payload) {
+        var item = payload.new;
+        var track = document.getElementById('ticker-content');
+        track.textContent += '  \u25cf  [' + ((item.category || 'NEWS').toUpperCase()) + '] ' + item.title + '  ';
+      }).subscribe();
+    client.channel('global_risk_flags')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'global_risk_flags' }, function (payload) {
+        if (payload.new.active) checkGlobalRisk();
+      }).subscribe();
+  }
+
+  checkGlobalRisk();
+  initRealtime();
+
+}());
+</script>
+
+</body>
+</html>
