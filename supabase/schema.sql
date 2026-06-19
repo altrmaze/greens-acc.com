@@ -143,3 +143,67 @@ create index if not exists idx_document_references_room on public.document_refer
 create index if not exists idx_compliance_logs_room on public.compliance_logs (room_id);
 create index if not exists idx_compliance_logs_severity on public.compliance_logs (severity);
 create index if not exists idx_room_sessions_status on public.room_sessions (session_status);
+
+-- ============================================================
+-- TRADING MONOLITH TABLES
+-- ============================================================
+
+-- Marketplace listings (Module 1: Secure Marketplace Engine)
+create table if not exists public.marketplace_listings (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  category text not null,
+  description text,
+  quantity numeric(14,4),
+  price_per_unit numeric(14,4),
+  seller_id uuid not null,
+  is_verified boolean not null default false,
+  status text not null default 'pending_verification',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_marketplace_listings_seller on public.marketplace_listings (seller_id);
+create index if not exists idx_marketplace_listings_status on public.marketplace_listings (status);
+
+-- User profiles with compliance flags (kill-switch target)
+create table if not exists public.user_profiles (
+  id uuid primary key default gen_random_uuid(),
+  display_name text,
+  email text,
+  account_status text not null default 'active',
+  security_flags text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_user_profiles_status on public.user_profiles (account_status);
+
+-- Legal audit logs (Module 2: AI Compliance Lawyer contract audits)
+create table if not exists public.legal_audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  contract_id uuid,
+  is_compliant boolean not null default false,
+  report_payload jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_legal_audit_logs_contract on public.legal_audit_logs (contract_id);
+create index if not exists idx_legal_audit_logs_compliant on public.legal_audit_logs (is_compliant);
+
+-- Supply chain tracking (Module 3: Supply Chain & Logistics Coordinator)
+create table if not exists public.supply_chain_tracking (
+  id uuid primary key default gen_random_uuid(),
+  order_id text not null,
+  carrier_identity text not null default 'unassigned',
+  origin_point text not null,
+  destination_point text not null,
+  current_milestone text not null default 'manifest_created',
+  transit_status text not null default 'in_preparation',
+  logs jsonb not null default '[]',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_supply_chain_order on public.supply_chain_tracking (order_id);
+create index if not exists idx_supply_chain_status on public.supply_chain_tracking (transit_status);
