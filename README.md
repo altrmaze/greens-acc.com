@@ -261,3 +261,50 @@ GreenACC now supports zero-friction, instant secure meeting rooms for global ent
 ✅ **Enterprise Grade** — Trusted by Toyota, Nissan, and global logistics giants.  
 
 GreenACC combines the simplicity of Google Meet with the compliance rigor of enterprise banking. Your deals are faster, safer, and globally compliant.
+
+---
+
+## Predictive Intelligence Engine
+
+GreenACC now includes a server-side predictive intelligence engine that analyzes behavioral signals and global market trends to surface high-yield category opportunities in real time.
+
+### How it works
+
+1. The engine fetches the 200 most recent rows from `behavioral_signals` (user interactions tagged with a `metadata.category` field).
+2. It fetches all active entries from `market_trends` (each with a `demand_index` and `velocity_score`).
+3. For each market trend category it calculates a weighted score (0–100):
+   - **60%** comes from behavioral momentum — purchase and deal-close signals score 3×, searches score 1.5×.
+   - **40%** comes from macro market velocity — `demand_index` × 0.7 + `velocity_score` × 0.3.
+4. When a category's score exceeds **75%**, it is flagged as a high-yield opportunity and a `prediction_alerts` row is inserted automatically.
+
+### Edge function
+
+`supabase/functions/predictiveIntelligenceEngine.js` — deploy as a Supabase edge function.
+
+**POST** (no required body — reserved for future category filters):
+
+```json
+{
+  "message": "Predictive intelligence pipeline completed",
+  "total_categories_evaluated": 5,
+  "high_yield_count": 2,
+  "results": [
+    { "category": "electronics", "score": 82.4, "high_yield": true, "signal_count": 47 }
+  ],
+  "timestamp": "2026-06-19T03:00:00.000Z"
+}
+```
+
+### Database tables
+
+| Table | Purpose |
+|---|---|
+| `behavioral_signals` | User interactions (purchase, search, deal_close, etc.) with a `metadata.category` field |
+| `market_trends` | Macro demand and velocity indices per category, updated by external data feeds |
+| `prediction_alerts` | Auto-inserted rows whenever a category score crosses 75% |
+
+### Environment variables
+
+Same as other edge functions:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`

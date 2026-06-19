@@ -143,3 +143,41 @@ create index if not exists idx_document_references_room on public.document_refer
 create index if not exists idx_compliance_logs_room on public.compliance_logs (room_id);
 create index if not exists idx_compliance_logs_severity on public.compliance_logs (severity);
 create index if not exists idx_room_sessions_status on public.room_sessions (session_status);
+
+-- Behavioral signals for predictive intelligence engine
+-- Tracks user interactions with categories (purchase, search, deal_close, etc.)
+create table if not exists public.behavioral_signals (
+  id uuid primary key default gen_random_uuid(),
+  interaction_type text not null, -- purchase, deal_close, search, view, inquiry, etc.
+  weight numeric(5,2) not null default 1.0,
+  metadata jsonb, -- must contain { "category": "..." } to match market trends
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_behavioral_signals_created_at on public.behavioral_signals (created_at desc);
+create index if not exists idx_behavioral_signals_interaction_type on public.behavioral_signals (interaction_type);
+
+-- Global market trends for predictive intelligence engine
+create table if not exists public.market_trends (
+  id uuid primary key default gen_random_uuid(),
+  category text not null unique,
+  demand_index numeric(5,4) not null default 0.0, -- normalized 0.0–1.0
+  velocity_score numeric(5,4) not null default 0.0, -- normalized 0.0–1.0
+  source text,
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_market_trends_category on public.market_trends (category);
+
+-- Automated alerts inserted when a category match score crosses the high-yield threshold (>75%)
+create table if not exists public.prediction_alerts (
+  id uuid primary key default gen_random_uuid(),
+  category text not null,
+  score numeric(5,2) not null,
+  threshold numeric(5,2) not null default 75.0,
+  triggered_at timestamptz not null default now()
+);
+
+create index if not exists idx_prediction_alerts_category on public.prediction_alerts (category);
+create index if not exists idx_prediction_alerts_triggered_at on public.prediction_alerts (triggered_at desc);
