@@ -89,9 +89,9 @@ async function simulateSyndicationCall(targetName, payload) {
   
   if (targetName === 'LinkedIn Feed' || targetName === 'X (Twitter)' || targetName === 'Reuters') {
     // Most likely to succeed (80%)
-    return random < 0.8 ? { success: true, url: `https://mock-${targetName.toLowerCase().replace(/\s+/g, '-')}.io/${Math.random().toString(36).substring(2, 11)}` } : { success: false, reason: 'Rate limit exceeded' };
+    return random < 0.8 ? { success: true, url: `https://mock-${targetName.toLowerCase().replace(/\s+/g, '-')}.io/${Math.random().toString(36).substr(2, 9)}` } : { success: false, reason: 'Rate limit exceeded' };
   } else {
     // Medium success (60%)
-    return random < 0.6 ? { success: true, url: `https://mock-${targetName.toLowerCase().replace(/\s+/g, '-')}.io/${Math.random().toString(36).substring(2, 11)}` } : { success: false, reason: 'Editorial review pending' };
+    return random < 0.6 ? { success: true, url: `https://mock-${targetName.toLowerCase().replace(/\s+/g, '-')}.io/${Math.random().toString(36).substr(2, 9)}` } : { success: false, reason: 'Editorial review pending' };
   }
 }

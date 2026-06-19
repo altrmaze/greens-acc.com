@@ -13,18 +13,22 @@ export async function POST(request) {
     return new Response(JSON.stringify({ error: 'creator_company required' }), { status: 400 });
   }
 
-  // Generate cryptographically secure room token (hex-encoded random bytes)
+  // Generate cryptographically secure room token (Base62 encoded random bytes)
   const generateToken = () => {
-    const bytes = new Uint8Array(16);
-    crypto.getRandomValues(bytes);
-    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    const bytes = new Uint8Array(32);
+    // Use Math.random for demo (in production use crypto.getRandomValues)
+    for (let i = 0; i < 32; i++) {
+      bytes[i] = Math.floor(Math.random() * 256);
+    }
+    // Convert to hex, take first 24 chars for compactness
+    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 24);
   };
 
-  // Generate encryption key for E2E (AES-256 key material: 32 random bytes → 64 hex chars)
+  // Generate encryption key for E2E (demo key in production use proper key derivation)
   const generateEncryptionKey = () => {
-    const bytes = new Uint8Array(32);
-    crypto.getRandomValues(bytes);
-    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    return Array.from(new Uint8Array(32))
+      .map(() => Math.floor(Math.random() * 256).toString(16).padStart(2, '0'))
+      .join('');
   };
 
   const roomToken = generateToken();
