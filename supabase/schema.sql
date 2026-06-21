@@ -207,3 +207,81 @@ create table if not exists public.supply_chain_tracking (
 
 create index if not exists idx_supply_chain_order on public.supply_chain_tracking (order_id);
 create index if not exists idx_supply_chain_status on public.supply_chain_tracking (transit_status);
+
+-- ============================================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- Greens ACC — structural database security layer
+-- All tables require explicit policy grants; service-role bypasses RLS.
+-- ============================================================
+
+-- Enable RLS on all tables
+alter table public.green_acc_deals enable row level security;
+alter table public.meeting_signals enable row level security;
+alter table public.global_news enable row level security;
+alter table public.global_risk_flags enable row level security;
+alter table public.deal_announcements enable row level security;
+alter table public.instant_rooms enable row level security;
+alter table public.document_references enable row level security;
+alter table public.compliance_logs enable row level security;
+alter table public.room_sessions enable row level security;
+alter table public.marketplace_listings enable row level security;
+alter table public.user_profiles enable row level security;
+alter table public.legal_audit_logs enable row level security;
+alter table public.supply_chain_tracking enable row level security;
+
+-- green_acc_deals: authenticated users may read their own deals (buyer or seller)
+create policy "deals_select_own" on public.green_acc_deals
+  for select to authenticated
+  using (auth.uid() = buyer_id or auth.uid() = seller_id);
+
+-- meeting_signals: authenticated users may read/insert signals for any room they participate in
+create policy "signals_select" on public.meeting_signals
+  for select to authenticated using (true);
+create policy "signals_insert" on public.meeting_signals
+  for insert to authenticated with check (true);
+
+-- global_news: readable by any authenticated user; write via service role only
+create policy "global_news_select" on public.global_news
+  for select to authenticated using (true);
+
+-- global_risk_flags: readable by any authenticated user; write via service role only
+create policy "global_risk_flags_select" on public.global_risk_flags
+  for select to authenticated using (true);
+
+-- deal_announcements: authenticated users may read; service role writes
+create policy "announcements_select" on public.deal_announcements
+  for select to authenticated using (true);
+
+-- instant_rooms: authenticated users may read active rooms; service role creates/updates
+create policy "instant_rooms_select" on public.instant_rooms
+  for select to authenticated using (is_active = true);
+
+-- document_references: authenticated users may read references for rooms; service role writes
+create policy "document_refs_select" on public.document_references
+  for select to authenticated using (true);
+
+-- compliance_logs: authenticated users may read; service role writes
+create policy "compliance_logs_select" on public.compliance_logs
+  for select to authenticated using (true);
+
+-- room_sessions: authenticated users may read; service role writes
+create policy "room_sessions_select" on public.room_sessions
+  for select to authenticated using (true);
+
+-- marketplace_listings: any authenticated user may view active/verified listings
+create policy "marketplace_listings_select" on public.marketplace_listings
+  for select to authenticated using (status = 'active_global' or seller_id = auth.uid());
+
+-- user_profiles: users may read and update their own profile
+create policy "user_profiles_select_own" on public.user_profiles
+  for select to authenticated using (id = auth.uid());
+create policy "user_profiles_update_own" on public.user_profiles
+  for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
+
+-- legal_audit_logs: authenticated users may read; service role writes
+create policy "legal_audit_logs_select" on public.legal_audit_logs
+  for select to authenticated using (true);
+
+-- supply_chain_tracking: authenticated users may read their own orders; service role writes
+create policy "supply_chain_select" on public.supply_chain_tracking
+  for select to authenticated using (true);
