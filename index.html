@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GreensACC — Secure Trading Command & AI Escrow Hub</title>
+    <title>Greens ACC — Secure B2B Trading Command & Compliance Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen antialiased">
 
     <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 shadow-sm font-mono">
         <div class="inline-block animate-marquee space-x-8">
-            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>GREENSACC INDEX (AGRI/USD): $14.20 <span class="text-emerald-400 ml-1">+1.4%</span></span>
+            <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>GREENS ACC INDEX (AGRI/USD): $14.20 <span class="text-emerald-400 ml-1">+1.4%</span></span>
             <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>FREIGHT INDEX (US-GLBL): $3,450 <span class="text-emerald-400 ml-1">+0.8%</span></span>
             <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / EGP: 47.85 <span class="text-emerald-400 ml-1">+2.1%</span></span>
             <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD / AED: 3.67 <span class="text-slate-400 ml-1">0.0%</span></span>
@@ -33,7 +33,7 @@
                     </svg>
                 </div>
                 <div>
-                    <span class="text-xl font-black tracking-tight text-slate-900">GreensACC</span>
+                    <span class="text-xl font-black tracking-tight text-slate-900">Greens ACC</span>
                     <span class="text-xs block text-emerald-600 font-semibold tracking-wider uppercase font-mono">Secure Access & Compliance Command</span>
                 </div>
             </div>
@@ -47,14 +47,22 @@
                     <option value="us">🇺🇸 United States</option>
                     <option value="ae">🇦🇪 United Arab Emirates</option>
                     <option value="eg">🇪🇬 Egypt</option>
+                    <option value="in">🇮🇳 India</option>
+                    <option value="pl">🇵🇱 Poland</option>
+                    <option value="fr">🇫🇷 France</option>
+                    <option value="cn">🇨🇳 China</option>
                 </select>
             </div>
 
             <div class="flex flex-col">
                 <label class="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-1">System Language Engine</label>
                 <select class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer shadow-2xs">
-                    <option value="en-base">🇬🇧 English (Base Environment)</option>
-                    <option value="en-ar">🇬🇧 English + 🇦🇪 العربية (Dual Interface)</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+                    <option value="pl">🇵🇱 Polski (Polish)</option>
+                    <option value="ar">🇦🇪 العربية (Arabic)</option>
+                    <option value="fr">🇫🇷 Français (French)</option>
+                    <option value="zh">🇨🇳 中文 (Chinese)</option>
                 </select>
             </div>
         </div>
@@ -68,7 +76,7 @@
                 <p class="text-slate-500 text-sm mt-1">Authorized corporate access strictly monitored. Dynamic 2% automated negotiation fee enforced on final handshake.</p>
             </div>
             <div class="flex gap-2">
-                <span class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-mono border border-slate-200">repo: github/greensacc</span>
+                <span class="px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-mono border border-slate-200">repo: github/greens-acc.com</span>
                 <span class="px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-mono font-bold border border-emerald-200">AI Fee: 2% Brokerage</span>
             </div>
         </header>
@@ -168,26 +176,30 @@
                                         <span class="inline-block bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold rounded-xl px-4 py-2 text-sm">$20.00 USD</span>
                                         <span class="text-slate-400 text-[11px]">fixed · non-refundable · required before handshake</span>
                                     </div>
-                                    <p class="mt-3 text-[11px] text-slate-500">Entry fee status: <span id="entry-fee-status-text" class="font-semibold text-slate-700">pending</span></p>
                                 </div>
-                                <div class="grid gap-3 sm:grid-cols-4">
-                                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700">
+                                <div class="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
+                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
+                                        <p class="font-bold text-slate-900 mb-2">Entry fee</p>
+                                        <p id="entry-fee-status-text" class="text-base font-semibold text-slate-900">pending</p>
+                                        <p class="mt-1 text-[11px] text-slate-500">Flat $20.00 access charge</p>
+                                    </div>
+                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
                                         <p class="font-bold text-slate-900 mb-2">Handshake</p>
                                         <p id="handshake-status-text" class="text-base font-semibold text-slate-900">pending</p>
-                                        <p class="mt-1 text-[11px] text-slate-500">L/C session status</p>
+                                        <p class="mt-1 text-[11px] text-slate-500">Deal confirmation state</p>
                                     </div>
-                                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700">
+                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
                                         <p class="font-bold text-slate-900 mb-2">Compliance</p>
                                         <p id="compliance-status-text" class="text-base font-semibold text-slate-900">pending</p>
-                                        <p class="mt-1 text-[11px] text-slate-500">KYC / AML audit</p>
+                                        <p class="mt-1 text-[11px] text-slate-500">KYC, AML, and policy review</p>
                                     </div>
-                                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700">
+                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
                                         <p class="font-bold text-slate-900 mb-2">Escrow</p>
                                         <p id="escrow-status-text" class="text-base font-semibold text-slate-900">locked</p>
-                                        <p class="mt-1 text-[11px] text-slate-500">Fund lock status</p>
+                                        <p class="mt-1 text-[11px] text-slate-500">Fund custody and release</p>
                                     </div>
-                                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-700">
-                                        <p class="font-bold text-slate-900 mb-2">Deal status</p>
+                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
+                                        <p class="font-bold text-slate-900 mb-2">Deal progress</p>
                                         <p id="deal-progress-text" class="text-base font-semibold text-slate-900">pending</p>
                                         <p class="mt-1 text-[11px] text-slate-500">Transaction progress</p>
                                     </div>
@@ -212,34 +224,12 @@
                                         <p class="mt-1 text-[11px] text-slate-500">From deal amount field</p>
                                     </div>
                                 </div>
-                                <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
-                                        <p class="font-bold text-slate-900 mb-2">Entry fee</p>
-                                        <p id="entry-fee-status-text" class="text-base font-semibold text-slate-900">pending</p>
-                                        <p class="mt-1 text-[11px] text-slate-500">Flat $20.00 access charge</p>
-                                    </div>
-                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
-                                        <p class="font-bold text-slate-900 mb-2">Handshake</p>
-                                        <p id="handshake-status-text" class="text-base font-semibold text-slate-900">pending</p>
-                                        <p class="mt-1 text-[11px] text-slate-500">Deal confirmation state</p>
-                                    </div>
-                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
-                                        <p class="font-bold text-slate-900 mb-2">Compliance</p>
-                                        <p id="compliance-status-text" class="text-base font-semibold text-slate-900">pending</p>
-                                        <p class="mt-1 text-[11px] text-slate-500">KYC, AML, and policy review</p>
-                                    </div>
-                                    <div class="rounded-3xl border border-slate-200 bg-white p-4 text-xs text-slate-700 shadow-sm">
-                                        <p class="font-bold text-slate-900 mb-2">Escrow</p>
-                                        <p id="escrow-status-text" class="text-base font-semibold text-slate-900">locked</p>
-                                        <p class="mt-1 text-[11px] text-slate-500">Fund custody and release</p>
-                                    </div>
-                                </div>
                                 <div class="grid gap-3 sm:grid-cols-3">
                                     <button id="process-entry-fee" class="w-full px-4 py-3 bg-emerald-600 text-white rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-emerald-700 transition">Pay $20 access fee</button>
                                     <button id="process-handshake" class="w-full px-4 py-3 bg-slate-900 text-white rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-slate-800 transition">Create L/C & lock 2%</button>
                                     <button id="trigger-withdrawal" class="w-full px-4 py-3 bg-slate-100 text-slate-900 rounded-2xl text-xs font-semibold uppercase tracking-[0.24em] hover:bg-slate-200 transition">Safe withdrawal</button>
                                 </div>
-                                <p class="text-[11px] text-slate-500">The $20.00 GreensACC access fee is separate from the deal amount. Supabase still drives the existing handshake, commission, and escrow workflow buttons.</p>
+                                <p class="text-[11px] text-slate-500">The $20.00 Greens ACC access fee is separate from the deal amount. Supabase still drives the existing handshake, commission, and escrow workflow buttons.</p>
                             </div>
                         </div>
                     </div>
@@ -303,6 +293,95 @@
             </div>
         </section>
 
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">Supply Chain Engine</h3>
+                    <p class="text-sm text-slate-500">Automated global logistics tracking, milestone verification, and shipment coordination for international commodities.</p>
+                </div>
+                <span class="inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">Global Tracking Active</span>
+            </div>
+
+            <div class="grid gap-4 lg:grid-cols-2">
+                <div class="rounded-2xl bg-slate-50 p-5 border border-slate-200 space-y-3">
+                    <h4 class="font-bold text-slate-900 text-sm">Initialize Shipment</h4>
+                    <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-1">Order ID
+                        <input id="sc-order-id" type="text" placeholder="ORD-0001" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 font-normal normal-case tracking-normal" />
+                    </label>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Origin
+                            <input id="sc-origin" type="text" placeholder="Port of Shanghai" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 font-normal normal-case tracking-normal" />
+                        </label>
+                        <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Destination
+                            <input id="sc-destination" type="text" placeholder="Port of Hamburg" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 font-normal normal-case tracking-normal" />
+                        </label>
+                    </div>
+                    <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Carrier Identity (optional)
+                        <input id="sc-carrier" type="text" placeholder="Carrier name or ID" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 font-normal normal-case tracking-normal" />
+                    </label>
+                    <button id="sc-init-btn" class="w-full px-4 py-3 bg-slate-900 text-white rounded-xl text-xs font-semibold uppercase tracking-wide hover:bg-slate-800 transition">Initialize Shipment</button>
+                </div>
+
+                <div class="rounded-2xl bg-slate-50 p-5 border border-slate-200 space-y-3">
+                    <h4 class="font-bold text-slate-900 text-sm">Advance Milestone</h4>
+                    <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Tracking ID
+                        <input id="sc-tracking-id" type="text" placeholder="UUID from initialized shipment" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 font-normal normal-case tracking-normal" />
+                    </label>
+                    <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Milestone
+                        <select id="sc-milestone" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 font-normal normal-case tracking-normal">
+                            <option value="manifest_created">Manifest Created</option>
+                            <option value="customs_cleared">Customs Cleared</option>
+                            <option value="in_transit">In Transit</option>
+                            <option value="at_destination_port">At Destination Port</option>
+                            <option value="delivery_confirmed">Delivery Confirmed</option>
+                        </select>
+                    </label>
+                    <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Update Summary (optional)
+                        <input id="sc-summary" type="text" placeholder="e.g., Cleared by port authority" class="mt-1 w-full bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 font-normal normal-case tracking-normal" />
+                    </label>
+                    <button id="sc-advance-btn" class="w-full px-4 py-3 bg-emerald-600 text-white rounded-xl text-xs font-semibold uppercase tracking-wide hover:bg-emerald-700 transition">Advance Milestone</button>
+                </div>
+            </div>
+
+            <div id="sc-output" class="hidden mt-1 p-4 rounded-xl text-xs font-medium border"></div>
+        </section>
+
+        <section class="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900">AI Legal Compliance Monitor — Contract Audit</h3>
+                    <p class="text-sm text-slate-500">Paste contract text to run an automated compliance check against CISG, INCOTERMS 2020, AML/KYC, and international trade law.</p>
+                </div>
+                <span class="inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">AI Compliance Ready</span>
+            </div>
+
+            <div class="grid gap-4 lg:grid-cols-3">
+                <div class="lg:col-span-2 space-y-3">
+                    <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Contract Text *
+                        <textarea id="contract-audit-text" rows="7" placeholder="Paste your contract or agreement text here for AI-powered compliance analysis..." class="mt-1 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 resize-none font-normal normal-case tracking-normal"></textarea>
+                    </label>
+                    <label class="block text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Contract ID (optional)
+                        <input id="contract-audit-id" type="text" placeholder="Internal contract reference" class="mt-1 w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-emerald-500 font-normal normal-case tracking-normal" />
+                    </label>
+                    <button id="contract-audit-btn" class="px-5 py-3 bg-slate-900 text-white rounded-xl text-xs font-semibold uppercase tracking-wide hover:bg-slate-800 transition">Run Compliance Audit</button>
+                </div>
+
+                <div class="rounded-2xl bg-slate-50 p-4 border border-slate-200 text-xs text-slate-600 space-y-3">
+                    <p class="font-bold text-slate-900 text-sm">Compliance Frameworks Applied</p>
+                    <ul class="space-y-2">
+                        <li class="flex items-start gap-2"><span class="mt-1 w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>CISG — UN Convention on International Sale of Goods</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>INCOTERMS 2020 — ICC Global Delivery Terms</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>UNIDROIT — International Commercial Contract Principles</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>AML / KYC — Anti-Money Laundering Standards</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Dispute Resolution — ICC / UNCITRAL Arbitration</li>
+                        <li class="flex items-start gap-2"><span class="mt-1 w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span>Force Majeure — Standard Clause Verification</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="audit-output" class="hidden mt-1 p-4 rounded-xl text-xs font-mono border whitespace-pre-wrap"></div>
+        </section>
+
         <div class="relative grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <div class="absolute inset-0 bg-slate-50/40 backdrop-blur-md rounded-2xl z-40 flex items-center justify-center p-4">
@@ -339,12 +418,12 @@
 
             <div class="space-y-6 lg:col-span-1 select-none pointer-events-none filter blur-xs">
                 <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">Command & CRM Operations</h3>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono mb-2">Global Commodity Marketplace</h3>
                     <button class="w-full py-3 px-4 bg-slate-50 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center text-slate-400">
-                        <span>➕ Add New Partner Profile</span>
+                        <span>📋 List New Commodity Asset</span>
                     </button>
                     <button class="w-full py-3 px-4 bg-slate-50 border border-slate-200 text-left rounded-lg text-sm font-semibold flex justify-between items-center text-slate-400">
-                        <span>📦 Dispatch Warehouse Stock</span>
+                        <span>✅ Submit $20 Listing Verification</span>
                     </button>
                 </div>
             </div>
@@ -353,30 +432,28 @@
                 <div>
                     <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
                         <div>
-                            <h3 class="text-base font-bold text-slate-900">Automated AI Agent Negotiation</h3>
-                            <p class="text-xs text-slate-400">Continuous background data verification streams.</p>
+                            <h3 class="text-base font-bold text-slate-900">Verified Marketplace Engine</h3>
+                            <p class="text-xs text-slate-400">Secure global commodity listings with $20 verification gate and compliance screening.</p>
                         </div>
                         <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-200">
-                            2% HANDSHAKE COMMISSION FEE
+                            $20 VERIFICATION REQUIRED
                         </span>
                     </div>
 
-                    <div class="space-y-4 my-2">
-                        <div class="flex flex-col items-end">
-                            <div class="max-w-[85%] bg-slate-100 p-3 rounded-2xl rounded-tr-none text-xs text-slate-400">
-                                Protected conversation details hidden. Pay $20 to review active translated bids.
-                            </div>
+                    <div class="space-y-3 my-2 text-xs text-slate-400">
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <p class="font-semibold text-slate-500 mb-1">Commodity Listing</p>
+                            <p>Title, category, quantity, and per-unit price — screened for restricted materials before listing.</p>
                         </div>
-                        <div class="flex flex-col items-start">
-                            <div class="max-w-[85%] bg-slate-100 p-3 rounded-2xl rounded-tl-none text-xs text-slate-400">
-                                Inbound global client request locked during banking review.
-                            </div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <p class="font-semibold text-slate-500 mb-1">Listing Verification</p>
+                            <p>$20.00 cleared payment activates listing to active_global status — visible to global buyers.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center text-xs font-mono text-slate-400">
-                    <span>CONTRACT ESCROW SECURED BY AUTOMATED AI ASSISTANT</span>
+                    <span>MARKETPLACE ENGINE SECURED BY AI COMPLIANCE SCREENING</span>
                     <span class="font-bold">STATUS: LOCKED</span>
                 </div>
             </div>
@@ -777,6 +854,126 @@
         addDomListener(processEntryFee, 'click', handleEntryFee);
         addDomListener(processHandshake, 'click', handleHandshake);
         addDomListener(triggerWithdrawal, 'click', handleWithdrawal);
+
+        // ── SUPPLY CHAIN ENGINE ──────────────────────────────────────────────
+        function showScOutput(message, type) {
+            const output = document.getElementById('sc-output');
+            if (!output) return;
+            output.classList.remove('hidden');
+            output.textContent = message;
+            output.className = `mt-1 p-4 rounded-xl text-xs font-medium border ${type === 'error' ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`;
+        }
+
+        async function initShipment() {
+            const order_id = document.getElementById('sc-order-id')?.value?.trim();
+            const origin = document.getElementById('sc-origin')?.value?.trim();
+            const destination = document.getElementById('sc-destination')?.value?.trim();
+            const carrier_id = document.getElementById('sc-carrier')?.value?.trim();
+            if (!order_id || !origin || !destination) {
+                showScOutput('Order ID, origin, and destination are required.', 'error');
+                return;
+            }
+            try {
+                const response = await fetch(`${functionHost}/supplyChainCoordinator`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'init_shipment', order_id, origin, destination, carrier_id: carrier_id || undefined })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    showScOutput(`Initialization failed: ${data.error || response.statusText}`, 'error');
+                    return;
+                }
+                const id = data.tracking_record?.id || 'see response';
+                showScOutput(`Shipment initialized. Tracking ID: ${id} · Order: ${order_id} · Route: ${origin} → ${destination}`, 'success');
+                appendLog(`Supply chain shipment initialized for order ${order_id}.`, 'success');
+            } catch (err) {
+                showScOutput(`Request failed: ${err.message}`, 'error');
+            }
+        }
+
+        async function advanceMilestone() {
+            const tracking_id = document.getElementById('sc-tracking-id')?.value?.trim();
+            const milestone = document.getElementById('sc-milestone')?.value?.trim();
+            const summary = document.getElementById('sc-summary')?.value?.trim();
+            if (!tracking_id || !milestone) {
+                showScOutput('Tracking ID and milestone are required.', 'error');
+                return;
+            }
+            try {
+                const response = await fetch(`${functionHost}/supplyChainCoordinator`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'advance_milestone', tracking_id, milestone, summary: summary || undefined })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    showScOutput(`Milestone update failed: ${data.error || response.statusText}`, 'error');
+                    return;
+                }
+                showScOutput(`Milestone advanced to: ${data.record?.current_milestone || milestone} · Order: ${data.record?.order_id || tracking_id}`, 'success');
+                appendLog(`Supply chain milestone advanced to ${milestone}.`, 'success');
+            } catch (err) {
+                showScOutput(`Request failed: ${err.message}`, 'error');
+            }
+        }
+
+        addDomListener(document.getElementById('sc-init-btn'), 'click', initShipment);
+        addDomListener(document.getElementById('sc-advance-btn'), 'click', advanceMilestone);
+
+        // ── CONTRACT COMPLIANCE AUDIT ────────────────────────────────────────
+        function showAuditOutput(message, type) {
+            const output = document.getElementById('audit-output');
+            if (!output) return;
+            output.classList.remove('hidden');
+            output.textContent = message;
+            output.className = `mt-1 p-4 rounded-xl text-xs font-mono border whitespace-pre-wrap ${type === 'error' ? 'bg-rose-50 text-rose-700 border-rose-200' : type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`;
+        }
+
+        async function auditContract() {
+            const contractText = document.getElementById('contract-audit-text')?.value?.trim();
+            const contractId = document.getElementById('contract-audit-id')?.value?.trim();
+            if (!contractText) {
+                showAuditOutput('Contract text is required to run the compliance audit.', 'error');
+                return;
+            }
+            const btn = document.getElementById('contract-audit-btn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Auditing...'; }
+            try {
+                const response = await fetch(`${functionHost}/auditContractCompliance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: contractText, contract_id: contractId || undefined })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    showAuditOutput(`Audit failed: ${data.error || response.statusText}`, 'error');
+                    return;
+                }
+                const status = data.compliance_status || 'UNKNOWN';
+                const discrepancies = data.report?.discrepancies || [];
+                const recommendations = data.report?.recommended_clauses || [];
+                let output = `Compliance Status: ${status}\n`;
+                if (data.report?.applied_frameworks?.length) {
+                    output += `\nFrameworks Checked:\n${data.report.applied_frameworks.map(f => `  • ${f}`).join('\n')}`;
+                }
+                if (discrepancies.length) {
+                    output += `\n\nDiscrepancies Found (${discrepancies.length}):\n${discrepancies.map(d => `  ⚠ ${d}`).join('\n')}`;
+                }
+                if (recommendations.length) {
+                    output += `\n\nRecommended Clauses:\n${recommendations.map(r => `  → ${r}`).join('\n')}`;
+                }
+                if (!discrepancies.length) output += '\n\nNo compliance issues detected.';
+                showAuditOutput(output, status === 'PASS' ? 'success' : 'warning');
+                appendLog(`Contract compliance audit complete: ${status}.`, status === 'PASS' ? 'success' : 'warning');
+            } catch (err) {
+                showAuditOutput(`Request failed: ${err.message}`, 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = 'Run Compliance Audit'; }
+            }
+        }
+
+        addDomListener(document.getElementById('contract-audit-btn'), 'click', auditContract);
 
         const dealAmountDisplay = document.getElementById('deal-amount-display');
         if (dealAmountInput && dealAmountDisplay) {
