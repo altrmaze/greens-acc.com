@@ -1,5 +1,5 @@
--- Supabase database schema for GreenACC payment lifecycle and escrow deals
--- This schema defines the master deal table for the GreenACC platform.
+-- Supabase database schema for Greens ACC payment lifecycle and escrow deals
+-- This schema defines the master deal table for the Greens ACC platform.
 
 create extension if not exists "pgcrypto";
 
