@@ -14,20 +14,27 @@ export async function POST(request) {
   }
 
   // Generate cryptographically secure room token (Base62 encoded random bytes)
-  const generateToken = () => {
-    const bytes = new Uint8Array(32);
-    // Use Math.random for demo (in production use crypto.getRandomValues)
-    for (let i = 0; i < 32; i++) {
+  const getRandomBytes = (length) => {
+    const bytes = new Uint8Array(length);
+    if (globalThis.crypto?.getRandomValues) {
+      globalThis.crypto.getRandomValues(bytes);
+      return bytes;
+    }
+    for (let i = 0; i < length; i += 1) {
       bytes[i] = Math.floor(Math.random() * 256);
     }
-    // Convert to hex, take first 24 chars for compactness
-    return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 24);
+    return bytes;
+  };
+
+  const generateToken = () => {
+    const bytes = getRandomBytes(32);
+    return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('').substring(0, 24);
   };
 
   // Generate encryption key for E2E (demo key in production use proper key derivation)
   const generateEncryptionKey = () => {
-    return Array.from(new Uint8Array(32))
-      .map(() => Math.floor(Math.random() * 256).toString(16).padStart(2, '0'))
+    return Array.from(getRandomBytes(32))
+      .map((value) => value.toString(16).padStart(2, '0'))
       .join('');
   };
 
@@ -90,7 +97,7 @@ export async function POST(request) {
   const session = await sessionResp.json();
 
   // Generate shareable link
-  const shareLink = `${request.headers.get('origin') || 'https://greensacc.com'}/meeting.html?room_token=${roomToken}&encryption_key=${encryptionKey}&fee_required=true`;
+  const shareLink = `${request.headers.get('origin') || 'https://www.greensacc.com'}/meeting.html?room_token=${roomToken}&encryption_key=${encryptionKey}&fee_required=true`;
 
   return new Response(JSON.stringify({ 
     message: 'instant room created',

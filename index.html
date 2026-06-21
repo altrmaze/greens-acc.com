@@ -53,7 +53,7 @@
   <!-- ═══════════════════════ TOP MARKET TICKER ═══════════════════════ -->
   <div class="bg-slate-900 text-slate-400 text-xs py-1.5 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 font-mono select-none">
     <div class="animate-marquee space-x-10">
-      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>GREENS ACC INDEX (AGRI/USD) $14.20 <span class="text-emerald-400">+1.4%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>GREENS ACC INDEX (TRADE/USD) $14.20 <span class="text-emerald-400">+1.4%</span></span>
       <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>FREIGHT INDEX (GLOBAL) $3,450 <span class="text-emerald-400">+0.8%</span></span>
       <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / EGP 47.85 <span class="text-emerald-400">+2.1%</span></span>
       <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / AED 3.67 <span class="text-slate-400">0.0%</span></span>
@@ -63,7 +63,7 @@
       <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / PLN 3.98 <span class="text-emerald-400">+0.1%</span></span>
       <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / CNY 7.24 <span class="text-slate-400">0.0%</span></span>
       <!-- duplicate band for seamless loop -->
-      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>GREENS ACC INDEX (AGRI/USD) $14.20 <span class="text-emerald-400">+1.4%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>GREENS ACC INDEX (TRADE/USD) $14.20 <span class="text-emerald-400">+1.4%</span></span>
       <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>FREIGHT INDEX (GLOBAL) $3,450 <span class="text-emerald-400">+0.8%</span></span>
       <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / EGP 47.85 <span class="text-emerald-400">+2.1%</span></span>
       <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / AED 3.67 <span class="text-slate-400">0.0%</span></span>
@@ -95,7 +95,7 @@
       <!-- Unified locale controls -->
       <div class="flex flex-wrap items-end gap-4">
         <div class="flex flex-col gap-1">
-          <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Region</label>
+          <label id="region-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Region</label>
           <select id="region-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
             <option value="global">🌍 Global</option>
             <option value="us">🇺🇸 United States</option>
@@ -109,7 +109,7 @@
           </select>
         </div>
         <div class="flex flex-col gap-1">
-          <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Interface Language</label>
+          <label id="interface-language-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Interface Language</label>
           <select id="language-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
             <option value="en">🇬🇧 English</option>
             <option value="ar">🇦🇪 العربية</option>
@@ -120,7 +120,7 @@
           </select>
         </div>
         <div class="flex flex-col gap-1">
-          <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Counterparty Language</label>
+          <label id="counterparty-language-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Counterparty Language</label>
           <select id="counterparty-language-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
             <option value="en">🇬🇧 English</option>
             <option value="ar">🇦🇪 العربية</option>
@@ -131,11 +131,42 @@
           </select>
         </div>
         <div id="system-time-badge" class="flex flex-col gap-1">
-          <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Local Time</label>
+          <label id="local-time-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Local Time</label>
           <span id="local-time" class="text-xs font-mono text-slate-600 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">—</span>
         </div>
       </div>
 
+    </div>
+    <div class="max-w-7xl mx-auto px-6 pb-4 flex flex-col gap-3">
+      <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3">
+        <div class="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest font-mono text-slate-500">
+          <a href="#platform-pillars" class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600 hover:border-emerald-200 hover:text-emerald-700 transition">Pillars</a>
+          <a href="#activation-lifecycle" class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600 hover:border-emerald-200 hover:text-emerald-700 transition">Activation</a>
+          <a href="#ops-log" class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600 hover:border-emerald-200 hover:text-emerald-700 transition">Operations</a>
+          <a href="#verification-vault" class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600 hover:border-emerald-200 hover:text-emerald-700 transition">Verification</a>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-[10px] font-semibold text-slate-500">
+          <span id="route-summary" class="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1.5 font-mono text-cyan-700">Route: Global</span>
+          <span id="python-sync-status" class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 font-mono text-amber-700">Python sync standby</span>
+        </div>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p id="desk-time-label" class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Desk Time</p>
+          <p id="desk-time-value" class="mt-1 text-base font-black text-slate-900">—</p>
+          <p id="desk-time-zone" class="text-[10px] text-slate-400">Browser locale</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p id="region-time-label" class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Regional Hub</p>
+          <p id="region-time-value" class="mt-1 text-base font-black text-slate-900">—</p>
+          <p id="region-time-zone" class="text-[10px] text-slate-400">UTC</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p id="counterparty-time-label" class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Counterparty Clock</p>
+          <p id="counterparty-time-value" class="mt-1 text-base font-black text-slate-900">—</p>
+          <p id="counterparty-time-zone" class="text-[10px] text-slate-400">Localized</p>
+        </div>
+      </div>
     </div>
   </nav>
 
@@ -147,10 +178,10 @@
       <div>
         <div class="flex items-center gap-2 mb-2">
           <span class="status-dot bg-emerald-500"></span>
-          <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest font-mono">All Systems Active</span>
+          <span id="platform-status-label" class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest font-mono">All Systems Active</span>
         </div>
-        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Global B2B Command Center</h1>
-        <p class="text-sm text-slate-500 mt-1 max-w-xl">Authorized corporate access. AI-driven compliance monitoring. Secure escrow lifecycle. Multilingual global trade orchestration.</p>
+        <h1 id="hero-title" class="text-2xl font-black text-slate-900 tracking-tight">Global B2B Command Center</h1>
+        <p id="hero-description" class="text-sm text-slate-500 mt-1 max-w-xl">Authorized corporate access. AI-driven compliance monitoring. Secure escrow lifecycle. Multilingual global trade orchestration.</p>
       </div>
       <div class="flex flex-wrap gap-2">
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold border border-emerald-200">
@@ -165,11 +196,34 @@
       </div>
     </header>
 
+    <section class="grid gap-4 lg:grid-cols-4">
+      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Backend Truth</p>
+        <p id="truth-summary" class="mt-2 text-base font-black text-slate-900">Awaiting identifiers</p>
+        <p class="mt-1 text-xs text-slate-500">Python sync polls authoritative system state before refreshing the homepage.</p>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Status Route</p>
+        <p id="route-detail" class="mt-2 text-base font-black text-slate-900">Global desk</p>
+        <p class="mt-1 text-xs text-slate-500">Region, interface language, and counterparty language share one localization model.</p>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Supply Snapshot</p>
+        <p id="supply-summary" class="mt-2 text-base font-black text-slate-900">Idle</p>
+        <p class="mt-1 text-xs text-slate-500">Latest manifest and transit milestone from the system record.</p>
+      </div>
+      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Compliance Signals</p>
+        <p id="compliance-summary" class="mt-2 text-base font-black text-slate-900">Monitoring</p>
+        <p class="mt-1 text-xs text-slate-500">AI legal review, meeting safeguards, and escalation state stay synchronized.</p>
+      </div>
+    </section>
+
     <!-- ─── THREE CORE PILLARS ─── -->
-    <section>
+    <section id="platform-pillars">
       <div class="mb-4 flex items-center gap-3">
         <hr class="flex-1 stroke-separator" />
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Core Platform Pillars</span>
+        <span id="pillars-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Core Platform Pillars</span>
         <hr class="flex-1 stroke-separator" />
       </div>
       <div class="grid gap-5 lg:grid-cols-3">
@@ -184,7 +238,7 @@
             </div>
             <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full font-mono">Pillar I</span>
           </div>
-          <h2 class="text-base font-bold text-slate-900 mb-2">Global B2B Meeting Room</h2>
+          <h2 id="pillar-room-title" class="text-base font-bold text-slate-900 mb-2">Global B2B Meeting Room</h2>
           <p class="text-xs text-slate-500 leading-relaxed mb-5">Encrypted, secure video and document rooms for international B2B trade sessions. WebRTC end-to-end. Kill-switch on compliance breach.</p>
           <hr class="stroke-separator mb-4" />
           <div class="space-y-2 mb-5">
@@ -209,7 +263,7 @@
             </div>
             <span class="text-[9px] font-bold text-cyan-600 uppercase tracking-widest bg-cyan-50 border border-cyan-100 px-2 py-1 rounded-full font-mono">Pillar II</span>
           </div>
-          <h2 class="text-base font-bold text-slate-900 mb-2">Supply Chain Engine</h2>
+          <h2 id="pillar-supply-title" class="text-base font-bold text-slate-900 mb-2">Supply Chain Engine</h2>
           <p class="text-xs text-slate-500 leading-relaxed mb-5">End-to-end shipment tracking for international commodities. Carrier assignment, milestone progression, and real-time logistics audit trail.</p>
           <hr class="stroke-separator mb-4" />
           <div class="space-y-2 mb-5">
@@ -250,7 +304,7 @@
             </div>
             <span class="text-[9px] font-bold text-violet-600 uppercase tracking-widest bg-violet-50 border border-violet-100 px-2 py-1 rounded-full font-mono">Pillar III</span>
           </div>
-          <h2 class="text-base font-bold text-slate-900 mb-2">AI Legal Compliance Monitor</h2>
+          <h2 id="pillar-compliance-title" class="text-base font-bold text-slate-900 mb-2">AI Legal Compliance Monitor</h2>
           <p class="text-xs text-slate-500 leading-relaxed mb-5">OFAC, AML, KYC, and CISG-aligned contract scanning. Detects sanction violations and illegal commodities. Includes automated kill-switch and audit logging.</p>
           <hr class="stroke-separator mb-4" />
           <div class="space-y-2 mb-5">
@@ -273,17 +327,42 @@
     </section>
 
     <!-- ─── DEAL ACTIVATION & ESCROW LIFECYCLE ─── -->
-    <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <section id="activation-lifecycle" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
       <div class="px-7 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1">Verification Gate</p>
-          <h2 class="text-lg font-black text-slate-900">Deal Activation &amp; Escrow Lifecycle</h2>
+          <h2 id="lifecycle-title" class="text-lg font-black text-slate-900">Deal Activation &amp; Escrow Lifecycle</h2>
           <p class="text-xs text-slate-500 mt-0.5">Flat $20.00 access activation · 2% L/C brokerage commission · AI-verified safe withdrawal</p>
         </div>
         <div id="deal-lifecycle-badge" class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full border border-slate-200">
           <span class="status-dot bg-slate-400"></span>
           <span id="lifecycle-stage-text">Awaiting inputs</span>
+        </div>
+      </div>
+
+      <div class="px-7 pt-5">
+        <div class="grid gap-3 md:grid-cols-4">
+          <div id="progress-entry" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-[9px] font-bold uppercase tracking-widest font-mono text-slate-400">Step 1</p>
+            <p class="mt-1 text-sm font-bold text-slate-900">Entry fee paid</p>
+            <p class="text-[10px] text-slate-500">Flat $20 access gate</p>
+          </div>
+          <div id="progress-handshake" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-[9px] font-bold uppercase tracking-widest font-mono text-slate-400">Step 2</p>
+            <p class="mt-1 text-sm font-bold text-slate-900">Handshake locked</p>
+            <p class="text-[10px] text-slate-500">L/C + brokerage isolation</p>
+          </div>
+          <div id="progress-compliance" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-[9px] font-bold uppercase tracking-widest font-mono text-slate-400">Step 3</p>
+            <p class="mt-1 text-sm font-bold text-slate-900">Compliance cleared</p>
+            <p class="text-[10px] text-slate-500">AI legal confirmation</p>
+          </div>
+          <div id="progress-withdrawal" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-[9px] font-bold uppercase tracking-widest font-mono text-slate-400">Step 4</p>
+            <p class="mt-1 text-sm font-bold text-slate-900">Escrow released</p>
+            <p class="text-[10px] text-slate-500">Safe withdrawal complete</p>
+          </div>
         </div>
       </div>
 
@@ -397,13 +476,13 @@
     </section>
 
     <!-- ─── NEGOTIATION SUPPORT + AI ACTIVITY LOG ─── -->
-    <section class="grid gap-6 lg:grid-cols-2">
+    <section id="ops-log" class="grid gap-6 lg:grid-cols-2">
 
       <!-- Secure Negotiation -->
       <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-100">
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-0.5">Multilingual Negotiation Support</p>
-          <h3 class="text-base font-bold text-slate-900">Secure Negotiation Channel</h3>
+          <h3 id="negotiation-title" class="text-base font-bold text-slate-900">Secure Negotiation Channel</h3>
         </div>
         <div class="p-6 space-y-4">
           <p class="text-xs text-slate-500">AI-assisted multilingual negotiation. Each party communicates in their preferred language. Logs kept for compliance review.</p>
@@ -437,7 +516,7 @@
     </section>
 
     <!-- ─── CORPORATE VERIFICATION GATE ─── -->
-    <section class="bg-white border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
+    <section id="verification-vault" class="bg-white border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="px-7 py-5 border-b border-amber-100 bg-amber-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="h-9 w-9 bg-amber-100 border border-amber-300 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -447,7 +526,7 @@
           </div>
           <div>
             <p class="text-[9px] font-bold text-amber-700 uppercase tracking-widest font-mono">Corporate Access Required</p>
-            <h3 class="text-base font-bold text-slate-900">Protected Corporate Information Vault</h3>
+            <h3 id="vault-title" class="text-base font-bold text-slate-900">Protected Corporate Information Vault</h3>
           </div>
         </div>
         <span class="text-[9px] font-bold bg-amber-100 border border-amber-300 text-amber-800 px-3 py-1.5 rounded-full font-mono uppercase">24-Hour KYB Review</span>
@@ -509,10 +588,36 @@
     const languageSelect             = document.getElementById('language-select');
     const counterpartyLanguageSelect = document.getElementById('counterparty-language-select');
     const localTimeEl                = document.getElementById('local-time');
+    const deskTimeValueEl            = document.getElementById('desk-time-value');
+    const deskTimeZoneEl             = document.getElementById('desk-time-zone');
+    const regionTimeValueEl          = document.getElementById('region-time-value');
+    const regionTimeZoneEl           = document.getElementById('region-time-zone');
+    const counterpartyTimeValueEl    = document.getElementById('counterparty-time-value');
+    const counterpartyTimeZoneEl     = document.getElementById('counterparty-time-zone');
     const conversationLog            = document.getElementById('conversation-log');
     const activityLog                = document.getElementById('activity-log');
     const systemStatusBadge          = document.getElementById('system-status-badge');
     const lifecycleStageTxt          = document.getElementById('lifecycle-stage-text');
+    const truthSummaryEl             = document.getElementById('truth-summary');
+    const routeSummaryEl             = document.getElementById('route-summary');
+    const routeDetailEl              = document.getElementById('route-detail');
+    const pythonSyncStatusEl         = document.getElementById('python-sync-status');
+    const supplySummaryEl            = document.getElementById('supply-summary');
+    const complianceSummaryEl        = document.getElementById('compliance-summary');
+    const progressEntryEl            = document.getElementById('progress-entry');
+    const progressHandshakeEl        = document.getElementById('progress-handshake');
+    const progressComplianceEl       = document.getElementById('progress-compliance');
+    const progressWithdrawalEl       = document.getElementById('progress-withdrawal');
+    const heroTitleEl                = document.getElementById('hero-title');
+    const heroDescriptionEl          = document.getElementById('hero-description');
+    const pillarsLabelEl             = document.getElementById('pillars-label');
+    const pillarRoomTitleEl          = document.getElementById('pillar-room-title');
+    const pillarSupplyTitleEl        = document.getElementById('pillar-supply-title');
+    const pillarComplianceTitleEl    = document.getElementById('pillar-compliance-title');
+    const lifecycleTitleEl           = document.getElementById('lifecycle-title');
+    const negotiationTitleEl         = document.getElementById('negotiation-title');
+    const vaultTitleEl               = document.getElementById('vault-title');
+    const platformStatusLabelEl      = document.getElementById('platform-status-label');
 
     // Deal inputs
     const dealIdInput       = document.getElementById('deal-id-input');
@@ -550,8 +655,20 @@
     const complianceScanStatusEl= document.getElementById('compliance-scan-status');
 
     // ─── CONSTANTS ───────────────────────────────────────────────────────────
-    const FUNCTION_HOST   = '/supabase/functions';
-    const ENTRY_FEE_AMOUNT= 20;
+    const FUNCTION_HOST    = '/supabase/functions';
+    const SYSTEM_STATUS_API= '/api/system-status';
+    const ENTRY_FEE_AMOUNT = 20;
+    const REGION_META = {
+      global: { label: 'Global', timezone: 'UTC' },
+      us:     { label: 'United States', timezone: 'America/New_York' },
+      ae:     { label: 'United Arab Emirates', timezone: 'Asia/Dubai' },
+      eg:     { label: 'Egypt', timezone: 'Africa/Cairo' },
+      in:     { label: 'India', timezone: 'Asia/Kolkata' },
+      pl:     { label: 'Poland', timezone: 'Europe/Warsaw' },
+      fr:     { label: 'France', timezone: 'Europe/Paris' },
+      cn:     { label: 'China', timezone: 'Asia/Shanghai' },
+      mn:     { label: 'Mongolia', timezone: 'Asia/Ulaanbaatar' }
+    };
 
     // ─── LOCAL STATE (updated from backend responses) ─────────────────────────
     const dealState = {
@@ -561,6 +678,10 @@
       escrow_status    : 'locked',
       funds_locked     : true,
       ai_agent_status  : { agent1: 'pending', agent2: 'pending', agent3: 'pending' }
+    };
+    const syncState = {
+      pythonAvailable: null,
+      syncInFlight: false
     };
 
     // ─── LOCALE / LANGUAGE ───────────────────────────────────────────────────
@@ -591,14 +712,95 @@
         handshake: 'Uścisk dłoni zakończony. Decyzja u analityka.'
       },
       fr: {
-        hello    : 'Bonjour — l'offre est prête pour la révision sécurisée.',
+        hello    : "Bonjour — l'offre est prête pour la révision sécurisée.",
         reply    : 'Conditions confirmées. En attente de la clôture.',
-        handshake: 'Poignée de main terminée. Décision finale chez l'analyste.'
+        handshake: "Poignée de main terminée. Décision finale chez l'analyste."
       },
       zh: {
         hello    : '您好 — 报价已准备好供安全审核。',
         reply    : '条款已确认。等待安全成交握手。',
         handshake: '握手完成。最终决定现由分析师做出。'
+      }
+    };
+
+    const UI_TRANSLATIONS = {
+      en: {
+        title: 'Greens ACC — Global B2B Command Center',
+        heroTitle: 'Global B2B Command Center',
+        heroDescription: 'Authorized corporate access. AI-driven compliance monitoring. Secure escrow lifecycle. Multilingual global trade orchestration.',
+        pillarsLabel: 'Core Platform Pillars',
+        roomTitle: 'Global B2B Meeting Room',
+        supplyTitle: 'Supply Chain Engine',
+        complianceTitle: 'AI Legal Compliance Monitor',
+        lifecycleTitle: 'Deal Activation & Escrow Lifecycle',
+        negotiationTitle: 'Secure Negotiation Channel',
+        vaultTitle: 'Protected Corporate Information Vault',
+        platformStatus: 'All Systems Active'
+      },
+      ar: {
+        title: 'Greens ACC — مركز أوامر الأعمال العالمي',
+        heroTitle: 'مركز أوامر الأعمال العالمي',
+        heroDescription: 'وصول مؤسسي معتمد. مراقبة امتثال بالذكاء الاصطناعي. دورة ضمان آمنة. تنسيق تجارة عالمي متعدد اللغات.',
+        pillarsLabel: 'ركائز المنصة الأساسية',
+        roomTitle: 'غرفة الاجتماعات العالمية بين الشركات',
+        supplyTitle: 'محرك سلسلة التوريد',
+        complianceTitle: 'مراقب الامتثال القانوني بالذكاء الاصطناعي',
+        lifecycleTitle: 'تفعيل الصفقة ودورة الضمان',
+        negotiationTitle: 'قناة تفاوض آمنة',
+        vaultTitle: 'خزنة المعلومات المؤسسية المحمية',
+        platformStatus: 'كل الأنظمة نشطة'
+      },
+      hi: {
+        title: 'Greens ACC — वैश्विक बी2बी कमांड सेंटर',
+        heroTitle: 'वैश्विक बी2बी कमांड सेंटर',
+        heroDescription: 'अधिकृत कॉर्पोरेट एक्सेस। एआई अनुपालन मॉनिटरिंग। सुरक्षित एस्क्रो लाइफसाइकल। बहुभाषी वैश्विक व्यापार संचालन।',
+        pillarsLabel: 'मुख्य प्लेटफ़ॉर्म स्तंभ',
+        roomTitle: 'ग्लोबल बी2बी मीटिंग रूम',
+        supplyTitle: 'सप्लाई चेन इंजन',
+        complianceTitle: 'एआई लीगल कंप्लायंस मॉनिटर',
+        lifecycleTitle: 'डील एक्टिवेशन और एस्क्रो लाइफसाइकल',
+        negotiationTitle: 'सुरक्षित वार्ता चैनल',
+        vaultTitle: 'सुरक्षित कॉर्पोरेट सूचना वॉल्ट',
+        platformStatus: 'सभी सिस्टम सक्रिय'
+      },
+      pl: {
+        title: 'Greens ACC — Globalne centrum dowodzenia B2B',
+        heroTitle: 'Globalne centrum dowodzenia B2B',
+        heroDescription: 'Autoryzowany dostęp korporacyjny. Monitoring zgodności AI. Bezpieczny cykl escrow. Wielojęzyczna orkiestracja handlu.',
+        pillarsLabel: 'Kluczowe filary platformy',
+        roomTitle: 'Globalny pokój spotkań B2B',
+        supplyTitle: 'Silnik łańcucha dostaw',
+        complianceTitle: 'Monitor zgodności prawnej AI',
+        lifecycleTitle: 'Aktywacja transakcji i cykl escrow',
+        negotiationTitle: 'Bezpieczny kanał negocjacji',
+        vaultTitle: 'Chroniony skarbiec informacji korporacyjnych',
+        platformStatus: 'Wszystkie systemy aktywne'
+      },
+      fr: {
+        title: 'Greens ACC — Centre de commande B2B mondial',
+        heroTitle: 'Centre de commande B2B mondial',
+        heroDescription: 'Accès entreprise autorisé. Supervision de conformité par IA. Cycle escrow sécurisé. Orchestration commerciale multilingue.',
+        pillarsLabel: 'Piliers clés de la plateforme',
+        roomTitle: 'Salle de réunion B2B mondiale',
+        supplyTitle: 'Moteur supply chain',
+        complianceTitle: 'Moniteur de conformité juridique IA',
+        lifecycleTitle: 'Activation du deal et cycle escrow',
+        negotiationTitle: 'Canal de négociation sécurisé',
+        vaultTitle: 'Coffre d’informations d’entreprise protégé',
+        platformStatus: 'Tous les systèmes sont actifs'
+      },
+      zh: {
+        title: 'Greens ACC — 全球 B2B 指挥中心',
+        heroTitle: '全球 B2B 指挥中心',
+        heroDescription: '企业授权访问、AI 合规监控、安全托管流程与多语言全球贸易协同。',
+        pillarsLabel: '平台三大支柱',
+        roomTitle: '全球 B2B 会议室',
+        supplyTitle: '供应链引擎',
+        complianceTitle: 'AI 法律合规监控',
+        lifecycleTitle: '交易激活与托管流程',
+        negotiationTitle: '安全谈判频道',
+        vaultTitle: '受保护的企业信息库',
+        platformStatus: '系统全部在线'
       }
     };
 
@@ -622,6 +824,104 @@
 
     function currentLocale() {
       return LOCALE_MAP[inp(languageSelect)] || 'en-US';
+    }
+
+    function currentRegion() {
+      return inp(regionSelect) || 'global';
+    }
+
+    function regionMeta(region = currentRegion()) {
+      return REGION_META[region] || REGION_META.global;
+    }
+
+    function currentTranslation() {
+      return UI_TRANSLATIONS[inp(languageSelect)] || UI_TRANSLATIONS.en;
+    }
+
+    function counterpartyLocale() {
+      return LOCALE_MAP[inp(counterpartyLanguageSelect)] || 'en-US';
+    }
+
+    function formatClock(locale, timezone) {
+      return new Intl.DateTimeFormat(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZone: timezone
+      }).format(new Date());
+    }
+
+    function setQueryState() {
+      const params = new URLSearchParams(window.location.search);
+      params.set('region', currentRegion());
+      params.set('lang', inp(languageSelect) || 'en');
+      params.set('counterparty_lang', inp(counterpartyLanguageSelect) || 'en');
+      const nextUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
+      window.history.replaceState({}, '', nextUrl);
+      window.localStorage.setItem('greens-acc-locale', JSON.stringify({
+        region: currentRegion(),
+        language: inp(languageSelect) || 'en',
+        counterpartyLanguage: inp(counterpartyLanguageSelect) || 'en'
+      }));
+    }
+
+    function hydrateLocalization() {
+      const params = new URLSearchParams(window.location.search);
+      const saved = (() => {
+        try {
+          return JSON.parse(window.localStorage.getItem('greens-acc-locale') || '{}');
+        } catch (error) {
+          return {};
+        }
+      })();
+      const state = {
+        region: params.get('region') || saved.region || 'global',
+        language: params.get('lang') || saved.language || 'en',
+        counterpartyLanguage: params.get('counterparty_lang') || saved.counterpartyLanguage || 'en'
+      };
+      if (regionSelect) regionSelect.value = state.region;
+      if (languageSelect) languageSelect.value = state.language;
+      if (counterpartyLanguageSelect) counterpartyLanguageSelect.value = state.counterpartyLanguage;
+    }
+
+    function applyTranslations() {
+      const translation = currentTranslation();
+      document.title = translation.title;
+      txt(heroTitleEl, translation.heroTitle);
+      txt(heroDescriptionEl, translation.heroDescription);
+      txt(pillarsLabelEl, translation.pillarsLabel);
+      txt(pillarRoomTitleEl, translation.roomTitle);
+      txt(pillarSupplyTitleEl, translation.supplyTitle);
+      txt(pillarComplianceTitleEl, translation.complianceTitle);
+      txt(lifecycleTitleEl, translation.lifecycleTitle);
+      txt(negotiationTitleEl, translation.negotiationTitle);
+      txt(vaultTitleEl, translation.vaultTitle);
+      txt(platformStatusLabelEl, translation.platformStatus);
+    }
+
+    function updateRouteSummary() {
+      const meta = regionMeta();
+      const localeLabel = languageSelect?.selectedOptions?.[0]?.textContent?.trim() || 'English';
+      const counterpartyLabel = counterpartyLanguageSelect?.selectedOptions?.[0]?.textContent?.trim() || 'English';
+      txt(routeSummaryEl, `Route: ${meta.label}`);
+      txt(routeDetailEl, `${meta.label} · ${localeLabel} → ${counterpartyLabel}`);
+    }
+
+    function updateTimeBars() {
+      const meta = regionMeta();
+      const locale = currentLocale();
+      txt(localTimeEl, formatClock(locale, Intl.DateTimeFormat().resolvedOptions().timeZone));
+      txt(deskTimeValueEl, formatClock(locale, Intl.DateTimeFormat().resolvedOptions().timeZone));
+      txt(deskTimeZoneEl, Intl.DateTimeFormat().resolvedOptions().timeZone);
+      txt(regionTimeValueEl, formatClock(locale, meta.timezone));
+      txt(regionTimeZoneEl, meta.timezone);
+      txt(counterpartyTimeValueEl, formatClock(counterpartyLocale(), meta.timezone));
+      txt(counterpartyTimeZoneEl, `${counterpartyTimeSelectLabel()} · ${meta.timezone}`);
+      document.documentElement.lang = inp(languageSelect) || 'en';
+    }
+
+    function counterpartyTimeSelectLabel() {
+      return counterpartyLanguageSelect?.selectedOptions?.[0]?.textContent?.trim() || 'Counterparty';
     }
 
     function setPillarStatus(el, message, type = 'info') {
@@ -717,6 +1017,96 @@
       }
 
       updateLifecycleStage();
+      updateProgressCards();
+    }
+
+    function setProgressCard(el, active) {
+      if (!el) return;
+      el.className = 'rounded-2xl border px-4 py-3 ' + (
+        active
+          ? 'border-emerald-200 bg-emerald-50 shadow-sm'
+          : 'border-slate-200 bg-slate-50'
+      );
+    }
+
+    function updateProgressCards() {
+      setProgressCard(progressEntryEl, ['paid', 'verified'].includes(dealState.entry_fee_status));
+      setProgressCard(progressHandshakeEl, dealState.handshake_status === 'confirmed');
+      setProgressCard(progressComplianceEl, dealState.compliance_status === 'verified');
+      setProgressCard(progressWithdrawalEl, dealState.escrow_status === 'released');
+    }
+
+    function updatePythonSyncBadge(label, type = 'warning') {
+      if (!pythonSyncStatusEl) return;
+      const colorMap = {
+        active: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+        warning: 'border-amber-200 bg-amber-50 text-amber-700',
+        alert: 'border-rose-200 bg-rose-50 text-rose-700'
+      };
+      pythonSyncStatusEl.className = 'rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold ' + (colorMap[type] || colorMap.warning);
+      txt(pythonSyncStatusEl, label);
+    }
+
+    function updateSystemSummaries(payload = {}) {
+      const deal = payload.deal || null;
+      const supply = payload.supply_chain || null;
+      const summaries = payload.summaries || {};
+      txt(truthSummaryEl, summaries.lifecycle_stage || lifecycleStageTxt?.textContent || 'Awaiting identifiers');
+      txt(supplySummaryEl, supply ? `${supply.current_milestone || 'manifest_created'} · ${supply.transit_status || 'in_preparation'}` : (summaries.supply_chain_status || 'Idle'));
+      txt(complianceSummaryEl, payload.room_session?.kill_switch_triggered ? 'Kill switch triggered' : `${summaries.compliance_alerts || 0} escalations`);
+      if (deal?.handshake_commission_amount != null) {
+        txt(commissionAmountEl, fmtUsd(deal.handshake_commission_amount));
+      }
+    }
+
+    async function syncSystemTruth(reason = 'manual') {
+      if (syncState.syncInFlight) return;
+      const dealId = inp(dealIdInput);
+      const orderId = inp(document.getElementById('sc-order-id'));
+      const roomId = inp(document.getElementById('compliance-room-id'));
+      if (!dealId && !orderId && !roomId) {
+        updatePythonSyncBadge('Python sync standby', 'warning');
+        txt(truthSummaryEl, 'Awaiting identifiers');
+        return;
+      }
+
+      syncState.syncInFlight = true;
+      try {
+        const query = new URLSearchParams({
+          region: currentRegion(),
+          deal_id: dealId,
+          order_id: orderId,
+          room_id: roomId
+        });
+        const resp = await fetch(`${SYSTEM_STATUS_API}?${query.toString()}`);
+        const payload = await resp.json();
+        if (!resp.ok || payload.available === false) {
+          updatePythonSyncBadge(payload.reason ? 'Python sync offline' : 'Python sync degraded', 'warning');
+          if (payload.reason) appendLog('Python sync unavailable: ' + payload.reason, reason === 'poll' ? 'info' : 'warning');
+          return;
+        }
+
+        syncState.pythonAvailable = true;
+        updatePythonSyncBadge('Python sync online', 'active');
+        if (payload.deal) {
+          Object.assign(dealState, {
+            entry_fee_status: payload.deal.entry_fee_status || dealState.entry_fee_status,
+            handshake_status: payload.deal.handshake_status || dealState.handshake_status,
+            compliance_status: payload.deal.compliance_status || dealState.compliance_status,
+            escrow_status: payload.deal.escrow_status || dealState.escrow_status,
+            funds_locked: payload.deal.funds_locked ?? dealState.funds_locked,
+            ai_agent_status: payload.deal.ai_agent_status || dealState.ai_agent_status
+          });
+          updateDealStatusUI();
+        }
+        updateSystemSummaries(payload);
+      } catch (error) {
+        syncState.pythonAvailable = false;
+        updatePythonSyncBadge('Python sync offline', 'warning');
+        if (reason !== 'poll') appendLog('Python sync error: ' + error.message, 'warning');
+      } finally {
+        syncState.syncInFlight = false;
+      }
     }
 
     // ─── DEAL ACTIONS ─────────────────────────────────────────────────────────
@@ -749,6 +1139,8 @@
         updateDealStatusUI();
         setSystemStatus('Entry Fee Paid', 'active');
         appendLog('$20.00 access fee recorded. Deal activation unlocked.', 'success');
+        updateSystemSummaries({ deal: data.deal });
+        await syncSystemTruth('entry-fee');
       } catch (err) {
         appendLog('Entry fee error: ' + err.message, 'alert');
       }
@@ -793,6 +1185,8 @@
         updateDealStatusUI();
         setSystemStatus('L/C Locked · Escrow Active', 'active');
         appendLog('Letter of credit created. 2% brokerage commission locked in escrow.', 'success');
+        updateSystemSummaries({ deal: data.deal });
+        await syncSystemTruth('handshake');
         // Redirect to announcement after a short delay
         setTimeout(() => {
           const params = new URLSearchParams({
@@ -837,6 +1231,8 @@
         setSystemStatus('Withdrawal Complete', 'active');
         const payout = data.payout_amount != null ? fmtUsd(data.payout_amount) : '—';
         appendLog('Escrow released. Net payout: ' + payout + '. LC: ' + (data.lc_reference_number || 'N/A'), 'success');
+        updateSystemSummaries({ deal: data.deal });
+        await syncSystemTruth('withdrawal');
       } catch (err) {
         appendLog('Withdrawal error: ' + err.message, 'alert');
       }
@@ -864,6 +1260,7 @@
         }
         setPillarStatus(roomStatusEl, 'Room created — redirecting...', 'success');
         appendLog('Secure meeting room created. Token: ' + (data.room_token || '—'), 'success');
+        txt(complianceSummaryEl, 'Room active · awaiting scans');
         if (data.share_link) {
           setTimeout(() => { window.location.href = data.share_link; }, 1200);
         }
@@ -899,6 +1296,8 @@
         const tracking = data.tracking_record;
         setPillarStatus(scStatusEl, 'Manifest created · ' + (tracking?.id?.substring(0, 8) || '—'), 'success');
         appendLog('Shipment initialized. Order: ' + order_id + ' | Route: ' + origin + ' → ' + destination, 'success');
+        updateSystemSummaries({ supply_chain: tracking, summaries: { supply_chain_status: tracking?.transit_status || 'in_preparation' } });
+        await syncSystemTruth('shipment');
       } catch (err) {
         setPillarStatus(scStatusEl, 'Network error.', 'error');
         appendLog('Supply chain error: ' + err.message, 'alert');
@@ -944,6 +1343,8 @@
         }
         dealState.compliance_status = data.kill_switch_triggered ? 'failed' : (data.violations?.length ? 'pending' : 'verified');
         updateDealStatusUI();
+        updateSystemSummaries({ room_session: { kill_switch_triggered: data.kill_switch_triggered }, summaries: { compliance_alerts: data.violations?.length || 0 } });
+        await syncSystemTruth('compliance');
       } catch (err) {
         setPillarStatus(complianceScanStatusEl, 'Network error.', 'error');
         appendLog('Compliance scan error: ' + err.message, 'alert');
@@ -1001,12 +1402,7 @@
 
     // ─── TIME ─────────────────────────────────────────────────────────────────
     function updateLocalTime() {
-      if (!localTimeEl) return;
-      const locale = currentLocale();
-      localTimeEl.textContent = new Intl.DateTimeFormat(locale, {
-        hour: '2-digit', minute: '2-digit', second: '2-digit'
-      }).format(new Date());
-      document.documentElement.lang = inp(languageSelect) || 'en';
+      updateTimeBars();
     }
 
     // ─── EVENT BINDINGS ───────────────────────────────────────────────────────
@@ -1033,24 +1429,50 @@
     });
 
     on(languageSelect, 'change', () => {
+      applyTranslations();
+      setQueryState();
+      updateRouteSummary();
       updateLocalTime();
       appendLog('Interface language updated.', 'success');
     });
 
     on(regionSelect, 'change', () => {
       const region = regionSelect.selectedOptions?.[0]?.text || 'selected region';
+      setQueryState();
+      updateRouteSummary();
+      updateLocalTime();
       appendLog('Operating region set to ' + region + '.', 'info');
+      syncSystemTruth('region-change');
     });
+
+    on(counterpartyLanguageSelect, 'change', () => {
+      setQueryState();
+      updateRouteSummary();
+      updateLocalTime();
+      appendLog('Counterparty language updated.', 'info');
+    });
+
+    on(dealIdInput, 'blur', () => syncSystemTruth('deal-id'));
+    on(document.getElementById('sc-order-id'), 'blur', () => syncSystemTruth('order-id'));
+    on(document.getElementById('compliance-room-id'), 'blur', () => syncSystemTruth('room-id'));
 
     // ─── INIT ─────────────────────────────────────────────────────────────────
     window.addEventListener('load', () => {
+      hydrateLocalization();
+      applyTranslations();
+      setQueryState();
+      updateRouteSummary();
       updateLocalTime();
       setInterval(updateLocalTime, 1000);
       txt(dealAmountDisplayEl, fmtUsd(num(dealAmountInput)));
       txt(commissionAmountEl,  fmtUsd(0));
       updateDealStatusUI();
+      updateSystemSummaries();
+      updatePythonSyncBadge('Python sync standby', 'warning');
       appendLog('Greens ACC platform initialized. All systems active.', 'success');
       appendLog('Secure trade policy in effect: OFAC, AML, KYC monitoring online.', 'warning');
+      syncSystemTruth('load');
+      setInterval(() => syncSystemTruth('poll'), 15000);
     });
   </script>
 </body>
