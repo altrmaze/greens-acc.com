@@ -214,6 +214,30 @@
     </div>
   </header>
 
+  <!-- ─── PLATFORM STATS ─── -->
+  <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 flex flex-col items-start gap-1">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Active Deals</p>
+      <p id="stat-active-deals" class="text-2xl font-black text-slate-900">—</p>
+      <p class="text-[10px] text-slate-400">in pipeline</p>
+    </div>
+    <div class="bg-white border border-amber-200 rounded-2xl shadow-sm p-4 flex flex-col items-start gap-1">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-amber-600 font-mono">Entry Fee</p>
+      <p class="text-2xl font-black text-amber-700">$20.00</p>
+      <p class="text-[10px] text-slate-400">flat activation</p>
+    </div>
+    <div class="bg-white border border-emerald-200 rounded-2xl shadow-sm p-4 flex flex-col items-start gap-1">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-emerald-600 font-mono">Commission</p>
+      <p class="text-2xl font-black text-emerald-700">2%</p>
+      <p class="text-[10px] text-slate-400">on handshake value</p>
+    </div>
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 flex flex-col items-start gap-1">
+      <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">AI Agents</p>
+      <p class="text-2xl font-black text-slate-900">3</p>
+      <p class="text-[10px] text-slate-400">monitoring live</p>
+    </div>
+  </section>
+
   <!-- ─── THREE PILLARS ─── -->
   <section>
     <div class="flex items-center gap-3 mb-5">
@@ -613,6 +637,45 @@
             <span class="font-bold">LOCKED</span>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── AI ASSISTANT ─── -->
+  <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="h-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500"></div>
+    <div class="px-6 sm:px-8 pt-6 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100">
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-amber-600 font-mono font-bold mb-1">AI Trade Advisor</p>
+        <h3 class="text-base font-bold text-slate-900">Ask the AI Deal Assistant</h3>
+        <p class="text-xs text-slate-500 mt-0.5">Instant answers on deal status, escrow rules, compliance, and platform fees.</p>
+      </div>
+      <span class="inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 flex-shrink-0">
+        <span class="w-1.5 h-1.5 bg-amber-500 rounded-full pulse-dot"></span>
+        AI Online
+      </span>
+    </div>
+    <div class="px-6 sm:px-8 py-5 space-y-4">
+      <!-- Quick prompts -->
+      <div class="flex flex-wrap gap-2">
+        <button class="ai-quick-btn px-3 py-1.5 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 rounded-lg text-[11px] font-semibold text-slate-600 hover:text-amber-700 transition">How does escrow work?</button>
+        <button class="ai-quick-btn px-3 py-1.5 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 rounded-lg text-[11px] font-semibold text-slate-600 hover:text-amber-700 transition">How is the 2% commission calculated?</button>
+        <button class="ai-quick-btn px-3 py-1.5 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 rounded-lg text-[11px] font-semibold text-slate-600 hover:text-amber-700 transition">Why is the $20 fee required?</button>
+        <button class="ai-quick-btn px-3 py-1.5 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 rounded-lg text-[11px] font-semibold text-slate-600 hover:text-amber-700 transition">What is KYC / AML?</button>
+        <button class="ai-quick-btn px-3 py-1.5 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 rounded-lg text-[11px] font-semibold text-slate-600 hover:text-amber-700 transition">What is a Letter of Credit?</button>
+      </div>
+      <!-- Chat display -->
+      <div id="ai-chat-log" class="min-h-[120px] max-h-[240px] overflow-y-auto rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-2">
+        <p class="text-xs text-slate-400 italic">Ask anything about deals, escrow, compliance, or the platform…</p>
+      </div>
+      <!-- Input row -->
+      <div class="flex gap-2">
+        <input id="ai-chat-input" type="text" placeholder="e.g. How does the handshake work?" maxlength="300"
+          class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 transition" />
+        <button id="ai-send-btn"
+          class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold uppercase tracking-wide transition shadow-sm active:scale-[.98] flex-shrink-0">
+          Ask AI
+        </button>
       </div>
     </div>
   </section>
@@ -1180,7 +1243,90 @@
   // ── Clock interval ───────────────────────────────────────────
   setInterval(updateClocks, 1000);
 
-  // ── Init ─────────────────────────────────────────────────────
+  // ── AI Assistant ─────────────────────────────────────────────
+  (function initAiAssistant() {
+    const chatLog    = document.getElementById('ai-chat-log');
+    const chatInput  = document.getElementById('ai-chat-input');
+    const sendBtn    = document.getElementById('ai-send-btn');
+
+    // Fallback answers for when the backend edge function is unavailable
+    const localAnswers = {
+      'escrow':       'Escrow holds your funds securely until all deal conditions are met — KYC, AML compliance, and handshake confirmation. Funds are only released after all 3 AI agents verify the deal.',
+      'commission':   'Greens ACC charges a flat 2% commission on the total handshake (deal) amount. This is locked at the time of the L/C handshake and is separate from the $20 activation fee.',
+      '$20':          'The $20.00 USD activation fee is a one-time, non-refundable charge required to open a deal and activate the escrow pipeline. It covers onboarding, KYC processing, and compliance screening.',
+      'kyc':          'KYC (Know Your Customer) and AML (Anti-Money Laundering) are regulatory requirements. Greens ACC screens all participants against OFAC sanctions lists and international trade law before allowing deal settlement.',
+      'letter of credit': 'A Letter of Credit (L/C) is a bank guarantee that ensures payment to the seller once agreed conditions are met. On Greens ACC it is locked at the handshake stage and released only after full compliance verification.',
+      'handshake':    'The handshake is the formal agreement step where both parties confirm the deal terms, lock the L/C, and activate escrow. A 2% commission is calculated on the deal amount at this stage.',
+    };
+
+    function addMessage(text, role) {
+      if (!chatLog) return;
+      const placeholder = chatLog.querySelector('p.italic');
+      if (placeholder) placeholder.remove();
+      const wrap = document.createElement('div');
+      wrap.className = role === 'user'
+        ? 'flex justify-end'
+        : 'flex justify-start';
+      const bubble = document.createElement('div');
+      bubble.className = role === 'user'
+        ? 'max-w-[80%] bg-amber-500 text-white text-xs font-medium px-3 py-2 rounded-2xl rounded-tr-none'
+        : 'max-w-[80%] bg-white border border-slate-200 text-slate-700 text-xs px-3 py-2 rounded-2xl rounded-tl-none shadow-sm';
+      bubble.textContent = text;
+      wrap.appendChild(bubble);
+      chatLog.appendChild(wrap);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function localFallback(query) {
+      const q = query.toLowerCase();
+      for (const [key, answer] of Object.entries(localAnswers)) {
+        if (q.includes(key)) return answer;
+      }
+      return 'Greens ACC is a secure B2B trade escrow platform. Every deal requires a $20 activation fee, KYC/AML compliance, and a 2% commission on the handshake amount. Ask me about escrow, commissions, KYC, or Letters of Credit.';
+    }
+
+    async function sendQuery(query) {
+      if (!query.trim()) return;
+      addMessage(query, 'user');
+      if (chatInput) chatInput.value = '';
+      if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = '…'; }
+
+      try {
+        const dealId = getVal(dealIdInput);
+        const res = await fetch(functionHost + '/aiAgentAnalyze', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ query, deal_id: dealId || null, context: 'assistant' })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const reply = data.analysis || data.message || data.result || localFallback(query);
+          addMessage(reply, 'ai');
+        } else {
+          addMessage(localFallback(query), 'ai');
+        }
+      } catch (_) {
+        addMessage(localFallback(query), 'ai');
+      } finally {
+        if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Ask AI'; }
+        if (chatInput) chatInput.focus();
+      }
+    }
+
+    if (sendBtn) {
+      sendBtn.addEventListener('click', () => sendQuery(chatInput?.value || ''));
+    }
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') sendQuery(chatInput.value);
+      });
+    }
+    document.querySelectorAll('.ai-quick-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () { sendQuery(btn.textContent); });
+    });
+  })();
+
+
   window.addEventListener('load', () => {
     updateClocks();
     setText(paymentStepDisplay,  'Step 1: ' + paymentSteps[0]);
