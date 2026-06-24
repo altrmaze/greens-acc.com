@@ -392,6 +392,8 @@ async function generateInstantRoom() {
     return;
   }
 
+  const durationHours = Number(document.getElementById('meeting-duration').value) || 2;
+
   const btn = document.getElementById('generate-instant-room-btn');
   btn.disabled = true;
   btn.textContent = 'Generating...';
@@ -400,7 +402,7 @@ async function generateInstantRoom() {
     const response = await fetch(`${functionHost}/generateInstantRoom`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ creator_company: companyName })
+      body: JSON.stringify({ creator_company: companyName, duration_hours: durationHours })
     });
 
     const data = await response.json();
@@ -416,7 +418,8 @@ async function generateInstantRoom() {
     link.textContent = data.share_link;
     output.classList.remove('hidden');
 
-    appendChat(`Instant room created! Share this link for instant entry: ${data.share_link}. $20 session fee required.`, 'System');
+    const durationLabel = durationHours >= 24 ? `${durationHours / 24} day(s)` : `${durationHours} hour(s)`;
+    appendChat(`Instant room created! Duration: ${durationLabel}. Share this link for instant entry: ${data.share_link}. $20 session fee required.`, 'System');
     btn.textContent = 'Generate Link';
     btn.disabled = false;
   } catch (err) {

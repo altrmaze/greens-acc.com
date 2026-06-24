@@ -7,11 +7,13 @@ export async function POST(request) {
   }
 
   const body = await request.json();
-  const { creator_company, participant_email } = body || {};
+  const { creator_company, participant_email, duration_hours } = body || {};
 
   if (!creator_company) {
     return new Response(JSON.stringify({ error: 'creator_company required' }), { status: 400 });
   }
+
+  const durationMs = Math.max(1, Math.min(Number(duration_hours) || 2, 168)) * 60 * 60 * 1000;
 
   // Generate cryptographically secure room token (Base62 encoded random bytes)
   const generateToken = () => {
@@ -44,7 +46,7 @@ export async function POST(request) {
     session_fee_status: 'pending',
     is_active: true,
     created_at: new Date().toISOString(),
-    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    expires_at: new Date(Date.now() + durationMs).toISOString()
   };
 
   const roomResp = await fetch(`${supabaseUrl}/rest/v1/instant_rooms`, {
