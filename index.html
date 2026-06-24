@@ -338,11 +338,14 @@
           <input id="deal-amount-input" type="number" step="0.01" value="1000.00" placeholder="0.00"
             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition" />
         </label>
-        <label class="space-y-1.5">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Deal ID *</span>
-          <input id="deal-id-input" type="text" placeholder="Deal UUID"
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Deal ID *</span>
+            <button id="create-deal-btn" class="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 uppercase tracking-wide transition">+ New Deal</button>
+          </div>
+          <input id="deal-id-input" type="text" placeholder="Deal UUID or click + New Deal"
             class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition" />
-        </label>
+        </div>
         <label class="space-y-1.5">
           <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Buyer ID *</span>
           <input id="buyer-id-input" type="text" placeholder="Buyer UUID"
@@ -648,6 +651,7 @@
   const processEntryFeeBtn        = document.getElementById('process-entry-fee');
   const processHandshakeBtn       = document.getElementById('process-handshake');
   const triggerWithdrawalBtn      = document.getElementById('trigger-withdrawal');
+  const createDealBtn             = document.getElementById('create-deal-btn');
 
   // Canonical status elements — single set, no duplicates
   const entryFeeStatusText        = document.getElementById('entry-fee-status-text');
@@ -905,6 +909,44 @@
   let currentPaymentStep = 0;
 
   // ── Backend actions ──────────────────────────────────────────
+  async function handleCreateDeal() {
+    const payer_id = getVal(buyerIdInput);
+    const amount   = getNum(dealAmountInput);
+    if (!payer_id) {
+      appendLog('Enter a Buyer ID before creating a new deal.', 'warning');
+      return;
+    }
+    appendLog('Creating new deal record in database...', 'info');
+    if (createDealBtn) { createDealBtn.textContent = 'Creating...'; createDealBtn.disabled = true; }
+    try {
+      const res  = await fetch(functionHost + '/createDeal', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          buyer_id: payer_id,
+          amount_total: amount,
+          lc_reference_number: getVal(lcReferenceInput) || null
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        appendLog('Create deal failed: ' + (data.error || res.statusText), 'alert');
+        return;
+      }
+      const newId = data.deal?.id;
+      if (newId && dealIdInput) dealIdInput.value = newId;
+      dealStatus.entry_fee_status  = data.deal?.entry_fee_status  || 'pending';
+      dealStatus.handshake_status  = data.deal?.handshake_status  || 'pending';
+      dealStatus.compliance_status = data.deal?.compliance_status || 'pending';
+      updateDealStatusUI();
+      appendLog('New deal created. ID: ' + newId, 'success');
+    } catch (err) {
+      appendLog('Create deal error: ' + err.message, 'alert');
+    } finally {
+      if (createDealBtn) { createDealBtn.textContent = '+ New Deal'; createDealBtn.disabled = false; }
+    }
+  }
+
   async function handleEntryFee() {
     const deal_id  = getVal(dealIdInput);
     const payer_id = getVal(buyerIdInput);
@@ -1089,6 +1131,7 @@
   });
 
   // ── Button wiring ────────────────────────────────────────────
+  listen(createDealBtn,          'click', handleCreateDeal);
   listen(processEntryFeeBtn,   'click', handleEntryFee);
   listen(processHandshakeBtn,  'click', handleHandshake);
   listen(triggerWithdrawalBtn, 'click', handleWithdrawal);

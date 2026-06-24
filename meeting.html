@@ -181,12 +181,22 @@
   </div>
 
   <script>
-    // Set your Supabase public config for realtime signaling (replace with real values)
-    window.SUPABASE_CONFIG = {
-      url: 'https://your-project.supabase.co',
-      anonKey: 'YOUR_SUPABASE_ANON_KEY'
-    };
+    // Load Supabase config from the backend API, then start meeting.js
+    (function () {
+      fetch('/api/supabase-config')
+        .then(function (r) { return r.ok ? r.json() : {}; })
+        .then(function (cfg) {
+          if (cfg && cfg.url && cfg.url.indexOf('your-project') === -1) {
+            window.SUPABASE_CONFIG = { url: cfg.url, anonKey: cfg.anonKey };
+          }
+        })
+        .catch(function () {})
+        .finally(function () {
+          var s = document.createElement('script');
+          s.src = '/meeting.js';
+          document.body.appendChild(s);
+        });
+    })();
   </script>
-  <script src="/meeting.js"></script>
 </body>
 </html>

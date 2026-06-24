@@ -178,17 +178,13 @@
   </div>
 
   <script>
-    const supabaseConfig = window.SUPABASE_CONFIG || { url: 'https://your-project.supabase.co', anonKey: 'YOUR_SUPABASE_ANON_KEY' };
+    const supabaseConfig = {};
     let supabase = null;
     let currentAnnouncement = null;
     let dealData = null;
 
     function initSupabase() {
-      try {
-        supabase = window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey);
-      } catch (e) {
-        console.warn('Supabase init failed', e);
-      }
+      // Supabase client not needed for announce.html — all operations use fetch() to edge functions
     }
 
     function loadDealFromURL() {
