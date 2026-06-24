@@ -10,6 +10,44 @@
   <link rel="stylesheet" href="/meeting.css" />
 </head>
 <body class="bg-[#f8fafc] text-slate-800 font-sans min-h-screen">
+
+<!-- ═══════════════════════════════════════════════
+     PIN ACCESS GATE  (hidden after successful entry)
+═══════════════════════════════════════════════ -->
+<div id="pin-gate" class="fixed inset-0 z-[9999] bg-[#f8fafc] flex flex-col items-center justify-center px-4" role="dialog" aria-modal="true" aria-labelledby="pin-gate-title">
+  <div class="w-full max-w-sm bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
+    <div class="h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600"></div>
+    <div class="p-8 space-y-6">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-5 h-5 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253M3 12a8.96 8.96 0 0 1 .284-2.253" />
+          </svg>
+        </div>
+        <div>
+          <span class="text-lg font-black text-slate-900 tracking-tight">Greens ACC</span>
+          <p class="text-[10px] text-emerald-600 font-bold tracking-widest uppercase font-mono">Global Trade Command</p>
+        </div>
+      </div>
+      <div>
+        <h1 id="pin-gate-title" class="text-base font-black text-slate-900">Secure Access</h1>
+        <p class="text-xs text-slate-500 mt-1">Enter your 6‑digit PIN to access the meeting suites.</p>
+      </div>
+      <div class="space-y-3">
+        <label for="pin-input" class="block text-[10px] uppercase tracking-widest text-slate-400 font-mono font-bold">Access PIN</label>
+        <input id="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" placeholder="••••••"
+          class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-center text-xl font-black tracking-[0.5em] text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 transition" />
+        <p id="pin-error" class="text-xs text-rose-600 font-semibold" style="display:none">Incorrect PIN. Please try again.</p>
+      </div>
+      <button id="pin-submit"
+        class="w-full px-4 py-3.5 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 active:scale-[.98] transition shadow-sm">
+        Unlock Meeting Suites
+      </button>
+    </div>
+  </div>
+  <p class="mt-5 text-[11px] text-slate-400">Authorized corporate access only. All activity is monitored and logged.</p>
+</div>
+
   <div class="max-w-7xl mx-auto p-8">
     <header class="flex items-center justify-between mb-8">
       <div>
@@ -208,6 +246,71 @@
           s.src = '/meeting.js';
           document.body.appendChild(s);
         });
+    })();
+  </script>
+
+  <!-- ═══════════════════════════════════════════════
+       PIN GATE SCRIPT
+  ═══════════════════════════════════════════════ -->
+  <script>
+    'use strict';
+    (function initPinGate() {
+      var gate    = document.getElementById('pin-gate');
+      var input   = document.getElementById('pin-input');
+      var submit  = document.getElementById('pin-submit');
+      var errMsg  = document.getElementById('pin-error');
+      var SESSION_KEY = 'greens_acc_unlocked';
+
+      function unlock() {
+        gate.style.transition = 'opacity 0.35s ease';
+        gate.style.opacity    = '0';
+        setTimeout(function () { gate.style.display = 'none'; }, 360);
+      }
+
+      if (sessionStorage.getItem(SESSION_KEY) === '1') {
+        gate.style.display = 'none';
+        return;
+      }
+
+      function tryPin() {
+        var pin = input.value.trim();
+        if (!pin) { input.focus(); return; }
+        submit.disabled    = true;
+        submit.textContent = 'Verifying\u2026';
+        errMsg.style.display = 'none';
+        fetch('/api/pin/validate', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ pin: pin })
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.valid) {
+              sessionStorage.setItem(SESSION_KEY, '1');
+              unlock();
+            } else {
+              errMsg.textContent   = 'Incorrect PIN. Please try again.';
+              errMsg.style.display = '';
+              input.value = '';
+              input.focus();
+            }
+          })
+          .catch(function () {
+            errMsg.textContent   = 'Connection error — please retry.';
+            errMsg.style.display = '';
+          })
+          .finally(function () {
+            submit.disabled    = false;
+            submit.textContent = 'Unlock Meeting Suites';
+          });
+      }
+
+      submit.addEventListener('click', tryPin);
+      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryPin(); });
+      input.addEventListener('input', function () {
+        if (input.value.replace(/\D/g, '').length === 6) tryPin();
+      });
+      input.focus();
     })();
   </script>
 </body>
