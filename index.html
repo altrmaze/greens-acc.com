@@ -405,10 +405,13 @@
       </div>
 
       <!-- Action buttons -->
+      <div class="flex items-center gap-2">
+        <span id="payment-mode-badge" class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border bg-indigo-50 text-indigo-700 border-indigo-200">Demo/Sandbox Payments Enabled</span>
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <button id="process-entry-fee"
           class="w-full px-4 py-3.5 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 active:scale-[.98] transition shadow-sm">
-          Pay $20.00 Entry Fee
+          Pay $20.00 Entry Fee (Demo)
         </button>
         <button id="process-handshake"
           class="w-full px-4 py-3.5 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-800 active:scale-[.98] transition shadow-sm">
@@ -419,7 +422,7 @@
           Safe Withdrawal
         </button>
       </div>
-      <p class="text-[11px] text-slate-400">The $20.00 Greens ACC activation fee is fully separate from your deal amount. All transactions are processed through the Supabase‑backed escrow system and are final once confirmed.</p>
+      <p class="text-[11px] text-slate-400">The $20.00 Greens ACC activation fee is fully separate from your deal amount. Demo/Sandbox transactions are simulated and logged to Supabase accounting records.</p>
     </div>
   </section>
 
@@ -683,6 +686,7 @@
   const checkHandshakeBtn         = document.getElementById('check-handshake');
   const nextPaymentStepBtn        = document.getElementById('next-payment-step');
   const paymentStepDisplay        = document.getElementById('payment-step');
+  const paymentModeBadge          = document.getElementById('payment-mode-badge');
 
   // ── Constants ────────────────────────────────────────────────
   const functionHost      = '/supabase/functions';
@@ -913,9 +917,9 @@
       return;
     }
     setStepState(step1Circle, step1Status, 'active', 'processing');
-    appendLog('Processing $20.00 entry fee...', 'info');
+    appendLog('Starting Demo/Sandbox checkout for $20.00 entry fee...', 'info');
     try {
-      const res  = await fetch(functionHost + '/processEntryFee', {
+      const res  = await fetch(functionHost + '/createStripeCheckout', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ deal_id, payer_id, amount: ENTRY_FEE_AMOUNT, lc_reference_number: getVal(lcReferenceInput) })
@@ -930,7 +934,8 @@
       dealStatus.entry_fee_status  = data.deal?.entry_fee_status  || 'paid';
       dealStatus.compliance_status = data.deal?.compliance_status || 'pending';
       updateDealStatusUI();
-      appendLog('$20.00 entry fee processed and recorded. Deal activation unlocked.', 'success');
+      appendLog('$20.00 entry fee processed and recorded in Demo/Sandbox mode. Deal activation unlocked.', 'success');
+      if (paymentModeBadge) setText(paymentModeBadge, 'Demo/Sandbox · TXN ' + (data?.payment?.transaction_id || 'approved'));
       setSystemStatus('Entry Fee Paid · Handshake Ready', 'bg-emerald-50 text-emerald-700 border-emerald-200');
     } catch (err) {
       appendLog('Entry fee error: ' + err.message, 'alert');

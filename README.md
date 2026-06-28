@@ -39,6 +39,7 @@ GreenACC is a static website with Supabase backend support for secure trade escr
 
 ## Stripe & Webhook
 
+- Demo/Sandbox mode is now enabled by default through `supabase/functions/paymentService.js`. Checkout and entry fee processing can complete without a live Stripe gateway while still updating `green_acc_deals` and writing accounting logs to `payment_accounting_logs`.
 - Deploy the Stripe webhook edge function at `supabase/functions/stripeWebhook.js` and set the following environment variables in your Supabase functions config or platform:
    - `STRIPE_SECRET_KEY` — your Stripe secret key
    - (Optional) `STRIPE_WEBHOOK_SECRET` — if you add signature verification later

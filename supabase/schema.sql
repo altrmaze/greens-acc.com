@@ -30,6 +30,24 @@ create index if not exists idx_green_acc_deals_lc_reference_number on public.gre
 create index if not exists idx_green_acc_deals_buyer_id on public.green_acc_deals (buyer_id);
 create index if not exists idx_green_acc_deals_seller_id on public.green_acc_deals (seller_id);
 
+create table if not exists public.payment_accounting_logs (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  deal_id uuid,
+  payer_id uuid,
+  gateway text not null default 'demo-payment-service',
+  mode text not null default 'sandbox',
+  channel text not null default 'entry_fee',
+  transaction_id text not null unique,
+  amount numeric(12,2) not null default 0.00,
+  currency text not null default 'USD',
+  status text not null default 'succeeded',
+  details jsonb not null default '{}'
+);
+
+create index if not exists idx_payment_accounting_logs_deal on public.payment_accounting_logs (deal_id);
+create index if not exists idx_payment_accounting_logs_transaction on public.payment_accounting_logs (transaction_id);
+
 -- Signaling table for meeting suite (used for WebRTC offer/answer/candidates via Supabase Realtime)
 create table if not exists public.meeting_signals (
   id uuid primary key default gen_random_uuid(),
