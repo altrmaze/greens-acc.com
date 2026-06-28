@@ -162,6 +162,24 @@ create index if not exists idx_compliance_logs_room on public.compliance_logs (r
 create index if not exists idx_compliance_logs_severity on public.compliance_logs (severity);
 create index if not exists idx_room_sessions_status on public.room_sessions (session_status);
 
+-- Strict meeting room paywall via RLS (repository table: instant_rooms)
+alter table public.instant_rooms enable row level security;
+
+drop policy if exists "Strict Paywall: Only active subscribers can enter rooms" on public.instant_rooms;
+
+create policy "Strict Paywall: Only active subscribers can enter rooms"
+on public.instant_rooms
+for select
+to authenticated
+using (
+  exists (
+    select 1
+    from public.user_profiles
+    where user_profiles.id = auth.uid()
+      and (user_profiles.account_status = 'active' or user_profiles.account_status = 'premium')
+  )
+);
+
 -- ============================================================
 -- TRADING MONOLITH TABLES
 -- ============================================================
