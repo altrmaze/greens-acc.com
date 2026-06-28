@@ -84,7 +84,10 @@ function renderWorldClockBar() {
 
     const meta = document.createElement('div');
     meta.className = 'clock-meta';
-    meta.textContent = `${cityConfig.country} • ${cityConfig.timeZone}`;
+    const countryLabel = typeof cityConfig.country === 'object' && cityConfig.country !== null
+      ? (cityConfig.country.name || '')
+      : cityConfig.country;
+    meta.textContent = `${countryLabel} • ${cityConfig.timeZone}`;
 
     const clock = document.createElement('div');
     clock.className = 'clock-time';
