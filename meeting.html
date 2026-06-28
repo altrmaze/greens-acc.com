@@ -21,6 +21,28 @@
       </div>
     </header>
 
+    <!-- Global Time Zone Bar -->
+    <section class="bg-white border border-slate-200 rounded-2xl p-4 mb-4 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <div>
+          <h2 class="text-base font-bold">Global Meeting Time Bar</h2>
+          <p class="text-xs text-slate-500">Major cities for cross-country coordination</p>
+        </div>
+        <label for="clock-locale" class="text-xs text-slate-500 flex items-center gap-2">
+          Language
+          <select id="clock-locale" class="rounded-md border border-slate-200 px-2 py-1 text-xs text-slate-700">
+            <option value="auto">Auto (city default)</option>
+            <option value="en-US">English</option>
+            <option value="fr-FR">Français</option>
+            <option value="es-ES">Español</option>
+            <option value="ar-AE">العربية</option>
+            <option value="ja-JP">日本語</option>
+          </select>
+        </label>
+      </div>
+      <div id="world-clock-bar" class="world-clock-bar" aria-live="polite"></div>
+    </section>
+
     <!-- Global News Ticker (Realtime) -->
     <div id="global-news-ticker" class="news-ticker mb-4" aria-live="polite"></div>
 

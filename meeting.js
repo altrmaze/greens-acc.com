@@ -27,6 +27,86 @@ function initSupabase() {
 // ----- Global news ticker & risk subscriptions -----
 let globalRiskActive = false;
 let currentRisk = null;
+let worldClockInterval = null;
+
+const majorCityClocks = [
+  { city: 'New York', country: 'USA', timeZone: 'America/New_York', locale: 'en-US' },
+  { city: 'Los Angeles', country: 'USA', timeZone: 'America/Los_Angeles', locale: 'en-US' },
+  { city: 'London', country: 'UK', timeZone: 'Europe/London', locale: 'en-GB' },
+  { city: 'Paris', country: 'France', timeZone: 'Europe/Paris', locale: 'fr-FR' },
+  { city: 'Dubai', country: 'UAE', timeZone: 'Asia/Dubai', locale: 'ar-AE' },
+  { city: 'Mumbai', country: 'India', timeZone: 'Asia/Kolkata', locale: 'hi-IN' },
+  { city: 'Singapore', country: 'Singapore', timeZone: 'Asia/Singapore', locale: 'en-SG' },
+  { city: 'Tokyo', country: 'Japan', timeZone: 'Asia/Tokyo', locale: 'ja-JP' },
+  { city: 'Sydney', country: 'Australia', timeZone: 'Australia/Sydney', locale: 'en-AU' },
+  { city: 'São Paulo', country: 'Brazil', timeZone: 'America/Sao_Paulo', locale: 'pt-BR' }
+];
+
+function getClockLocale(defaultLocale) {
+  const localeSelect = document.getElementById('clock-locale');
+  if (!localeSelect || localeSelect.value === 'auto') return defaultLocale;
+  return localeSelect.value;
+}
+
+function formatClockDateTime(now, cityConfig) {
+  const locale = getClockLocale(cityConfig.locale);
+  const timeText = new Intl.DateTimeFormat(locale, {
+    timeZone: cityConfig.timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  }).format(now);
+
+  const dateText = new Intl.DateTimeFormat(locale, {
+    timeZone: cityConfig.timeZone,
+    weekday: 'short',
+    month: 'short',
+    day: '2-digit'
+  }).format(now);
+
+  return { timeText, dateText };
+}
+
+function renderWorldClockBar() {
+  const bar = document.getElementById('world-clock-bar');
+  if (!bar) return;
+  const now = new Date();
+  bar.textContent = '';
+
+  majorCityClocks.forEach(cityConfig => {
+    const tile = document.createElement('div');
+    tile.className = 'clock-tile';
+
+    const city = document.createElement('div');
+    city.className = 'clock-city';
+    city.textContent = cityConfig.city;
+
+    const meta = document.createElement('div');
+    meta.className = 'clock-meta';
+    meta.textContent = `${cityConfig.country} • ${cityConfig.timeZone}`;
+
+    const clock = document.createElement('div');
+    clock.className = 'clock-time';
+    const formatted = formatClockDateTime(now, cityConfig);
+    clock.textContent = `${formatted.timeText} • ${formatted.dateText}`;
+
+    tile.appendChild(city);
+    tile.appendChild(meta);
+    tile.appendChild(clock);
+    bar.appendChild(tile);
+  });
+}
+
+function initWorldClockBar() {
+  const localeSelect = document.getElementById('clock-locale');
+  if (localeSelect) {
+    localeSelect.addEventListener('change', renderWorldClockBar);
+  }
+  renderWorldClockBar();
+  if (worldClockInterval) clearInterval(worldClockInterval);
+  worldClockInterval = setInterval(renderWorldClockBar, 1000);
+}
 
 async function initNewsAndRisk() {
   if (!supabase) return;
@@ -372,6 +452,7 @@ uploadFileBtn.addEventListener('click', uploadFile);
 
 document.addEventListener('DOMContentLoaded', () => {
   fetchRooms();
+  initWorldClockBar();
   initSupabase();
   initNewsAndRisk();
 });

@@ -25,3 +25,38 @@ body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 
 }
 
 .emergency-modal.hidden { display: none; }
+
+.world-clock-bar {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 8px;
+}
+
+.clock-tile {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 8px 10px;
+	min-height: 76px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.clock-city {
+	font-size: 12px;
+	font-weight: 700;
+	color: #0f172a;
+}
+
+.clock-meta {
+	font-size: 11px;
+	color: #64748b;
+}
+
+.clock-time {
+	font-size: 14px;
+	font-weight: 800;
+	color: #0f172a;
+	margin-top: 2px;
+}
