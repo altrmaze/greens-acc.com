@@ -11,7 +11,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 if not OPENAI_API_KEY:
     raise RuntimeError("OPENAI_API_KEY environment variable is required.")
 
-llm = ChatOpenAI(model="gpt-4o", temperature=0.2, api_key=OPENAI_API_KEY)
+llm = ChatOpenAI(model="gpt-4o", temperature=0.1, api_key=OPENAI_API_KEY)
 search_tool = DuckDuckGoSearchRun()
 
 
@@ -25,6 +25,7 @@ def fetch_stock_data(ticker: str) -> str:
         close_series = hist["Close"].to_string() if "Close" in hist.columns else "No recent close data available."
 
         return (
+            f"Source Checked: Yahoo Finance API\n"
             f"Ticker: {ticker}\n"
             f"Current Price: ${info.get('currentPrice', 'N/A')}\n"
             f"52 Week High: ${info.get('fiftyTwoWeekHigh', 'N/A')}\n"
@@ -37,10 +38,10 @@ def fetch_stock_data(ticker: str) -> str:
 
 financial_analyst = Agent(
     role="Senior Technical Financial Analyst",
-    goal="Analyze quantitative stock data, price trends, and technical indicators.",
+    goal="Analyze patterns, technical indicators, and volumes to find structural setups.",
     backstory=(
-        "You are a veteran Wall Street quantitative analyst. You look strictly at numbers, "
-        "patterns, moving averages, and volume to identify breakout setups."
+        "A quantitative market specialist who filters setups based purely on empirical chart numbers "
+        "and documents the exact indicators checked."
     ),
     verbose=True,
     llm=llm,
@@ -49,10 +50,10 @@ financial_analyst = Agent(
 
 sentiment_analyst = Agent(
     role="Global News & Sentiment Analyst",
-    goal="Analyze market sentiment, breaking news, earnings reports, and social chatter for a given stock.",
+    goal="Scan breaking news, financial reviews, and global sentiment updates.",
     backstory=(
-        "You are an expert financial journalist and sentiment tracker. You read between the lines of "
-        "news articles, press releases, and market rumors to gauge if public sentiment is bullish or bearish."
+        "An expert financial analyst tracking live press releases, geopolitical updates, and macro risks. "
+        "Must explicitly record sources used."
     ),
     verbose=True,
     llm=llm,
@@ -61,11 +62,10 @@ sentiment_analyst = Agent(
 
 committee_chair = Agent(
     role="Chief Investment Officer (CIO)",
-    goal="Synthesize technical and sentiment data to make a final, highly calculated risk-managed stock recommendation.",
+    goal="Synthesize technical and sentiment intelligence into exactly ONE definitive market action with an audit trail.",
     backstory=(
-        "You are the ultimate decision-maker. You take the quantitative data from the Financial Analyst and "
-        "the qualitative data from the Sentiment Analyst, weigh the risks, and decide if a stock is truly "
-        "a promising buy for tomorrow."
+        "The final decision-maker. Refuses ambiguity. Forces the team to narrow everything down to one solid "
+        "recommendation while completely breaking down the reasoning and verifying every source."
     ),
     verbose=True,
     llm=llm,
@@ -73,37 +73,40 @@ committee_chair = Agent(
 
 task_technical_analysis = Task(
     description=(
-        "Analyze recent price movements and technical health for the watch-list tickers: {ticker_list}. "
-        "Identify which one shows the strongest technical setup for short-term gains."
+        "Analyze charts and trends for: {ticker_list}. "
+        "State exactly what formulas, trends, or tools you checked."
     ),
     expected_output=(
-        "A detailed technical analysis report highlighting the strongest stock setup with entry points "
-        "and support/resistance levels."
+        "Technical health assessment for the asset pool along with data logs."
     ),
     agent=financial_analyst,
 )
 
 task_sentiment_analysis = Task(
     description=(
-        "Search and analyze the latest breaking news, sentiment, and macro factors over the last 48 hours "
-        "for the tickers: {ticker_list}."
+        "Scan live global news, financial reviews, magazines, and economic data over the last 48 hours "
+        "for: {ticker_list}. You must document the names of the websites, domains, or articles you gathered "
+        "information from."
     ),
     expected_output=(
-        "A sentiment analysis report detailing whether the news cycle is highly positive, neutral, or negative "
-        "for each stock, highlighting potential risks."
+        "Sentiment analysis highlighting potential catalyst events with an explicit list of domains visited."
     ),
     agent=sentiment_analyst,
 )
 
 task_final_recommendation = Task(
     description=(
-        "Review both the technical analysis report and the sentiment analysis report. Debate the pros and cons. "
-        "Pick the SINGLE most promising stock from the list to watch for tomorrow. Provide a clear justification, "
-        "target price, and a risk mitigation plan."
+        "Review the structural and sentiment data. Eliminate all weak options until only one remains. "
+        "Provide EXACTLY ONE clear, solid stock recommendation. "
+        "CRITICAL: After providing your pick, create a section called '### 🔍 AUDIT TRAIL AND VERIFICATION MATRIX'. "
+        "In this section, explicitly list: "
+        "1. Exactly why this asset won over others. "
+        "2. The exact websites, news engines, economic indicators, or data applications analyzed. "
+        "3. What technical parameters were verified (e.g., Yahoo Finance, specific media articles, sentiment scores)."
     ),
     expected_output=(
-        "A final executive investment memo naming the absolute best stock pick with explicit reasoning, "
-        "combining data and news sentiment."
+        "A definitive, executive-level summary selecting exactly ONE winning ticker followed by a transparent "
+        "verification matrix of all checked resources."
     ),
     agent=committee_chair,
 )
