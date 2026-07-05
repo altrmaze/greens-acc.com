@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Stripe from 'stripe';
+import { rateLimit } from 'express-rate-limit';
 
 import { verifyIdentity } from '../middleware/auth.js';
 import { securityWatcher } from '../middleware/securityWatcher.js';
@@ -11,6 +12,13 @@ import { resolvePaymentDecision } from '../models/paymentDecision.js';
 import { recordSecurityEvent } from '../database/auditStore.js';
 
 const router = Router();
+const paymentIntentRateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many payment intent requests' }
+});
 
 function getStripeClient() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -23,7 +31,7 @@ function getStripeClient() {
   return new Stripe(key);
 }
 
-router.post('/intent', verifyIdentity, securityWatcher, shield, tradingMonitor, honeypotGuard, async (req, res, next) => {
+router.post('/intent', paymentIntentRateLimiter, verifyIdentity, securityWatcher, shield, tradingMonitor, honeypotGuard, async (req, res, next) => {
   try {
     const amount = Number(req.body.amount);
     const currency = req.body.currency || 'usd';
