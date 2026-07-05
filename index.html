@@ -1,1111 +1,1479 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Greens ACC — Global Trade Command Center</title>
-  <meta name="description" content="Greens ACC: Secure international B2B trading, AI-powered compliance, and escrow-protected deal settlements.">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Greens ACC — Global B2B Command Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @keyframes pulse-dot { 0%,100%{opacity:1}50%{opacity:.35} }
-    .pulse-dot{animation:pulse-dot 2s ease-in-out infinite}
-    @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-    .marquee-inner{display:inline-block;animation:marquee 48s linear infinite}
-    .marquee-inner:hover{animation-play-state:paused}
-    .pipeline-line{position:absolute;top:20px;left:10%;right:10%;height:2px;background:linear-gradient(to right,#e2e8f0 0%,#94a3b8 50%,#e2e8f0 100%);z-index:0}
-    .step-node{position:relative;z-index:1}
-    .pillar-connect{position:absolute;top:50%;transform:translateY(-50%);left:0;right:0;height:1px;background:linear-gradient(to right,transparent 0%,#e2e8f0 20%,#e2e8f0 80%,transparent 100%)}
+    @keyframes marquee {
+      0%   { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    .animate-marquee {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 32s linear infinite;
+      white-space: nowrap;
+    }
+    .animate-marquee:hover { animation-play-state: paused; }
+
+    .pillar-card {
+      border-left: 3px solid;
+      transition: box-shadow 0.15s ease, border-left-color 0.15s ease;
+    }
+    .pillar-card:hover { box-shadow: 0 4px 16px 0 rgba(16,185,129,0.10); }
+
+    .stroke-separator {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .log-entry-info    { color: #475569; }
+    .log-entry-success { color: #059669; }
+    .log-entry-warning { color: #d97706; }
+    .log-entry-alert   { color: #dc2626; }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #059669 !important;
+      box-shadow: 0 0 0 2px rgba(5,150,105,0.08);
+    }
   </style>
 </head>
-<body class="bg-[#f0f7f4] text-slate-800 font-sans min-h-screen antialiased">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased">
 
-<!-- ═══════════════════════════════════════════════
-     MARKET TICKER
-═══════════════════════════════════════════════ -->
-<div class="bg-slate-900 text-slate-300 text-[11px] py-2 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 font-mono" aria-label="Live market data">
-  <div class="marquee-inner space-x-10">
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2 pulse-dot"></span>GREENS ACC AGRI INDEX: $14.20 <span class="text-emerald-400 ml-1.5">+1.4%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>GLOBAL FREIGHT: $3,450/TEU <span class="text-emerald-400 ml-1.5">+0.8%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD/EGP: 47.85 <span class="text-emerald-400 ml-1.5">+2.1%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-slate-400 rounded-full mr-2"></span>USD/AED: 3.67 <span class="text-slate-400 ml-1.5">0.0%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-rose-400 rounded-full mr-2"></span>USD/TRY: 32.45 <span class="text-rose-400 ml-1.5">−0.5%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD/MNT: 3,420 <span class="text-emerald-400 ml-1.5">+0.2%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD/INR: 83.40 <span class="text-emerald-400 ml-1.5">+0.3%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-slate-400 rounded-full mr-2"></span>USD/PLN: 3.95 <span class="text-slate-400 ml-1.5">−0.1%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>COMMODITY INDEX (GLOBAL): 218.4 <span class="text-emerald-400 ml-1.5">+0.6%</span></span>
-    <!-- duplicate for seamless loop -->
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2 pulse-dot"></span>GREENS ACC AGRI INDEX: $14.20 <span class="text-emerald-400 ml-1.5">+1.4%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>GLOBAL FREIGHT: $3,450/TEU <span class="text-emerald-400 ml-1.5">+0.8%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD/EGP: 47.85 <span class="text-emerald-400 ml-1.5">+2.1%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-slate-400 rounded-full mr-2"></span>USD/AED: 3.67 <span class="text-slate-400 ml-1.5">0.0%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-rose-400 rounded-full mr-2"></span>USD/TRY: 32.45 <span class="text-rose-400 ml-1.5">−0.5%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD/MNT: 3,420 <span class="text-emerald-400 ml-1.5">+0.2%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>USD/INR: 83.40 <span class="text-emerald-400 ml-1.5">+0.3%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-slate-400 rounded-full mr-2"></span>USD/PLN: 3.95 <span class="text-slate-400 ml-1.5">−0.1%</span></span>
-    <span class="inline-flex items-center"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2"></span>COMMODITY INDEX (GLOBAL): 218.4 <span class="text-emerald-400 ml-1.5">+0.6%</span></span>
+  <!-- ═══════════════════════ TOP MARKET TICKER ═══════════════════════ -->
+  <div class="bg-slate-900 text-slate-400 text-xs py-1.5 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 font-mono select-none">
+    <div class="animate-marquee space-x-10">
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>GREENS ACC INDEX (TRADE/USD) $14.20 <span class="text-emerald-400">+1.4%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>FREIGHT INDEX (GLOBAL) $3,450 <span class="text-emerald-400">+0.8%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / EGP 47.85 <span class="text-emerald-400">+2.1%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / AED 3.67 <span class="text-slate-400">0.0%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-rose-400"></span>USD / TRY 32.45 <span class="text-rose-400">-0.5%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / MNT 3,420 <span class="text-emerald-400">+0.2%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / INR 83.20 <span class="text-emerald-400">+0.3%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / PLN 3.98 <span class="text-emerald-400">+0.1%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / CNY 7.24 <span class="text-slate-400">0.0%</span></span>
+      <!-- duplicate band for seamless loop -->
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>GREENS ACC INDEX (TRADE/USD) $14.20 <span class="text-emerald-400">+1.4%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>FREIGHT INDEX (GLOBAL) $3,450 <span class="text-emerald-400">+0.8%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / EGP 47.85 <span class="text-emerald-400">+2.1%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / AED 3.67 <span class="text-slate-400">0.0%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-rose-400"></span>USD / TRY 32.45 <span class="text-rose-400">-0.5%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / MNT 3,420 <span class="text-emerald-400">+0.2%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / INR 83.20 <span class="text-emerald-400">+0.3%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / PLN 3.98 <span class="text-emerald-400">+0.1%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / CNY 7.24 <span class="text-slate-400">0.0%</span></span>
+    </div>
   </div>
-</div>
 
-<!-- ═══════════════════════════════════════════════
-     NAVIGATION
-═══════════════════════════════════════════════ -->
-<nav class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="flex items-center justify-between h-16 gap-4">
+  <!-- ═══════════════════════ NAVIGATION ═══════════════════════ -->
+  <nav class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
 
       <!-- Brand -->
-      <a href="/" class="flex items-center gap-3 flex-shrink-0 group">
-        <div class="h-10 w-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-md group-hover:bg-emerald-700 transition">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-5 h-5 text-white">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253M3 12a8.96 8.96 0 0 1 .284-2.253" />
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-5 h-5">
+            <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-1.5V9a3 3 0 00-3-3h-3V4.5a3 3 0 00-3-3H4.5a3 3 0 00-3 3V9a3 3 0 003 3H6v1.5a3 3 0 003 3h3V18a3 3 0 003 3h4.5zM6 10.5H4.5a1.5 1.5 0 01-1.5-1.5V4.5a1.5 1.5 0 011.5-1.5H9a1.5 1.5 0 011.5 1.5V6H9a3 3 0 00-3 3v1.5z" />
           </svg>
         </div>
         <div>
-          <span class="text-lg font-black text-slate-900 tracking-tight">Greens ACC</span>
-          <span class="hidden sm:block text-[10px] text-emerald-600 font-bold tracking-widest uppercase font-mono">Global Trade Command</span>
+          <p class="text-lg font-black tracking-tight text-slate-900 leading-none">Greens ACC</p>
+          <p class="text-[10px] text-emerald-600 font-bold tracking-widest uppercase font-mono leading-none mt-0.5">Secure Access &amp; Compliance Command</p>
         </div>
-      </a>
-
-      <!-- Page links (desktop) -->
-      <div class="hidden md:flex items-center gap-1">
-        <a href="/" class="px-3 py-2 rounded-lg text-sm font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200">Dashboard</a>
-        <a href="/meeting.html" class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition">Meeting Rooms</a>
-        <span class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-400 cursor-not-allowed select-none">Supply Chain</span>
-        <span class="px-3 py-2 rounded-lg text-sm font-semibold text-slate-400 cursor-not-allowed select-none">Compliance</span>
       </div>
 
       <!-- Unified locale controls -->
-      <div class="flex items-center gap-2 flex-shrink-0">
-        <div class="flex flex-col">
-          <label for="region-select" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 font-mono">Region</label>
-          <select id="region-select" class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-2 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer">
+      <div class="flex flex-wrap items-end gap-4">
+        <div class="flex flex-col gap-1">
+          <label id="region-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Region</label>
+          <select id="region-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
             <option value="global">🌍 Global</option>
+            <option value="us">🇺🇸 United States</option>
             <option value="ae">🇦🇪 UAE</option>
             <option value="eg">🇪🇬 Egypt</option>
-            <option value="us">🇺🇸 USA</option>
             <option value="in">🇮🇳 India</option>
             <option value="pl">🇵🇱 Poland</option>
             <option value="fr">🇫🇷 France</option>
             <option value="cn">🇨🇳 China</option>
-            <option value="ng">🇳🇬 Nigeria</option>
-            <option value="tr">🇹🇷 Türkiye</option>
             <option value="mn">🇲🇳 Mongolia</option>
           </select>
         </div>
-        <div class="flex flex-col">
-          <label for="language-select" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 font-mono">Language</label>
-          <select id="language-select" class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-2 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500 cursor-pointer">
+        <div class="flex flex-col gap-1">
+          <label id="interface-language-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Interface Language</label>
+          <select id="language-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
             <option value="en">🇬🇧 English</option>
-            <option value="ar">🇸🇦 العربية</option>
-            <option value="fr">🇫🇷 Français</option>
+            <option value="ar">🇦🇪 العربية</option>
             <option value="hi">🇮🇳 हिन्दी</option>
-            <option value="zh">🇨🇳 中文</option>
             <option value="pl">🇵🇱 Polski</option>
-            <option value="tr">🇹🇷 Türkçe</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="zh">🇨🇳 中文</option>
           </select>
         </div>
-      </div>
-    </div>
-  </div>
-</nav>
-
-<!-- ═══════════════════════════════════════════════
-     TIMEZONE BAR
-═══════════════════════════════════════════════ -->
-<div class="bg-slate-800 text-slate-300 text-[11px] font-mono border-b border-slate-700">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex flex-wrap items-center gap-x-6 gap-y-1">
-    <div class="flex items-center gap-2">
-      <span class="text-slate-500 uppercase tracking-widest text-[10px]">UTC</span>
-      <span id="clock-utc" class="font-bold text-slate-200">—</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-slate-500 uppercase tracking-widest text-[10px]">Local</span>
-      <span id="clock-local" class="font-bold text-emerald-400">—</span>
-    </div>
-    <div class="flex items-center gap-2">
-      <span id="clock-region-label" class="text-slate-500 uppercase tracking-widest text-[10px]">Region</span>
-      <span id="clock-region" class="font-bold text-slate-200">—</span>
-    </div>
-    <div class="ml-auto flex items-center gap-2">
-      <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full pulse-dot"></span>
-      <span class="text-slate-400 text-[10px]">Greens ACC system</span>
-      <span id="system-status-indicator" class="font-semibold text-emerald-400">Online</span>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════
-     MAIN CONTENT
-═══════════════════════════════════════════════ -->
-<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-
-  <!-- ─── HERO ─── -->
-  <header class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-    <div class="h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600"></div>
-    <div class="p-6 sm:p-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-      <div class="space-y-3">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-xs font-bold text-emerald-700 uppercase tracking-wider">
-            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full pulse-dot"></span>Live — All Systems Nominal
-          </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-xs font-semibold text-slate-600 uppercase tracking-wider">AI Compliance Active</span>
+        <div class="flex flex-col gap-1">
+          <label id="counterparty-language-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Counterparty Language</label>
+          <select id="counterparty-language-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
+            <option value="en">🇬🇧 English</option>
+            <option value="ar">🇦🇪 العربية</option>
+            <option value="hi">🇮🇳 हिन्दी</option>
+            <option value="pl">🇵🇱 Polski</option>
+            <option value="fr">🇫🇷 Français</option>
+            <option value="zh">🇨🇳 中文</option>
+          </select>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">Global Trade Command Center</h1>
-        <p class="text-sm text-slate-500 max-w-xl leading-relaxed">Secure international B2B transactions with AI‑powered compliance, escrow‑protected settlements, and multilingual negotiation support. Authorized corporate access — all activity is monitored and logged.</p>
-      </div>
-      <div class="flex flex-wrap gap-3 flex-shrink-0">
-        <div class="text-center px-5 py-3 bg-emerald-50 border border-emerald-200 rounded-xl min-w-[88px]">
-          <p class="text-[10px] text-emerald-600 uppercase tracking-widest font-mono font-bold mb-1">Entry Fee</p>
-          <p class="text-xl font-black text-emerald-700">$20</p>
-          <p class="text-[10px] text-emerald-600 font-medium">flat activation</p>
-        </div>
-        <div class="text-center px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl min-w-[88px]">
-          <p class="text-[10px] text-slate-500 uppercase tracking-widest font-mono font-bold mb-1">Commission</p>
-          <p class="text-xl font-black text-slate-800">2%</p>
-          <p class="text-[10px] text-slate-500">on handshake</p>
-        </div>
-        <div class="text-center px-5 py-3 bg-slate-50 border border-slate-200 rounded-xl min-w-[88px]">
-          <p class="text-[10px] text-slate-500 uppercase tracking-widest font-mono font-bold mb-1">AI Agents</p>
-          <p class="text-xl font-black text-slate-800">3</p>
-          <p class="text-[10px] text-slate-500">monitoring</p>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- ─── THREE PILLARS ─── -->
-  <section>
-    <div class="flex items-center gap-3 mb-5">
-      <h2 class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono flex-shrink-0">System Modules</h2>
-      <div class="flex-1 h-px bg-slate-200"></div>
-    </div>
-    <!-- Connected pillar grid -->
-    <div class="relative grid grid-cols-1 sm:grid-cols-3 gap-0">
-      <!-- Desktop horizontal connector (behind cards) -->
-      <div class="hidden sm:block absolute top-10 left-[33%] right-[33%] h-px bg-gradient-to-r from-slate-200 via-emerald-300 to-slate-200 z-0"></div>
-
-      <!-- Pillar I: Global B2B Meeting Room -->
-      <div class="relative z-10 p-2">
-        <a href="/meeting.html" class="group block h-full bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-300 transition overflow-hidden">
-          <div class="h-1 bg-emerald-500 group-hover:bg-emerald-600 transition"></div>
-          <div class="p-6">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="h-10 w-10 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-emerald-600">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-                </svg>
-              </div>
-              <div>
-                <p class="text-[10px] uppercase tracking-widest text-emerald-600 font-bold font-mono">Pillar I</p>
-                <h3 class="text-sm font-black text-slate-900 group-hover:text-emerald-700 transition">Global B2B Meeting Room</h3>
-              </div>
-            </div>
-            <p class="text-xs text-slate-500 leading-relaxed">Secure, AI‑monitored executive meeting suites for international trade negotiations. WebRTC encrypted, compliance‑enforced, fully multilingual.</p>
-            <div class="mt-4 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600">
-              Enter Meeting Room
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>
-            </div>
-          </div>
-        </a>
-      </div>
-
-      <!-- Pillar II: Supply Chain Engine -->
-      <div class="relative z-10 p-2">
-        <div class="h-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div class="h-1 bg-blue-500"></div>
-          <div class="p-6">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="h-10 w-10 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-blue-600">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                </svg>
-              </div>
-              <div>
-                <p class="text-[10px] uppercase tracking-widest text-blue-600 font-bold font-mono">Pillar II</p>
-                <h3 class="text-sm font-black text-slate-900">Supply Chain Engine</h3>
-              </div>
-            </div>
-            <p class="text-xs text-slate-500 leading-relaxed">End‑to‑end international logistics coordination. Shipment tracking, warehouse dispatch, and automated freight routing for global commodities trade.</p>
-            <div class="mt-4">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-lg text-[11px] font-bold text-amber-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>Activation Required
-              </span>
-            </div>
-          </div>
+        <div id="system-time-badge" class="flex flex-col gap-1">
+          <label id="local-time-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Local Time</label>
+          <span id="local-time" class="text-xs font-mono text-slate-600 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">—</span>
         </div>
       </div>
 
-      <!-- Pillar III: AI Legal Compliance Monitor -->
-      <div class="relative z-10 p-2">
-        <div class="h-full bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-          <div class="h-1 bg-violet-500"></div>
-          <div class="p-6">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="h-10 w-10 bg-violet-50 border border-violet-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-violet-600">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
-                </svg>
-              </div>
-              <div>
-                <p class="text-[10px] uppercase tracking-widest text-violet-600 font-bold font-mono">Pillar III</p>
-                <h3 class="text-sm font-black text-slate-900">AI Legal Compliance Monitor</h3>
-              </div>
-            </div>
-            <p class="text-xs text-slate-500 leading-relaxed">Continuous monitoring against OFAC, EU sanctions, AML, KYC, and international trade law. AI agents flag violations and escalate to human analysts.</p>
-            <div class="mt-4">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-violet-50 border border-violet-200 rounded-lg text-[11px] font-bold text-violet-700">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-500 pulse-dot"></span>Always Active
-              </span>
-            </div>
-          </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-6 pb-4 flex flex-col gap-3">
+      <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3">
+        <div class="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-widest font-mono text-slate-500">
+          <a href="#platform-pillars" class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600 hover:border-emerald-200 hover:text-emerald-700 transition">Pillars</a>
+          <a href="#activation-lifecycle" class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600 hover:border-emerald-200 hover:text-emerald-700 transition">Activation</a>
+          <a href="#ops-log" class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600 hover:border-emerald-200 hover:text-emerald-700 transition">Operations</a>
+          <a href="#verification-vault" class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-slate-600 hover:border-emerald-200 hover:text-emerald-700 transition">Verification</a>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-[10px] font-semibold text-slate-500">
+          <span id="route-summary" class="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1.5 font-mono text-cyan-700">Route: Global</span>
+          <span id="python-sync-status" class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 font-mono text-amber-700">Python sync standby</span>
+        </div>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-3">
+        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p id="desk-time-label" class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Desk Time</p>
+          <p id="desk-time-value" class="mt-1 text-base font-black text-slate-900">—</p>
+          <p id="desk-time-zone" class="text-[10px] text-slate-400">Browser locale</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p id="region-time-label" class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Regional Hub</p>
+          <p id="region-time-value" class="mt-1 text-base font-black text-slate-900">—</p>
+          <p id="region-time-zone" class="text-[10px] text-slate-400">UTC</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <p id="counterparty-time-label" class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Counterparty Clock</p>
+          <p id="counterparty-time-value" class="mt-1 text-base font-black text-slate-900">—</p>
+          <p id="counterparty-time-zone" class="text-[10px] text-slate-400">Localized</p>
         </div>
       </div>
     </div>
-  </section>
+  </nav>
 
-  <!-- ─── DEAL ACTIVATION PIPELINE ─── -->
-  <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-    <div class="h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600"></div>
+  <!-- ═══════════════════════ MAIN CONTENT ═══════════════════════ -->
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
 
-    <!-- Header -->
-    <div class="px-6 sm:px-8 pt-6 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100">
+    <!-- Platform Header -->
+    <header class="bg-white border border-slate-200 rounded-2xl px-7 py-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 shadow-sm">
       <div>
-        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-mono font-bold mb-1">Secure Deal Activation</p>
-        <h2 class="text-lg font-black text-slate-900">Activation Workflow &amp; Escrow Pipeline</h2>
-        <p class="text-sm text-slate-500 mt-1 max-w-xl">Complete each step in sequence. The $20 entry fee activates the deal — your deal amount is always kept fully separate.</p>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="status-dot bg-emerald-500"></span>
+          <span id="platform-status-label" class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest font-mono">All Systems Active</span>
+        </div>
+        <h1 id="hero-title" class="text-2xl font-black text-slate-900 tracking-tight">Global B2B Command Center</h1>
+        <p id="hero-description" class="text-sm text-slate-500 mt-1 max-w-xl">Authorized corporate access. AI-driven compliance monitoring. Secure escrow lifecycle. Multilingual global trade orchestration.</p>
       </div>
-      <span id="pipeline-status-badge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border bg-slate-50 text-slate-600 border-slate-200 flex-shrink-0">
-        <span class="w-2 h-2 rounded-full bg-slate-300"></span>
-        Awaiting Activation
-      </span>
-    </div>
-
-    <!-- Connected pipeline steps -->
-    <div class="px-6 sm:px-8 py-6">
-      <div class="relative flex items-start justify-between gap-1 overflow-x-auto pb-2">
-        <!-- Background connector line (desktop) -->
-        <div class="pipeline-line hidden sm:block"></div>
-
-        <!-- Step 1 -->
-        <div class="step-node flex flex-col items-center text-center min-w-[90px] flex-1">
-          <div id="step-1-circle" class="w-10 h-10 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-sm font-black text-slate-500 shadow-sm transition-all duration-500">1</div>
-          <p class="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Entry Fee</p>
-          <p class="text-[11px] text-slate-400 mt-0.5">$20.00 flat</p>
-          <span id="step-1-status" class="mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 transition-all duration-300">pending</span>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="step-node flex flex-col items-center text-center min-w-[90px] flex-1">
-          <div id="step-2-circle" class="w-10 h-10 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-sm font-black text-slate-500 shadow-sm transition-all duration-500">2</div>
-          <p class="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Handshake</p>
-          <p class="text-[11px] text-slate-400 mt-0.5">L/C + 2%</p>
-          <span id="step-2-status" class="mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 transition-all duration-300">pending</span>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="step-node flex flex-col items-center text-center min-w-[90px] flex-1">
-          <div id="step-3-circle" class="w-10 h-10 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-sm font-black text-slate-500 shadow-sm transition-all duration-500">3</div>
-          <p class="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Escrow</p>
-          <p class="text-[11px] text-slate-400 mt-0.5">Fund lock</p>
-          <span id="step-3-status" class="mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 transition-all duration-300">locked</span>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="step-node flex flex-col items-center text-center min-w-[90px] flex-1">
-          <div id="step-4-circle" class="w-10 h-10 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-sm font-black text-slate-500 shadow-sm transition-all duration-500">4</div>
-          <p class="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Compliance</p>
-          <p class="text-[11px] text-slate-400 mt-0.5">KYC · AML</p>
-          <span id="step-4-status" class="mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 transition-all duration-300">pending</span>
-        </div>
-
-        <!-- Step 5 -->
-        <div class="step-node flex flex-col items-center text-center min-w-[90px] flex-1">
-          <div id="step-5-circle" class="w-10 h-10 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-sm font-black text-slate-500 shadow-sm transition-all duration-500">5</div>
-          <p class="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Settlement</p>
-          <p class="text-[11px] text-slate-400 mt-0.5">Withdrawal</p>
-          <span id="step-5-status" class="mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 transition-all duration-300">pending</span>
-        </div>
+      <div class="flex flex-wrap gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold border border-emerald-200">
+          <span class="status-dot bg-emerald-500"></span>Supabase Connected
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold border border-slate-200 font-mono">
+          AI Fee: 2% Brokerage
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold border border-slate-200 font-mono">
+          Entry: $20.00 flat
+        </span>
       </div>
-    </div>
+    </header>
 
-    <!-- Deal form -->
-    <div class="px-6 sm:px-8 pb-8 space-y-6">
-
-      <!-- Input row -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <label class="space-y-1.5">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Deal Amount *</span>
-          <input id="deal-amount-input" type="number" step="0.01" value="1000.00" placeholder="0.00"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition" />
-        </label>
-        <label class="space-y-1.5">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Deal ID *</span>
-          <input id="deal-id-input" type="text" placeholder="Deal UUID"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition" />
-        </label>
-        <label class="space-y-1.5">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Buyer ID *</span>
-          <input id="buyer-id-input" type="text" placeholder="Buyer UUID"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition" />
-        </label>
-        <label class="space-y-1.5">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">LC Reference</span>
-          <input id="lc-reference-input" type="text" placeholder="LCR-0001"
-            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition" />
-        </label>
+    <section class="grid gap-4 lg:grid-cols-4">
+      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Backend Truth</p>
+        <p id="truth-summary" class="mt-2 text-base font-black text-slate-900">Awaiting identifiers</p>
+        <p class="mt-1 text-xs text-slate-500">Python sync polls authoritative system state before refreshing the homepage.</p>
       </div>
-
-      <!-- Entry fee banner -->
-      <div class="rounded-2xl bg-emerald-50 border border-emerald-200 p-5">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <p class="text-[10px] uppercase tracking-widest text-emerald-600 font-bold font-mono mb-1">Entry Access Fee</p>
-            <p class="text-base font-black text-slate-900">$20.00 USD — Flat Activation Charge</p>
-            <p class="text-xs text-emerald-800 mt-1">One‑time, non‑refundable. Fully separate from your deal amount. Required before handshake.</p>
-          </div>
-          <div class="flex-shrink-0 sm:text-right">
-            <p class="text-[10px] text-slate-400 mb-0.5">Deal amount (separate)</p>
-            <p id="deal-amount-display" class="text-2xl font-black text-slate-900">$1,000.00</p>
-            <p class="text-[11px] text-slate-500 mt-0.5">+ <span id="commission-amount-text">$0.00</span> commission (2%)</p>
-          </div>
-        </div>
+      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Status Route</p>
+        <p id="route-detail" class="mt-2 text-base font-black text-slate-900">Global desk</p>
+        <p class="mt-1 text-xs text-slate-500">Region, interface language, and counterparty language share one localization model.</p>
       </div>
-
-      <!-- Canonical status grid (single set — no duplicates) -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono mb-1.5">Entry Fee</p>
-          <p id="entry-fee-status-text" class="text-sm font-bold text-slate-700">pending</p>
-          <p class="text-[10px] text-slate-400 mt-1">$20.00 access</p>
-        </div>
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono mb-1.5">Handshake</p>
-          <p id="handshake-status-text" class="text-sm font-bold text-slate-700">pending</p>
-          <p class="text-[10px] text-slate-400 mt-1">L/C session</p>
-        </div>
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono mb-1.5">Compliance</p>
-          <p id="compliance-status-text" class="text-sm font-bold text-slate-700">pending</p>
-          <p class="text-[10px] text-slate-400 mt-1">KYC · AML</p>
-        </div>
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono mb-1.5">Escrow</p>
-          <p id="escrow-status-text" class="text-sm font-bold text-slate-700">locked</p>
-          <p class="text-[10px] text-slate-400 mt-1">Fund custody</p>
-        </div>
+      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Supply Snapshot</p>
+        <p id="supply-summary" class="mt-2 text-base font-black text-slate-900">Idle</p>
+        <p class="mt-1 text-xs text-slate-500">Latest manifest and transit milestone from the system record.</p>
       </div>
-
-      <!-- AI agents row -->
-      <div class="flex flex-wrap items-center gap-3">
-        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-mono font-bold">AI Audit:</p>
-        <span id="agent1-status" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Agent 1 · pending</span>
-        <span id="agent2-status" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Agent 2 · pending</span>
-        <span id="agent3-status" class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Agent 3 · pending</span>
-        <span class="ml-auto text-[11px] text-slate-500">Progress: <span id="deal-progress-text" class="font-bold text-slate-700">pending</span></span>
+      <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+        <p class="text-[10px] font-bold uppercase tracking-widest font-mono text-slate-400">Compliance Signals</p>
+        <p id="compliance-summary" class="mt-2 text-base font-black text-slate-900">Monitoring</p>
+        <p class="mt-1 text-xs text-slate-500">AI legal review, meeting safeguards, and escalation state stay synchronized.</p>
       </div>
+    </section>
 
-      <!-- Action buttons -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <button id="process-entry-fee"
-          class="w-full px-4 py-3.5 bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 active:scale-[.98] transition shadow-sm">
-          Pay $20.00 Entry Fee
-        </button>
-        <button id="process-handshake"
-          class="w-full px-4 py-3.5 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-800 active:scale-[.98] transition shadow-sm">
-          Create L/C · Lock 2%
-        </button>
-        <button id="trigger-withdrawal"
-          class="w-full px-4 py-3.5 bg-white text-slate-700 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-50 active:scale-[.98] transition shadow-sm border border-slate-300">
-          Safe Withdrawal
-        </button>
+    <!-- ─── THREE CORE PILLARS ─── -->
+    <section id="platform-pillars">
+      <div class="mb-4 flex items-center gap-3">
+        <hr class="flex-1 stroke-separator" />
+        <span id="pillars-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Core Platform Pillars</span>
+        <hr class="flex-1 stroke-separator" />
       </div>
-      <p class="text-[11px] text-slate-400">The $20.00 Greens ACC activation fee is fully separate from your deal amount. All transactions are processed through the Supabase‑backed escrow system and are final once confirmed.</p>
-    </div>
-  </section>
+      <div class="grid gap-5 lg:grid-cols-3">
 
-  <!-- ─── NEGOTIATION + LOCALE ─── -->
-  <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-    <!-- Multilingual negotiation -->
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-      <div class="h-1 bg-blue-500"></div>
-      <div class="p-6 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div>
-            <p class="text-[10px] uppercase tracking-widest text-blue-600 font-mono font-bold mb-1">Secure Channel</p>
-            <h3 class="text-base font-black text-slate-900">Multilingual Negotiation</h3>
-            <p class="text-xs text-slate-500 mt-1">AI helps both parties communicate in their native language through a secure, monitored channel.</p>
-          </div>
-          <div class="flex flex-col gap-2 flex-shrink-0">
-            <div class="flex items-center gap-2">
-              <label for="user-language-select" class="text-[9px] uppercase tracking-widest text-slate-400 font-mono w-16 flex-shrink-0">Your Lang</label>
-              <select id="user-language-select" class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-2 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500">
-                <option value="en">English</option>
-                <option value="ar">العربية</option>
-                <option value="fr">Français</option>
-                <option value="hi">हिन्दी</option>
-                <option value="zh">中文</option>
-                <option value="pl">Polski</option>
-                <option value="tr">Türkçe</option>
-              </select>
+        <!-- Pillar 1: Global B2B Meeting Room -->
+        <div class="pillar-card bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" style="border-left-color: #059669;">
+          <div class="flex items-start justify-between mb-4">
+            <div class="h-10 w-10 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#059669" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              </svg>
             </div>
-            <div class="flex items-center gap-2">
-              <label for="counterparty-language-select" class="text-[9px] uppercase tracking-widest text-slate-400 font-mono w-16 flex-shrink-0">Partner</label>
-              <select id="counterparty-language-select" class="bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold px-2 py-1.5 text-slate-700 focus:outline-none focus:border-emerald-500">
-                <option value="en">English</option>
-                <option value="ar">العربية</option>
-                <option value="fr">Français</option>
-                <option value="hi">हिन्दी</option>
-                <option value="zh">中文</option>
-                <option value="pl">Polski</option>
-                <option value="tr">Türkçe</option>
-              </select>
+            <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full font-mono">Pillar I</span>
+          </div>
+          <h2 id="pillar-room-title" class="text-base font-bold text-slate-900 mb-2">Global B2B Meeting Room</h2>
+          <p class="text-xs text-slate-500 leading-relaxed mb-5">Encrypted, secure video and document rooms for international B2B trade sessions. WebRTC end-to-end. Kill-switch on compliance breach.</p>
+          <hr class="stroke-separator mb-4" />
+          <div class="space-y-2 mb-5">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Your Company</label>
+              <input id="room-company-input" type="text" placeholder="e.g. Acme Trading Ltd." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
             </div>
           </div>
+          <button id="create-meeting-room" class="w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition">
+            Launch Secure Room
+          </button>
+          <p id="room-status" class="mt-2.5 text-[10px] text-slate-400 font-mono text-center min-h-[16px]"></p>
         </div>
-        <div id="conversation-log" class="min-h-[160px] max-h-[260px] overflow-y-auto rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-700 space-y-1">
-          <p class="text-slate-400 italic text-xs">Secure conversation will appear here after initialization.</p>
-        </div>
-        <div class="flex flex-wrap gap-2.5">
-          <button id="start-conversation" class="px-4 py-2.5 bg-slate-900 text-white rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-slate-800 active:scale-[.98] transition">Start Negotiation</button>
-          <button id="check-handshake" class="px-4 py-2.5 bg-amber-500 text-white rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-amber-600 active:scale-[.98] transition">Check Handshake</button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Locale info + payment steps + policy -->
-    <div class="space-y-4">
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
-        <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-          <p class="text-[10px] uppercase tracking-widest text-slate-400 font-mono font-bold mb-1.5">Local Date &amp; Time</p>
-          <p id="local-time" class="text-sm font-semibold text-slate-800">Loading...</p>
+        <!-- Pillar 2: Supply Chain Engine -->
+        <div class="pillar-card bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" style="border-left-color: #0891b2;">
+          <div class="flex items-start justify-between mb-4">
+            <div class="h-10 w-10 bg-cyan-50 border border-cyan-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#0891b2" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+              </svg>
+            </div>
+            <span class="text-[9px] font-bold text-cyan-600 uppercase tracking-widest bg-cyan-50 border border-cyan-100 px-2 py-1 rounded-full font-mono">Pillar II</span>
+          </div>
+          <h2 id="pillar-supply-title" class="text-base font-bold text-slate-900 mb-2">Supply Chain Engine</h2>
+          <p class="text-xs text-slate-500 leading-relaxed mb-5">End-to-end shipment tracking for international commodities. Carrier assignment, milestone progression, and real-time logistics audit trail.</p>
+          <hr class="stroke-separator mb-4" />
+          <div class="space-y-2 mb-5">
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Order ID</label>
+                <input id="sc-order-id" type="text" placeholder="ORD-0001" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Carrier</label>
+                <input id="sc-carrier-id" type="text" placeholder="Optional" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Origin</label>
+                <input id="sc-origin" type="text" placeholder="e.g. Cairo, EG" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Destination</label>
+                <input id="sc-destination" type="text" placeholder="e.g. Dubai, AE" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+              </div>
+            </div>
+          </div>
+          <button id="init-shipment" class="w-full px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition">
+            Initialize Shipment
+          </button>
+          <p id="sc-status" class="mt-2.5 text-[10px] text-slate-400 font-mono text-center min-h-[16px]"></p>
         </div>
-        <div class="rounded-xl bg-slate-50 border border-slate-200 p-4">
-          <p class="text-[10px] uppercase tracking-widest text-slate-400 font-mono font-bold mb-2">Payment &amp; Escrow Guide</p>
-          <p id="payment-step" class="text-sm text-slate-700 mb-3">Step 1: Verify identity and KYC documents</p>
-          <button id="next-payment-step" class="w-full px-4 py-2.5 bg-emerald-600 text-white rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-emerald-700 active:scale-[.98] transition">Next Step</button>
-        </div>
-      </div>
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
-        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-mono font-bold mb-3">Secure Trade Policy</p>
-        <ul class="space-y-2.5 text-xs text-slate-600">
-          <li class="flex items-start gap-2.5">
-            <span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0">
-              <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-            </span>
-            All deals require KYC, AML, and compliance verification before payment.
-          </li>
-          <li class="flex items-start gap-2.5">
-            <span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0">
-              <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-            </span>
-            No sanctioned entities, illegal goods, or illicit financing permitted.
-          </li>
-          <li class="flex items-start gap-2.5">
-            <span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0">
-              <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-            </span>
-            AI monitors all conversations, client behavior, and handshake risk continuously.
-          </li>
-          <li class="flex items-start gap-2.5">
-            <span class="mt-0.5 w-4 h-4 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0">
-              <svg class="w-2.5 h-2.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-            </span>
-            Suspicious activity is reported, blocked, and escalated to analyst review.
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
 
-  <!-- ─── CORPORATE VAULT ─── -->
-  <section>
-    <div class="relative rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <!-- Lock overlay -->
-      <div class="absolute inset-0 bg-white/85 backdrop-blur-sm z-20 flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 shadow-2xl rounded-2xl max-w-lg w-full p-8 text-center space-y-5">
-          <div class="mx-auto h-14 w-14 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-200">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-amber-600">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+        <!-- Pillar 3: AI Legal Compliance Monitor -->
+        <div class="pillar-card bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" style="border-left-color: #7c3aed;">
+          <div class="flex items-start justify-between mb-4">
+            <div class="h-10 w-10 bg-violet-50 border border-violet-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#7c3aed" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.97zm-16.5 0c-.99.143-1.99.317-2.999.52m2.999-.52L5.13 15.696c-.122.499.106 1.028.589 1.202a5.989 5.989 0 002.031.352 5.989 5.989 0 002.031-.352c.483-.174.711-.703.59-1.202L5.25 4.97z" />
+              </svg>
+            </div>
+            <span class="text-[9px] font-bold text-violet-600 uppercase tracking-widest bg-violet-50 border border-violet-100 px-2 py-1 rounded-full font-mono">Pillar III</span>
+          </div>
+          <h2 id="pillar-compliance-title" class="text-base font-bold text-slate-900 mb-2">AI Legal Compliance Monitor</h2>
+          <p class="text-xs text-slate-500 leading-relaxed mb-5">OFAC, AML, KYC, and CISG-aligned contract scanning. Detects sanction violations and illegal commodities. Includes automated kill-switch and audit logging.</p>
+          <hr class="stroke-separator mb-4" />
+          <div class="space-y-2 mb-5">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Contract Text or Trade Note</label>
+              <textarea id="compliance-text-input" rows="3" placeholder="Paste contract clause, trade note, or conversation excerpt for AI compliance review..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 resize-none"></textarea>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Room / Contract ID (optional)</label>
+              <input id="compliance-room-id" type="text" placeholder="Room or Contract UUID" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+            </div>
+          </div>
+          <button id="run-compliance" class="w-full px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition">
+            Run AI Compliance Scan
+          </button>
+          <p id="compliance-scan-status" class="mt-2.5 text-[10px] text-slate-400 font-mono text-center min-h-[16px]"></p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ─── DEAL ACTIVATION & ESCROW LIFECYCLE ─── -->
+    <section id="activation-lifecycle" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+
+      <div class="px-7 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1">Verification Gate</p>
+          <h2 id="lifecycle-title" class="text-lg font-black text-slate-900">Deal Activation &amp; Escrow Lifecycle</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Flat $20.00 access activation · 2% L/C brokerage commission · AI-verified safe withdrawal</p>
+        </div>
+        <div id="deal-lifecycle-badge" class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full border border-slate-200">
+          <span class="status-dot bg-slate-400"></span>
+          <span id="lifecycle-stage-text">Awaiting inputs</span>
+        </div>
+      </div>
+
+      <div class="px-7 pt-5">
+        <div class="grid gap-3 md:grid-cols-4">
+          <div id="progress-entry" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-[9px] font-bold uppercase tracking-widest font-mono text-slate-400">Step 1</p>
+            <p class="mt-1 text-sm font-bold text-slate-900">Entry fee paid</p>
+            <p class="text-[10px] text-slate-500">Flat $20 access gate</p>
+          </div>
+          <div id="progress-handshake" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-[9px] font-bold uppercase tracking-widest font-mono text-slate-400">Step 2</p>
+            <p class="mt-1 text-sm font-bold text-slate-900">Handshake locked</p>
+            <p class="text-[10px] text-slate-500">L/C + brokerage isolation</p>
+          </div>
+          <div id="progress-compliance" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-[9px] font-bold uppercase tracking-widest font-mono text-slate-400">Step 3</p>
+            <p class="mt-1 text-sm font-bold text-slate-900">Compliance cleared</p>
+            <p class="text-[10px] text-slate-500">AI legal confirmation</p>
+          </div>
+          <div id="progress-withdrawal" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p class="text-[9px] font-bold uppercase tracking-widest font-mono text-slate-400">Step 4</p>
+            <p class="mt-1 text-sm font-bold text-slate-900">Escrow released</p>
+            <p class="text-[10px] text-slate-500">Safe withdrawal complete</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-7 grid gap-6 lg:grid-cols-2">
+
+        <!-- Left: Deal inputs -->
+        <div class="space-y-4">
+          <div class="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-[9px] font-bold text-emerald-700 uppercase tracking-widest font-mono">Entry Access Fee</p>
+                <p class="text-xl font-black text-slate-900 mt-0.5">$20.00 USD</p>
+                <p class="text-[10px] text-emerald-800 mt-0.5">One-time flat activation · separate from deal amount · non-refundable</p>
+              </div>
+              <span class="text-[9px] font-bold bg-white border border-emerald-200 text-emerald-700 px-2 py-1 rounded-full font-mono uppercase">Required first</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Deal ID *</label>
+              <input id="deal-id-input" type="text" placeholder="UUID" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 font-mono" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Buyer ID *</label>
+              <input id="buyer-id-input" type="text" placeholder="UUID" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 font-mono" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Deal Amount (USD) *</label>
+              <input id="deal-amount-input" type="number" step="0.01" value="1000.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">L/C Reference</label>
+              <input id="lc-reference-input" type="text" placeholder="LCR-0001" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 font-mono" />
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="grid grid-cols-3 gap-2 pt-1">
+            <button id="process-entry-fee" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition">Pay $20 Access</button>
+            <button id="process-handshake" class="px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition">Lock L/C + 2%</button>
+            <button id="trigger-withdrawal" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold uppercase tracking-widest rounded-xl border border-slate-200 transition">Safe Withdrawal</button>
+          </div>
+          <p class="text-[10px] text-slate-400 leading-relaxed">Withdrawal requires: entry fee paid · handshake confirmed · all 3 AI agents verified · compliance cleared.</p>
+        </div>
+
+        <!-- Right: Status grid (single canonical set) -->
+        <div class="flex flex-col gap-3">
+
+          <!-- Four status tiles -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Entry Fee</p>
+              <p id="entry-fee-status" class="text-base font-black text-slate-900">pending</p>
+              <p class="text-[10px] text-slate-400 mt-1">$20.00 flat access</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Handshake</p>
+              <p id="handshake-status" class="text-base font-black text-slate-900">pending</p>
+              <p class="text-[10px] text-slate-400 mt-1">L/C session</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Compliance</p>
+              <p id="compliance-status" class="text-base font-black text-slate-900">pending</p>
+              <p class="text-[10px] text-slate-400 mt-1">KYC / AML / OFAC</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Escrow</p>
+              <p id="escrow-status" class="text-base font-black text-slate-900">locked</p>
+              <p class="text-[10px] text-slate-400 mt-1">Fund custody</p>
+            </div>
+          </div>
+
+          <!-- AI Agents + Commission + Amount -->
+          <div class="grid grid-cols-3 gap-2">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2">AI Agents</p>
+              <div class="flex flex-col gap-1">
+                <span id="agent1-status" class="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">1 pending</span>
+                <span id="agent2-status" class="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">2 pending</span>
+                <span id="agent3-status" class="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">3 pending</span>
+              </div>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Commission</p>
+              <p id="commission-amount" class="text-base font-black text-slate-900">$0.00</p>
+              <p class="text-[10px] text-slate-400 mt-1">2% brokerage</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Deal Amount</p>
+              <p id="deal-amount-display" class="text-base font-black text-slate-900">—</p>
+              <p class="text-[10px] text-slate-400 mt-1">From input</p>
+            </div>
+          </div>
+
+          <!-- Secure trade policy -->
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2">Secure Trade Policy</p>
+            <ul class="space-y-1.5 text-[10px] text-slate-500">
+              <li class="flex items-start gap-2"><span class="status-dot bg-emerald-500 mt-0.5 flex-shrink-0"></span>All deals require KYC, AML, and compliance verification before payment.</li>
+              <li class="flex items-start gap-2"><span class="status-dot bg-emerald-500 mt-0.5 flex-shrink-0"></span>No sanctioned entities, illegal goods, or illicit financing permitted.</li>
+              <li class="flex items-start gap-2"><span class="status-dot bg-emerald-500 mt-0.5 flex-shrink-0"></span>AI monitors conversations, behavior, and handshake risk continuously.</li>
+              <li class="flex items-start gap-2"><span class="status-dot bg-emerald-500 mt-0.5 flex-shrink-0"></span>Suspicious activity is blocked, reported, and escalated for analyst review.</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── NEGOTIATION SUPPORT + AI ACTIVITY LOG ─── -->
+    <section id="ops-log" class="grid gap-6 lg:grid-cols-2">
+
+      <!-- Secure Negotiation -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-0.5">Multilingual Negotiation Support</p>
+          <h3 id="negotiation-title" class="text-base font-bold text-slate-900">Secure Negotiation Channel</h3>
+        </div>
+        <div class="p-6 space-y-4">
+          <p class="text-xs text-slate-500">AI-assisted multilingual negotiation. Each party communicates in their preferred language. Logs kept for compliance review.</p>
+          <div id="conversation-log" class="min-h-[180px] max-h-[240px] overflow-y-auto rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700 space-y-2">
+            <p class="text-xs text-slate-400 italic">Negotiation exchange will appear here when started.</p>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <button id="start-conversation" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition">Start Negotiation</button>
+            <button id="analyze-trade" class="px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition">AI Trade Analysis</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-0.5">AI Monitoring</p>
+            <h3 class="text-base font-bold text-slate-900">System Activity Log</h3>
+          </div>
+          <span id="system-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full font-mono uppercase">
+            <span class="status-dot bg-emerald-500"></span>Active
+          </span>
+        </div>
+        <div class="p-6">
+          <div id="activity-log" class="min-h-[220px] max-h-[280px] overflow-y-auto rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-2 text-xs">
+            <p class="text-slate-400 italic">System activity will be logged here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── CORPORATE VERIFICATION GATE ─── -->
+    <section id="verification-vault" class="bg-white border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="px-7 py-5 border-b border-amber-100 bg-amber-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 bg-amber-100 border border-amber-300 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#d97706" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
             </svg>
           </div>
           <div>
-            <h3 class="text-xl font-black text-slate-900">Protected Corporate Vault</h3>
-            <p class="text-sm text-slate-500 mt-2 leading-relaxed">Unlock global trade logistics data and AI‑assisted client negotiations. Requires company registration and identity verification.</p>
+            <p class="text-[9px] font-bold text-amber-700 uppercase tracking-widest font-mono">Corporate Access Required</p>
+            <h3 id="vault-title" class="text-base font-bold text-slate-900">Protected Corporate Information Vault</h3>
           </div>
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-left text-xs space-y-2.5 text-slate-600">
-            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span><span><strong>$20.00 USD</strong> access activation fee</span></div>
-            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span><span>Official trade registry &amp; company name submission</span></div>
-            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0"></span><span><strong>24‑hour</strong> mandatory background documentation check</span></div>
+        </div>
+        <span class="text-[9px] font-bold bg-amber-100 border border-amber-300 text-amber-800 px-3 py-1.5 rounded-full font-mono uppercase">24-Hour KYB Review</span>
+      </div>
+      <div class="p-7 grid gap-6 sm:grid-cols-2">
+        <div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-4">To unlock global trade logistics data, AI-negotiated bids, and direct bi-directional client conversations, register your corporate entity and submit documentation for a banking-grade compliance audit.</p>
+          <div class="space-y-2">
+            <div class="flex items-start gap-2 text-xs text-slate-600">
+              <span class="status-dot bg-emerald-500 mt-1 flex-shrink-0"></span>
+              <span><strong>$20.00 USD</strong> access activation fee · one-time · non-refundable</span>
+            </div>
+            <div class="flex items-start gap-2 text-xs text-slate-600">
+              <span class="status-dot bg-emerald-500 mt-1 flex-shrink-0"></span>
+              <span>Official trade registry &amp; company name submission</span>
+            </div>
+            <div class="flex items-start gap-2 text-xs text-slate-600">
+              <span class="status-dot bg-amber-400 mt-1 flex-shrink-0"></span>
+              <span><strong>24-hour mandatory period</strong> · background documentation verification</span>
+            </div>
+            <div class="flex items-start gap-2 text-xs text-slate-600">
+              <span class="status-dot bg-emerald-500 mt-1 flex-shrink-0"></span>
+              <span>AI-monitored compliance scan before corporate account activation</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col justify-between gap-4">
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-600 space-y-1.5">
+            <p class="font-bold text-slate-800 mb-2">What you unlock</p>
+            <p class="flex items-center gap-2"><span class="status-dot bg-cyan-500 flex-shrink-0"></span>Live global B2B meeting rooms with document sharing</p>
+            <p class="flex items-center gap-2"><span class="status-dot bg-violet-500 flex-shrink-0"></span>Direct AI-assisted multilingual negotiation streams</p>
+            <p class="flex items-center gap-2"><span class="status-dot bg-emerald-500 flex-shrink-0"></span>Full supply chain visibility and carrier assignment</p>
+            <p class="flex items-center gap-2"><span class="status-dot bg-amber-500 flex-shrink-0"></span>Real-time AI legal compliance monitor on every trade</p>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <button class="py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 transition uppercase tracking-wide">Register Company</button>
-            <button class="py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition uppercase tracking-wide">Pay $20 &amp; Unlock</button>
+            <button class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded-xl border border-slate-200 uppercase tracking-widest transition">Register Company</button>
+            <button id="vault-pay-unlock" class="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold rounded-xl uppercase tracking-widest transition">Pay $20 &amp; Begin</button>
           </div>
         </div>
       </div>
-      <!-- Blurred content beneath (decorative, hidden from a11y) -->
-      <div class="select-none pointer-events-none blur-sm p-6 grid grid-cols-1 lg:grid-cols-3 gap-4" aria-hidden="true">
-        <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-3">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">CRM &amp; Operations</h3>
-          <div class="h-8 bg-slate-100 rounded-lg"></div>
-          <div class="h-8 bg-slate-100 rounded-lg"></div>
-          <div class="h-8 bg-slate-100 rounded-lg"></div>
-        </div>
-        <div class="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
-            <div>
-              <h3 class="text-base font-bold text-slate-700">AI Negotiation Engine</h3>
-              <p class="text-xs text-slate-400">Encrypted bi‑directional client conversations</p>
-            </div>
-            <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-200">2% COMMISSION</span>
-          </div>
-          <div class="space-y-3">
-            <div class="flex justify-end"><div class="max-w-[80%] bg-slate-100 h-8 rounded-2xl rounded-tr-none"></div></div>
-            <div class="flex justify-start"><div class="max-w-[80%] bg-slate-100 h-8 rounded-2xl rounded-tl-none"></div></div>
-          </div>
-          <div class="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center text-xs font-mono text-slate-400">
-            <span>CONTRACT ESCROW SECURED BY AI</span>
-            <span class="font-bold">LOCKED</span>
-          </div>
-        </div>
-      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+  <footer class="border-t border-slate-200 bg-white mt-12">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <p class="text-xs text-slate-400 font-mono">Greens ACC · Secure Access &amp; Compliance Command · All trade activity monitored.</p>
+      <p class="text-xs text-slate-400">CISG · INCOTERMS 2020 · OFAC / AML / KYC compliant infrastructure</p>
     </div>
-  </section>
+  </footer>
 
-  <!-- ─── ACTIVITY LOG ─── -->
-  <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-    <div class="h-1 bg-slate-700"></div>
-    <div class="px-6 pt-5 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100">
-      <div>
-        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-mono font-bold mb-1">System Log</p>
-        <h3 class="text-base font-bold text-slate-900">AI Compliance &amp; Activity Monitor</h3>
-        <p class="text-xs text-slate-500 mt-0.5">Real‑time log of system events, compliance checks, and deal activity.</p>
-      </div>
-      <span id="agent-status" class="inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex-shrink-0">
-        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full pulse-dot"></span>
-        Active · All Systems Nominal
-      </span>
-    </div>
-    <div class="px-6 py-5">
-      <div id="agent-log" class="min-h-[100px] max-h-[220px] overflow-y-auto rounded-xl bg-slate-50 border border-slate-200 p-4 leading-6 space-y-0.5">
-        <p class="text-xs text-slate-400 italic">Initializing monitoring systems...</p>
-      </div>
-      <p id="agent-summary" class="mt-3 text-xs text-slate-500">The AI compliance agent continuously monitors all deal activity, sanctions lists, and international trade law requirements.</p>
-    </div>
-  </section>
+  <!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+  <script>
+    'use strict';
 
-</main>
+    // ─── DOM REFERENCES ───────────────────────────────────────────────────────
+    const regionSelect               = document.getElementById('region-select');
+    const languageSelect             = document.getElementById('language-select');
+    const counterpartyLanguageSelect = document.getElementById('counterparty-language-select');
+    const localTimeEl                = document.getElementById('local-time');
+    const deskTimeValueEl            = document.getElementById('desk-time-value');
+    const deskTimeZoneEl             = document.getElementById('desk-time-zone');
+    const regionTimeValueEl          = document.getElementById('region-time-value');
+    const regionTimeZoneEl           = document.getElementById('region-time-zone');
+    const counterpartyTimeValueEl    = document.getElementById('counterparty-time-value');
+    const counterpartyTimeZoneEl     = document.getElementById('counterparty-time-zone');
+    const conversationLog            = document.getElementById('conversation-log');
+    const activityLog                = document.getElementById('activity-log');
+    const systemStatusBadge          = document.getElementById('system-status-badge');
+    const lifecycleStageTxt          = document.getElementById('lifecycle-stage-text');
+    const truthSummaryEl             = document.getElementById('truth-summary');
+    const routeSummaryEl             = document.getElementById('route-summary');
+    const routeDetailEl              = document.getElementById('route-detail');
+    const pythonSyncStatusEl         = document.getElementById('python-sync-status');
+    const supplySummaryEl            = document.getElementById('supply-summary');
+    const complianceSummaryEl        = document.getElementById('compliance-summary');
+    const progressEntryEl            = document.getElementById('progress-entry');
+    const progressHandshakeEl        = document.getElementById('progress-handshake');
+    const progressComplianceEl       = document.getElementById('progress-compliance');
+    const progressWithdrawalEl       = document.getElementById('progress-withdrawal');
+    const heroTitleEl                = document.getElementById('hero-title');
+    const heroDescriptionEl          = document.getElementById('hero-description');
+    const pillarsLabelEl             = document.getElementById('pillars-label');
+    const pillarRoomTitleEl          = document.getElementById('pillar-room-title');
+    const pillarSupplyTitleEl        = document.getElementById('pillar-supply-title');
+    const pillarComplianceTitleEl    = document.getElementById('pillar-compliance-title');
+    const lifecycleTitleEl           = document.getElementById('lifecycle-title');
+    const negotiationTitleEl         = document.getElementById('negotiation-title');
+    const vaultTitleEl               = document.getElementById('vault-title');
+    const platformStatusLabelEl      = document.getElementById('platform-status-label');
 
-<!-- ═══════════════════════════════════════════════
-     FOOTER
-═══════════════════════════════════════════════ -->
-<footer class="border-t border-slate-200 bg-white mt-4">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-    <div class="flex items-center gap-3">
-      <div class="h-7 w-7 bg-emerald-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-4 h-4 text-white">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253M3 12a8.96 8.96 0 0 1 .284-2.253" />
-        </svg>
-      </div>
-      <span class="text-sm font-black text-slate-700">Greens ACC</span>
-      <span class="text-slate-300 select-none">|</span>
-      <span class="text-xs text-slate-400">Global Trade Command Center</span>
-    </div>
-    <div class="flex items-center gap-3 text-xs text-slate-400 text-center sm:text-right">
-      <span>Secure · Compliant · Enterprise‑Grade</span>
-      <span class="text-slate-300 select-none hidden sm:inline">|</span>
-      <span class="hidden sm:inline">All activity monitored and logged</span>
-    </div>
-  </div>
-</footer>
+    // Deal inputs
+    const dealIdInput       = document.getElementById('deal-id-input');
+    const buyerIdInput      = document.getElementById('buyer-id-input');
+    const dealAmountInput   = document.getElementById('deal-amount-input');
+    const lcReferenceInput  = document.getElementById('lc-reference-input');
 
-<!-- ═══════════════════════════════════════════════
-     SYSTEM INTEGRATION SCRIPT
-     Python‑backed Supabase edge functions are called
-     via /supabase/functions/* (served by Python HTTP
-     server in package.json "start" script).
-═══════════════════════════════════════════════ -->
-<script>
-  'use strict';
+    // Action buttons
+    const btnEntryFee    = document.getElementById('process-entry-fee');
+    const btnHandshake   = document.getElementById('process-handshake');
+    const btnWithdrawal  = document.getElementById('trigger-withdrawal');
+    const btnConversation= document.getElementById('start-conversation');
+    const btnAnalyzeTrade= document.getElementById('analyze-trade');
 
-  // ── DOM references ──────────────────────────────────────────
-  const regionSelect              = document.getElementById('region-select');
-  const languageSelect            = document.getElementById('language-select');
-  const userLanguageSelect        = document.getElementById('user-language-select');
-  const counterpartyLanguageSelect= document.getElementById('counterparty-language-select');
-  const localTime                 = document.getElementById('local-time');
-  const clockUtc                  = document.getElementById('clock-utc');
-  const clockLocal                = document.getElementById('clock-local');
-  const clockRegion               = document.getElementById('clock-region');
-  const clockRegionLabel          = document.getElementById('clock-region-label');
+    // Pillar buttons
+    const btnCreateRoom  = document.getElementById('create-meeting-room');
+    const btnInitShipment= document.getElementById('init-shipment');
+    const btnCompliance  = document.getElementById('run-compliance');
+    const btnVaultPay    = document.getElementById('vault-pay-unlock');
 
-  const dealIdInput               = document.getElementById('deal-id-input');
-  const buyerIdInput              = document.getElementById('buyer-id-input');
-  const dealAmountInput           = document.getElementById('deal-amount-input');
-  const lcReferenceInput          = document.getElementById('lc-reference-input');
+    // Status fields (single canonical set)
+    const entryFeeStatusEl  = document.getElementById('entry-fee-status');
+    const handshakeStatusEl = document.getElementById('handshake-status');
+    const complianceStatusEl= document.getElementById('compliance-status');
+    const escrowStatusEl    = document.getElementById('escrow-status');
+    const agent1StatusEl    = document.getElementById('agent1-status');
+    const agent2StatusEl    = document.getElementById('agent2-status');
+    const agent3StatusEl    = document.getElementById('agent3-status');
+    const commissionAmountEl= document.getElementById('commission-amount');
+    const dealAmountDisplayEl= document.getElementById('deal-amount-display');
 
-  const processEntryFeeBtn        = document.getElementById('process-entry-fee');
-  const processHandshakeBtn       = document.getElementById('process-handshake');
-  const triggerWithdrawalBtn      = document.getElementById('trigger-withdrawal');
+    // Pillar status messages
+    const roomStatusEl          = document.getElementById('room-status');
+    const scStatusEl            = document.getElementById('sc-status');
+    const complianceScanStatusEl= document.getElementById('compliance-scan-status');
 
-  // Canonical status elements — single set, no duplicates
-  const entryFeeStatusText        = document.getElementById('entry-fee-status-text');
-  const handshakeStatusText       = document.getElementById('handshake-status-text');
-  const complianceStatusText      = document.getElementById('compliance-status-text');
-  const escrowStatusText          = document.getElementById('escrow-status-text');
-  const dealProgressText          = document.getElementById('deal-progress-text');
-  const commissionAmountText      = document.getElementById('commission-amount-text');
-  const dealAmountDisplay         = document.getElementById('deal-amount-display');
+    // ─── CONSTANTS ───────────────────────────────────────────────────────────
+    const FUNCTION_HOST    = '/supabase/functions';
+    const SYSTEM_STATUS_API= '/api/system-status';
+    const ENTRY_FEE_AMOUNT = 20;
+    const REGION_META = {
+      global: { label: 'Global', timezone: 'UTC' },
+      us:     { label: 'United States', timezone: 'America/New_York' },
+      ae:     { label: 'United Arab Emirates', timezone: 'Asia/Dubai' },
+      eg:     { label: 'Egypt', timezone: 'Africa/Cairo' },
+      in:     { label: 'India', timezone: 'Asia/Kolkata' },
+      pl:     { label: 'Poland', timezone: 'Europe/Warsaw' },
+      fr:     { label: 'France', timezone: 'Europe/Paris' },
+      cn:     { label: 'China', timezone: 'Asia/Shanghai' },
+      mn:     { label: 'Mongolia', timezone: 'Asia/Ulaanbaatar' }
+    };
 
-  // Pipeline nodes
-  const step1Circle = document.getElementById('step-1-circle');
-  const step2Circle = document.getElementById('step-2-circle');
-  const step3Circle = document.getElementById('step-3-circle');
-  const step4Circle = document.getElementById('step-4-circle');
-  const step5Circle = document.getElementById('step-5-circle');
-  const step1Status = document.getElementById('step-1-status');
-  const step2Status = document.getElementById('step-2-status');
-  const step3Status = document.getElementById('step-3-status');
-  const step4Status = document.getElementById('step-4-status');
-  const step5Status = document.getElementById('step-5-status');
-  const pipelineStatusBadge       = document.getElementById('pipeline-status-badge');
+    // ─── LOCAL STATE (updated from backend responses) ─────────────────────────
+    const dealState = {
+      entry_fee_status : 'pending',
+      handshake_status : 'pending',
+      compliance_status: 'pending',
+      escrow_status    : 'locked',
+      funds_locked     : true,
+      ai_agent_status  : { agent1: 'pending', agent2: 'pending', agent3: 'pending' }
+    };
+    const syncState = {
+      pythonAvailable: null,
+      syncInFlight: false
+    };
 
-  const agent1Status              = document.getElementById('agent1-status');
-  const agent2Status              = document.getElementById('agent2-status');
-  const agent3Status              = document.getElementById('agent3-status');
+    // ─── LOCALE / LANGUAGE ───────────────────────────────────────────────────
+    const LOCALE_MAP = {
+      en: 'en-US', ar: 'ar-SA', hi: 'hi-IN',
+      pl: 'pl-PL', fr: 'fr-FR', zh: 'zh-CN'
+    };
 
-  const agentLog                  = document.getElementById('agent-log');
-  const agentStatus               = document.getElementById('agent-status');
-  const agentSummary              = document.getElementById('agent-summary');
-  const conversationLog           = document.getElementById('conversation-log');
-  const startConversationBtn      = document.getElementById('start-conversation');
-  const checkHandshakeBtn         = document.getElementById('check-handshake');
-  const nextPaymentStepBtn        = document.getElementById('next-payment-step');
-  const paymentStepDisplay        = document.getElementById('payment-step');
-
-  // ── Constants ────────────────────────────────────────────────
-  const functionHost      = '/supabase/functions';
-  const ENTRY_FEE_AMOUNT  = 20;
-
-  // ── Deal state ───────────────────────────────────────────────
-  const dealStatus = {
-    entry_fee_status:  'pending',
-    handshake_status:  'pending',
-    compliance_status: 'pending',
-    escrow_status:     'locked',
-    funds_locked:      true,
-    safe_withdrawal_ready: false,
-    ai_agent_status:   { agent1: 'pending', agent2: 'pending', agent3: 'pending' }
-  };
-
-  // ── Null‑safe helpers ────────────────────────────────────────
-  function setText(node, value)    { if (node) node.textContent = value; }
-  function setClass(node, value)   { if (node) node.className = value; }
-  function listen(node, ev, fn)    { if (node) node.addEventListener(ev, fn); }
-  function getVal(node)            { return typeof node?.value === 'string' ? node.value.trim() : ''; }
-  function getNum(node)            { const v = Number(node?.value ?? 0); return Number.isFinite(v) ? v : 0; }
-  function fmtUsd(v) {
-    return '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-
-  // ── Locale maps ──────────────────────────────────────────────
-  const localeMap = {
-    en: 'en-US', ar: 'ar-SA', fr: 'fr-FR',
-    hi: 'hi-IN', zh: 'zh-CN', pl: 'pl-PL', tr: 'tr-TR'
-  };
-  const regionTimezoneMap = {
-    global: 'UTC',         ae: 'Asia/Dubai',      eg: 'Africa/Cairo',
-    us:     'America/New_York', in: 'Asia/Kolkata', pl: 'Europe/Warsaw',
-    fr:     'Europe/Paris', cn: 'Asia/Shanghai',   ng: 'Africa/Lagos',
-    tr:     'Europe/Istanbul', mn: 'Asia/Ulaanbaatar'
-  };
-  const regionLabelMap = {
-    global: 'UTC', ae: 'Dubai', eg: 'Cairo', us: 'New York',
-    in: 'Mumbai', pl: 'Warsaw', fr: 'Paris', cn: 'Shanghai',
-    ng: 'Lagos', tr: 'Istanbul', mn: 'Ulaanbaatar'
-  };
-
-  function getCurrentLocale() { return localeMap[languageSelect?.value] || 'en-US'; }
-
-  // ── Clock ────────────────────────────────────────────────────
-  function updateClocks() {
-    const now    = new Date();
-    const locale = getCurrentLocale();
-    const tf     = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-    const df     = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-
-    setText(clockUtc,   new Intl.DateTimeFormat('en-GB',  { ...tf, timeZone: 'UTC' }).format(now) + ' UTC');
-    setText(clockLocal, new Intl.DateTimeFormat(locale,   tf).format(now));
-    setText(localTime,  new Intl.DateTimeFormat(locale,   df).format(now));
-
-    const region = regionSelect?.value || 'global';
-    const tz     = regionTimezoneMap[region] || 'UTC';
-    const label  = regionLabelMap[region] || 'UTC';
-    setText(clockRegionLabel, label);
-    setText(clockRegion, new Intl.DateTimeFormat('en-GB', { ...tf, timeZone: tz }).format(now));
-  }
-
-  // ── Pipeline step styling ────────────────────────────────────
-  function setStepState(circle, statusEl, state, label) {
-    if (!circle || !statusEl) return;
-    const baseCircle = 'w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-black shadow-sm transition-all duration-500 ';
-    const baseStatus = 'mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all duration-300 ';
-    if (state === 'complete') {
-      circle.className   = baseCircle + 'border-emerald-500 bg-emerald-500 text-white';
-      statusEl.className = baseStatus + 'bg-emerald-100 text-emerald-700 border-emerald-300';
-      setText(statusEl, label || '✓ done');
-    } else if (state === 'active') {
-      circle.className   = baseCircle + 'border-amber-400 bg-amber-50 text-amber-600 pulse-dot';
-      statusEl.className = baseStatus + 'bg-amber-100 text-amber-700 border-amber-300';
-      setText(statusEl, label || 'active');
-    } else if (state === 'error') {
-      circle.className   = baseCircle + 'border-rose-500 bg-rose-50 text-rose-600';
-      statusEl.className = baseStatus + 'bg-rose-100 text-rose-700 border-rose-300';
-      setText(statusEl, label || 'error');
-    } else {
-      circle.className   = baseCircle + 'border-slate-300 bg-white text-slate-500';
-      statusEl.className = baseStatus + 'bg-slate-100 text-slate-500 border-slate-200';
-      if (label) setText(statusEl, label);
-    }
-  }
-
-  function updatePipeline() {
-    const ef = dealStatus.entry_fee_status;
-    const hs = dealStatus.handshake_status;
-    const es = dealStatus.escrow_status;
-    const co = dealStatus.compliance_status;
-    const wd = dealStatus.safe_withdrawal_ready;
-
-    setStepState(step1Circle, step1Status,
-      (ef === 'paid' || ef === 'verified') ? 'complete' : 'pending', ef);
-
-    setStepState(step2Circle, step2Status,
-      hs === 'confirmed' ? 'complete' : hs === 'rejected' ? 'error' : 'pending', hs);
-
-    setStepState(step3Circle, step3Status,
-      es === 'released' ? 'complete' : (es === 'locked' && hs === 'confirmed') ? 'active' : 'pending', es);
-
-    setStepState(step4Circle, step4Status,
-      co === 'verified' ? 'complete' : co === 'failed' ? 'error' : 'pending', co);
-
-    setStepState(step5Circle, step5Status,
-      wd ? 'complete' : 'pending', wd ? 'released' : 'pending');
-
-    // Pipeline badge
-    if (pipelineStatusBadge) {
-      if (wd) {
-        pipelineStatusBadge.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border flex-shrink-0 bg-emerald-50 text-emerald-700 border-emerald-200';
-        setText(pipelineStatusBadge, '✓ Settlement Complete');
-      } else if (hs === 'confirmed') {
-        pipelineStatusBadge.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border flex-shrink-0 bg-blue-50 text-blue-700 border-blue-200';
-        setText(pipelineStatusBadge, '⬤ Escrow Active');
-      } else if (ef === 'paid' || ef === 'verified') {
-        pipelineStatusBadge.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border flex-shrink-0 bg-amber-50 text-amber-700 border-amber-200';
-        setText(pipelineStatusBadge, '⬤ Entry Paid — Handshake Pending');
-      } else {
-        pipelineStatusBadge.className = 'inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold border flex-shrink-0 bg-slate-50 text-slate-600 border-slate-200';
-        setText(pipelineStatusBadge, '⬤ Awaiting Activation');
+    const NEGOTIATION_PHRASES = {
+      en: {
+        hello    : 'Hello — the offer is ready for secure review.',
+        reply    : 'Terms confirmed. Awaiting safe closing handshake.',
+        handshake: 'Handshake acknowledged. Final decision with analyst.'
+      },
+      ar: {
+        hello    : 'مرحباً — العرض جاهز للمراجعة الآمنة.',
+        reply    : 'تم تأكيد الشروط. في انتظار المصافحة الختامية.',
+        handshake: 'تمت المصافحة. القرار النهائي مع المحلل.'
+      },
+      hi: {
+        hello    : 'नमस्ते — प्रस्ताव सुरक्षित समीक्षा के लिए तैयार है।',
+        reply    : 'शर्तें स्वीकृत। सुरक्षित समझौते की प्रतीक्षा।',
+        handshake: 'हस्तमिलाप पूर्ण। अंतिम निर्णय विश्लेषक के पास।'
+      },
+      pl: {
+        hello    : 'Cześć — oferta gotowa do bezpiecznego przeglądu.',
+        reply    : 'Warunki potwierdzone. Czekam na finalne zamknięcie.',
+        handshake: 'Uścisk dłoni zakończony. Decyzja u analityka.'
+      },
+      fr: {
+        hello    : "Bonjour — l'offre est prête pour la révision sécurisée.",
+        reply    : 'Conditions confirmées. En attente de la clôture.',
+        handshake: "Poignée de main terminée. Décision finale chez l'analyste."
+      },
+      zh: {
+        hello    : '您好 — 报价已准备好供安全审核。',
+        reply    : '条款已确认。等待安全成交握手。',
+        handshake: '握手完成。最终决定现由分析师做出。'
       }
-    }
-  }
+    };
 
-  function updateAgentBadge(node, index, status) {
-    if (!node) return;
-    node.textContent = 'Agent ' + index + ' · ' + status;
-    if (status === 'verified')
-      node.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300';
-    else if (status === 'rejected')
-      node.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700 border border-rose-300';
-    else
-      node.className = 'px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200';
-  }
-
-  function updateDealStatusUI() {
-    setText(entryFeeStatusText,   dealStatus.entry_fee_status);
-    setText(handshakeStatusText,  dealStatus.handshake_status);
-    setText(complianceStatusText, dealStatus.compliance_status);
-    setText(escrowStatusText,     dealStatus.escrow_status);
-    const progress =
-      dealStatus.safe_withdrawal_ready         ? 'settled'        :
-      dealStatus.handshake_status === 'confirmed' ? 'locked in escrow' :
-      dealStatus.entry_fee_status === 'paid'   ? 'entry paid'     : 'pending';
-    setText(dealProgressText, progress);
-    updateAgentBadge(agent1Status, 1, dealStatus.ai_agent_status.agent1);
-    updateAgentBadge(agent2Status, 2, dealStatus.ai_agent_status.agent2);
-    updateAgentBadge(agent3Status, 3, dealStatus.ai_agent_status.agent3);
-    updatePipeline();
-  }
-
-  // ── Logging (safe — textContent only) ───────────────────────
-  function appendLog(message, level) {
-    if (!agentLog) return;
-    const placeholder = agentLog.querySelector('p.italic');
-    if (placeholder) placeholder.remove();
-    const row   = document.createElement('p');
-    row.className = 'text-xs leading-5';
-    const ts    = document.createElement('span');
-    ts.className  = 'text-slate-400 mr-2 select-none';
-    ts.textContent = new Intl.DateTimeFormat(getCurrentLocale(), { timeStyle: 'short' }).format(new Date());
-    const msg   = document.createElement('span');
-    msg.textContent = message;
-    if (level === 'warning') msg.className = 'text-amber-700 font-medium';
-    else if (level === 'alert') msg.className = 'text-rose-600 font-medium';
-    else if (level === 'success') msg.className = 'text-emerald-700 font-medium';
-    else msg.className = 'text-slate-700';
-    row.appendChild(ts);
-    row.appendChild(msg);
-    agentLog.appendChild(row);
-    agentLog.scrollTop = agentLog.scrollHeight;
-  }
-
-  // ── Conversation (safe — no innerHTML with user data) ────────
-  function showConversation(message, speaker) {
-    if (!conversationLog) return;
-    const placeholder = conversationLog.querySelector('p.italic');
-    if (placeholder) placeholder.remove();
-    const row   = document.createElement('p');
-    row.className = 'text-xs leading-5 mb-1';
-    const sp    = document.createElement('strong');
-    sp.className  = 'text-slate-900 mr-1';
-    sp.textContent = (speaker || 'Agent') + ':';
-    const msg   = document.createElement('span');
-    msg.className   = 'text-slate-700';
-    msg.textContent = ' ' + message;
-    row.appendChild(sp);
-    row.appendChild(msg);
-    conversationLog.appendChild(row);
-    conversationLog.scrollTop = conversationLog.scrollHeight;
-  }
-
-  function setSystemStatus(text, colorClass) {
-    setText(agentStatus, text);
-    setClass(agentStatus, 'inline-flex items-center gap-2 px-3 py-2 rounded-full text-xs font-bold border flex-shrink-0 ' + colorClass);
-  }
-
-  // ── Language templates ───────────────────────────────────────
-  const langTemplates = {
-    en: { hello: 'Hello, the offer is ready for secure review.',               reply: 'I confirm the terms and expect a safe closing handshake.',          handshake: 'Handshake complete. Final decision is now with the analyst.' },
-    ar: { hello: 'مرحباً، العرض جاهز للمراجعة الآمنة.',                       reply: 'أؤكد الشروط وأتوقع إغلاقاً آمناً.',                                handshake: 'اكتمل المصافحة. القرار النهائي الآن مع المحلل.' },
-    fr: { hello: "Bonjour, l'offre est prête pour une révision sécurisée.",    reply: "Je confirme les conditions et attends une conclusion sûre.",         handshake: "Poignée de main terminée. La décision finale est avec l'analyste." },
-    hi: { hello: 'नमस्ते, प्रस्ताव सुरक्षित समीक्षा के लिए तैयार है।',        reply: 'मैं शर्तों की पुष्टि करता हूं और सुरक्षित समझौते की उम्मीद करता हूं।', handshake: 'हस्त मिलाना पूरा हुआ। अंतिम निर्णय अब विश्लेषक के पास है।' },
-    zh: { hello: '您好，报价已准备好供安全审核。',                                 reply: '我确认条款，并期待安全的成交。',                                          handshake: '握手完成。最终决定现在由分析师做出。' },
-    pl: { hello: 'Cześć, oferta jest gotowa do bezpiecznego przeglądu.',       reply: 'Potwierdzam warunki i oczekuję bezpiecznego zakończenia.',           handshake: 'Uścisk dłoni zakończony. Ostateczna decyzja należy do analityka.' },
-    tr: { hello: 'Merhaba, teklif güvenli inceleme için hazır.',               reply: 'Koşulları onaylıyorum ve güvenli bir kapanış bekliyorum.',           handshake: 'El sıkışma tamamlandı. Son karar analistle.' }
-  };
-
-  // ── Payment steps ────────────────────────────────────────────
-  const paymentSteps = [
-    'Verify identity and KYC documents',
-    'Confirm contract terms and legal compliance',
-    'Initiate escrow payment in secure vault',
-    'AI-assisted analyst review of the deal',
-    'Final handshake and settlement confirmation'
-  ];
-  let currentPaymentStep = 0;
-
-  // ── Backend actions ──────────────────────────────────────────
-  async function handleEntryFee() {
-    const deal_id  = getVal(dealIdInput);
-    const payer_id = getVal(buyerIdInput);
-    if (!deal_id || !payer_id) {
-      appendLog('Entry fee requires both Deal ID and Buyer ID.', 'warning');
-      return;
-    }
-    setStepState(step1Circle, step1Status, 'active', 'processing');
-    appendLog('Processing $20.00 entry fee...', 'info');
-    try {
-      const res  = await fetch(functionHost + '/processEntryFee', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ deal_id, payer_id, amount: ENTRY_FEE_AMOUNT, lc_reference_number: getVal(lcReferenceInput) })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        appendLog('Entry fee failed: ' + (data.error || res.statusText), 'alert');
-        setStepState(step1Circle, step1Status, 'error', 'failed');
-        return;
+    const UI_TRANSLATIONS = {
+      en: {
+        title: 'Greens ACC — Global B2B Command Center',
+        heroTitle: 'Global B2B Command Center',
+        heroDescription: 'Authorized corporate access. AI-driven compliance monitoring. Secure escrow lifecycle. Multilingual global trade orchestration.',
+        pillarsLabel: 'Core Platform Pillars',
+        roomTitle: 'Global B2B Meeting Room',
+        supplyTitle: 'Supply Chain Engine',
+        complianceTitle: 'AI Legal Compliance Monitor',
+        lifecycleTitle: 'Deal Activation & Escrow Lifecycle',
+        negotiationTitle: 'Secure Negotiation Channel',
+        vaultTitle: 'Protected Corporate Information Vault',
+        platformStatus: 'All Systems Active'
+      },
+      ar: {
+        title: 'Greens ACC — مركز أوامر الأعمال العالمي',
+        heroTitle: 'مركز أوامر الأعمال العالمي',
+        heroDescription: 'وصول مؤسسي معتمد. مراقبة امتثال بالذكاء الاصطناعي. دورة ضمان آمنة. تنسيق تجارة عالمي متعدد اللغات.',
+        pillarsLabel: 'ركائز المنصة الأساسية',
+        roomTitle: 'غرفة الاجتماعات العالمية بين الشركات',
+        supplyTitle: 'محرك سلسلة التوريد',
+        complianceTitle: 'مراقب الامتثال القانوني بالذكاء الاصطناعي',
+        lifecycleTitle: 'تفعيل الصفقة ودورة الضمان',
+        negotiationTitle: 'قناة تفاوض آمنة',
+        vaultTitle: 'خزنة المعلومات المؤسسية المحمية',
+        platformStatus: 'كل الأنظمة نشطة'
+      },
+      hi: {
+        title: 'Greens ACC — वैश्विक बी2बी कमांड सेंटर',
+        heroTitle: 'वैश्विक बी2बी कमांड सेंटर',
+        heroDescription: 'अधिकृत कॉर्पोरेट एक्सेस। एआई अनुपालन मॉनिटरिंग। सुरक्षित एस्क्रो लाइफसाइकल। बहुभाषी वैश्विक व्यापार संचालन।',
+        pillarsLabel: 'मुख्य प्लेटफ़ॉर्म स्तंभ',
+        roomTitle: 'ग्लोबल बी2बी मीटिंग रूम',
+        supplyTitle: 'सप्लाई चेन इंजन',
+        complianceTitle: 'एआई लीगल कंप्लायंस मॉनिटर',
+        lifecycleTitle: 'डील एक्टिवेशन और एस्क्रो लाइफसाइकल',
+        negotiationTitle: 'सुरक्षित वार्ता चैनल',
+        vaultTitle: 'सुरक्षित कॉर्पोरेट सूचना वॉल्ट',
+        platformStatus: 'सभी सिस्टम सक्रिय'
+      },
+      pl: {
+        title: 'Greens ACC — Globalne centrum dowodzenia B2B',
+        heroTitle: 'Globalne centrum dowodzenia B2B',
+        heroDescription: 'Autoryzowany dostęp korporacyjny. Monitoring zgodności AI. Bezpieczny cykl escrow. Wielojęzyczna orkiestracja handlu.',
+        pillarsLabel: 'Kluczowe filary platformy',
+        roomTitle: 'Globalny pokój spotkań B2B',
+        supplyTitle: 'Silnik łańcucha dostaw',
+        complianceTitle: 'Monitor zgodności prawnej AI',
+        lifecycleTitle: 'Aktywacja transakcji i cykl escrow',
+        negotiationTitle: 'Bezpieczny kanał negocjacji',
+        vaultTitle: 'Chroniony skarbiec informacji korporacyjnych',
+        platformStatus: 'Wszystkie systemy aktywne'
+      },
+      fr: {
+        title: 'Greens ACC — Centre de commande B2B mondial',
+        heroTitle: 'Centre de commande B2B mondial',
+        heroDescription: 'Accès entreprise autorisé. Supervision de conformité par IA. Cycle escrow sécurisé. Orchestration commerciale multilingue.',
+        pillarsLabel: 'Piliers clés de la plateforme',
+        roomTitle: 'Salle de réunion B2B mondiale',
+        supplyTitle: 'Moteur supply chain',
+        complianceTitle: 'Moniteur de conformité juridique IA',
+        lifecycleTitle: 'Activation du deal et cycle escrow',
+        negotiationTitle: 'Canal de négociation sécurisé',
+        vaultTitle: 'Coffre d’informations d’entreprise protégé',
+        platformStatus: 'Tous les systèmes sont actifs'
+      },
+      zh: {
+        title: 'Greens ACC — 全球 B2B 指挥中心',
+        heroTitle: '全球 B2B 指挥中心',
+        heroDescription: '企业授权访问、AI 合规监控、安全托管流程与多语言全球贸易协同。',
+        pillarsLabel: '平台三大支柱',
+        roomTitle: '全球 B2B 会议室',
+        supplyTitle: '供应链引擎',
+        complianceTitle: 'AI 法律合规监控',
+        lifecycleTitle: '交易激活与托管流程',
+        negotiationTitle: '安全谈判频道',
+        vaultTitle: '受保护的企业信息库',
+        platformStatus: '系统全部在线'
       }
-      // Reflect backend truth
-      dealStatus.entry_fee_status  = data.deal?.entry_fee_status  || 'paid';
-      dealStatus.compliance_status = data.deal?.compliance_status || 'pending';
-      updateDealStatusUI();
-      appendLog('$20.00 entry fee processed and recorded. Deal activation unlocked.', 'success');
-      setSystemStatus('Entry Fee Paid · Handshake Ready', 'bg-emerald-50 text-emerald-700 border-emerald-200');
-    } catch (err) {
-      appendLog('Entry fee error: ' + err.message, 'alert');
-      setStepState(step1Circle, step1Status, 'error', 'error');
-    }
-  }
+    };
 
-  async function handleHandshake() {
-    const deal_id  = getVal(dealIdInput);
-    const payer_id = getVal(buyerIdInput);
-    const amount   = getNum(dealAmountInput);
-    if (!deal_id || !payer_id || amount <= 0) {
-      appendLog('Handshake requires Deal ID, Buyer ID, and a valid deal amount.', 'warning');
-      return;
+    // ─── HELPERS ─────────────────────────────────────────────────────────────
+    function txt(el, value) {
+      if (el) el.textContent = String(value ?? '');
     }
-    if (dealStatus.entry_fee_status !== 'paid' && dealStatus.entry_fee_status !== 'verified') {
-      appendLog('Pay the $20.00 entry fee before creating a handshake.', 'warning');
-      return;
+
+    function inp(el) {
+      return typeof el?.value === 'string' ? el.value.trim() : '';
     }
-    try {
-      if (window.checkGlobalRiskBeforeHandshake) {
-        const risk = await window.checkGlobalRiskBeforeHandshake();
-        if (risk && risk.active) {
-          appendLog('Handshake blocked: critical global event detected. Review AI recommendations.', 'alert');
-          window.dispatchEvent(new CustomEvent('handshakeBlocked', { detail: risk }));
-          return;
+
+    function num(el) {
+      const v = Number(el?.value ?? 0);
+      return Number.isFinite(v) ? v : 0;
+    }
+
+    function fmtUsd(v) {
+      return '$' + Number(v).toFixed(2);
+    }
+
+    function currentLocale() {
+      return LOCALE_MAP[inp(languageSelect)] || 'en-US';
+    }
+
+    function currentRegion() {
+      return inp(regionSelect) || 'global';
+    }
+
+    function regionMeta(region = currentRegion()) {
+      return REGION_META[region] || REGION_META.global;
+    }
+
+    function currentTranslation() {
+      return UI_TRANSLATIONS[inp(languageSelect)] || UI_TRANSLATIONS.en;
+    }
+
+    function counterpartyLocale() {
+      return LOCALE_MAP[inp(counterpartyLanguageSelect)] || 'en-US';
+    }
+
+    function formatClock(locale, timezone) {
+      return new Intl.DateTimeFormat(locale, {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZone: timezone
+      }).format(new Date());
+    }
+
+    function setQueryState() {
+      const params = new URLSearchParams(window.location.search);
+      params.set('region', currentRegion());
+      params.set('lang', inp(languageSelect) || 'en');
+      params.set('counterparty_lang', inp(counterpartyLanguageSelect) || 'en');
+      const nextUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
+      window.history.replaceState({}, '', nextUrl);
+      window.localStorage.setItem('greens-acc-locale', JSON.stringify({
+        region: currentRegion(),
+        language: inp(languageSelect) || 'en',
+        counterpartyLanguage: inp(counterpartyLanguageSelect) || 'en'
+      }));
+    }
+
+    function hydrateLocalization() {
+      const params = new URLSearchParams(window.location.search);
+      const saved = (() => {
+        try {
+          return JSON.parse(window.localStorage.getItem('greens-acc-locale') || '{}');
+        } catch (error) {
+          return {};
+        }
+      })();
+      const state = {
+        region: params.get('region') || saved.region || 'global',
+        language: params.get('lang') || saved.language || 'en',
+        counterpartyLanguage: params.get('counterparty_lang') || saved.counterpartyLanguage || 'en'
+      };
+      if (regionSelect) regionSelect.value = state.region;
+      if (languageSelect) languageSelect.value = state.language;
+      if (counterpartyLanguageSelect) counterpartyLanguageSelect.value = state.counterpartyLanguage;
+    }
+
+    function applyTranslations() {
+      const translation = currentTranslation();
+      document.title = translation.title;
+      txt(heroTitleEl, translation.heroTitle);
+      txt(heroDescriptionEl, translation.heroDescription);
+      txt(pillarsLabelEl, translation.pillarsLabel);
+      txt(pillarRoomTitleEl, translation.roomTitle);
+      txt(pillarSupplyTitleEl, translation.supplyTitle);
+      txt(pillarComplianceTitleEl, translation.complianceTitle);
+      txt(lifecycleTitleEl, translation.lifecycleTitle);
+      txt(negotiationTitleEl, translation.negotiationTitle);
+      txt(vaultTitleEl, translation.vaultTitle);
+      txt(platformStatusLabelEl, translation.platformStatus);
+    }
+
+    function updateRouteSummary() {
+      const meta = regionMeta();
+      const localeLabel = languageSelect?.selectedOptions?.[0]?.textContent?.trim() || 'English';
+      const counterpartyLabel = counterpartyLanguageSelect?.selectedOptions?.[0]?.textContent?.trim() || 'English';
+      txt(routeSummaryEl, `Route: ${meta.label}`);
+      txt(routeDetailEl, `${meta.label} · ${localeLabel} → ${counterpartyLabel}`);
+    }
+
+    function updateTimeBars() {
+      const meta = regionMeta();
+      const locale = currentLocale();
+      txt(localTimeEl, formatClock(locale, Intl.DateTimeFormat().resolvedOptions().timeZone));
+      txt(deskTimeValueEl, formatClock(locale, Intl.DateTimeFormat().resolvedOptions().timeZone));
+      txt(deskTimeZoneEl, Intl.DateTimeFormat().resolvedOptions().timeZone);
+      txt(regionTimeValueEl, formatClock(locale, meta.timezone));
+      txt(regionTimeZoneEl, meta.timezone);
+      txt(counterpartyTimeValueEl, formatClock(counterpartyLocale(), meta.timezone));
+      txt(counterpartyTimeZoneEl, `${counterpartyTimeSelectLabel()} · ${meta.timezone}`);
+      document.documentElement.lang = inp(languageSelect) || 'en';
+    }
+
+    function counterpartyTimeSelectLabel() {
+      return counterpartyLanguageSelect?.selectedOptions?.[0]?.textContent?.trim() || 'Counterparty';
+    }
+
+    function setPillarStatus(el, message, type = 'info') {
+      if (!el) return;
+      el.textContent = message;
+      el.className = 'mt-2.5 text-[10px] font-mono text-center min-h-[16px] ' +
+        (type === 'success' ? 'text-emerald-600' :
+         type === 'error'   ? 'text-rose-600' :
+         type === 'loading' ? 'text-blue-600' :
+                              'text-slate-400');
+    }
+
+    // ─── ACTIVITY LOG ─────────────────────────────────────────────────────────
+    function appendLog(message, level = 'info') {
+      if (!activityLog) return;
+      // Clear the placeholder on first real entry
+      const placeholder = activityLog.querySelector('p.italic');
+      if (placeholder) placeholder.remove();
+
+      const entry = document.createElement('p');
+      entry.className = 'log-entry-' + level + ' leading-relaxed';
+      const formatter = new Intl.DateTimeFormat(currentLocale(), { timeStyle: 'short' });
+      const time = document.createElement('span');
+      time.className = 'font-mono text-slate-400 mr-2';
+      time.textContent = formatter.format(new Date());
+      entry.appendChild(time);
+      entry.appendChild(document.createTextNode(message));
+      activityLog.appendChild(entry);
+      activityLog.scrollTop = activityLog.scrollHeight;
+    }
+
+    // ─── CONVERSATION LOG ─────────────────────────────────────────────────────
+    function appendConversation(speaker, message) {
+      if (!conversationLog) return;
+      const placeholder = conversationLog.querySelector('p.italic');
+      if (placeholder) placeholder.remove();
+
+      const row = document.createElement('p');
+      row.className = 'text-sm leading-relaxed';
+      const speakerEl = document.createElement('strong');
+      speakerEl.className = 'text-slate-700';
+      speakerEl.textContent = speaker + ':';
+      const msgEl = document.createTextNode(' ' + message);
+      row.appendChild(speakerEl);
+      row.appendChild(msgEl);
+      conversationLog.appendChild(row);
+      conversationLog.scrollTop = conversationLog.scrollHeight;
+    }
+
+    // ─── SYSTEM STATUS BADGE ──────────────────────────────────────────────────
+    function setSystemStatus(label, type = 'active') {
+      if (!systemStatusBadge) return;
+      const dot = systemStatusBadge.querySelector('.status-dot');
+      const span = systemStatusBadge.querySelector('span:last-child');
+      if (span) span.textContent = label;
+      const colorMap = {
+        active : 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        alert  : 'bg-rose-50 text-rose-700 border-rose-200',
+        warning: 'bg-amber-50 text-amber-700 border-amber-200',
+        busy   : 'bg-blue-50 text-blue-700 border-blue-200'
+      };
+      systemStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 border text-[10px] font-bold rounded-full font-mono uppercase ' + (colorMap[type] || colorMap.active);
+      if (dot) dot.className = 'status-dot ' + (type === 'active' ? 'bg-emerald-500' : type === 'alert' ? 'bg-rose-500' : type === 'warning' ? 'bg-amber-500' : 'bg-blue-500');
+    }
+
+    // ─── LIFECYCLE STAGE ─────────────────────────────────────────────────────
+    function updateLifecycleStage() {
+      const s = dealState;
+      let stage = 'Awaiting inputs';
+      if (s.entry_fee_status === 'paid' && s.handshake_status !== 'confirmed') stage = 'Entry paid · awaiting handshake';
+      if (s.handshake_status === 'confirmed' && s.escrow_status === 'locked') stage = 'Handshake confirmed · escrow locked';
+      if (s.escrow_status === 'released') stage = 'Escrow released · withdrawal complete';
+      txt(lifecycleStageTxt, stage);
+    }
+
+    // ─── DEAL STATUS UI ───────────────────────────────────────────────────────
+    function updateDealStatusUI() {
+      txt(entryFeeStatusEl,   dealState.entry_fee_status);
+      txt(handshakeStatusEl,  dealState.handshake_status);
+      txt(complianceStatusEl, dealState.compliance_status);
+      txt(escrowStatusEl,     dealState.escrow_status);
+
+      for (const [key, el] of [['agent1', agent1StatusEl], ['agent2', agent2StatusEl], ['agent3', agent3StatusEl]]) {
+        const status = dealState.ai_agent_status[key] || 'pending';
+        const num = key.replace('agent', '');
+        if (el) {
+          el.textContent = num + ' ' + status;
+          el.className = 'rounded-full px-2 py-0.5 text-[10px] font-semibold border ' +
+            (status === 'verified' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+             status === 'rejected' ? 'bg-rose-100 text-rose-700 border-rose-200' :
+             'bg-slate-100 text-slate-600 border-slate-200');
         }
       }
-    } catch (e) { console.warn('Risk check skipped:', e); }
 
-    setStepState(step2Circle, step2Status, 'active', 'processing');
-    appendLog('Creating handshake session and locking L/C...', 'info');
-    try {
-      const res  = await fetch(functionHost + '/createHandshakeSession', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ deal_id, payer_id, amount, lc_reference_number: getVal(lcReferenceInput) })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        appendLog('Handshake failed: ' + (data.error || res.statusText), 'alert');
-        setStepState(step2Circle, step2Status, 'error', 'failed');
+      updateLifecycleStage();
+      updateProgressCards();
+    }
+
+    function setProgressCard(el, active) {
+      if (!el) return;
+      el.className = 'rounded-2xl border px-4 py-3 ' + (
+        active
+          ? 'border-emerald-200 bg-emerald-50 shadow-sm'
+          : 'border-slate-200 bg-slate-50'
+      );
+    }
+
+    function updateProgressCards() {
+      setProgressCard(progressEntryEl, ['paid', 'verified'].includes(dealState.entry_fee_status));
+      setProgressCard(progressHandshakeEl, dealState.handshake_status === 'confirmed');
+      setProgressCard(progressComplianceEl, dealState.compliance_status === 'verified');
+      setProgressCard(progressWithdrawalEl, dealState.escrow_status === 'released');
+    }
+
+    function updatePythonSyncBadge(label, type = 'warning') {
+      if (!pythonSyncStatusEl) return;
+      const colorMap = {
+        active: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+        warning: 'border-amber-200 bg-amber-50 text-amber-700',
+        alert: 'border-rose-200 bg-rose-50 text-rose-700'
+      };
+      pythonSyncStatusEl.className = 'rounded-full border px-3 py-1.5 font-mono text-[10px] font-semibold ' + (colorMap[type] || colorMap.warning);
+      txt(pythonSyncStatusEl, label);
+    }
+
+    function updateSystemSummaries(payload = {}) {
+      const deal = payload.deal || null;
+      const supply = payload.supply_chain || null;
+      const summaries = payload.summaries || {};
+      txt(truthSummaryEl, summaries.lifecycle_stage || lifecycleStageTxt?.textContent || 'Awaiting identifiers');
+      txt(supplySummaryEl, supply ? `${supply.current_milestone || 'manifest_created'} · ${supply.transit_status || 'in_preparation'}` : (summaries.supply_chain_status || 'Idle'));
+      txt(complianceSummaryEl, payload.room_session?.kill_switch_triggered ? 'Kill switch triggered' : `${summaries.compliance_alerts || 0} escalations`);
+      if (deal?.handshake_commission_amount != null) {
+        txt(commissionAmountEl, fmtUsd(deal.handshake_commission_amount));
+      }
+    }
+
+    async function syncSystemTruth(reason = 'manual') {
+      if (syncState.syncInFlight) return;
+      const dealId = inp(dealIdInput);
+      const orderId = inp(document.getElementById('sc-order-id'));
+      const roomId = inp(document.getElementById('compliance-room-id'));
+      if (!dealId && !orderId && !roomId) {
+        updatePythonSyncBadge('Python sync standby', 'warning');
+        txt(truthSummaryEl, 'Awaiting identifiers');
         return;
       }
-      // Reflect backend truth
-      if (data.deal) {
-        dealStatus.handshake_status  = data.deal.handshake_status  || 'confirmed';
-        dealStatus.escrow_status     = data.deal.escrow_status     || 'locked';
-        dealStatus.entry_fee_status  = data.deal.entry_fee_status  || dealStatus.entry_fee_status;
-        dealStatus.compliance_status = data.deal.compliance_status || 'verified';
-        dealStatus.ai_agent_status   = data.deal.ai_agent_status   || { agent1: 'verified', agent2: 'verified', agent3: 'verified' };
-      } else {
-        dealStatus.handshake_status  = 'confirmed';
-        dealStatus.escrow_status     = 'locked';
-        dealStatus.compliance_status = 'verified';
-        dealStatus.ai_agent_status   = { agent1: 'verified', agent2: 'verified', agent3: 'verified' };
-      }
-      setText(commissionAmountText, fmtUsd(data.commission_amount ?? 0));
-      updateDealStatusUI();
-      appendLog('Handshake confirmed. L/C locked. Commission: ' + fmtUsd(data.commission_amount ?? 0), 'success');
-      setSystemStatus('Handshake Confirmed · Escrow Active', 'bg-emerald-50 text-emerald-700 border-emerald-200');
-      setTimeout(() => {
-        const params = new URLSearchParams({
-          deal_id,
-          buyer_name:  payer_id,
-          seller_name: 'Counterparty',
-          region:      regionSelect?.value || 'global',
-          lc_ref:      getVal(lcReferenceInput) || 'LCR-TBD',
-          amount
+
+      syncState.syncInFlight = true;
+      try {
+        const query = new URLSearchParams({
+          region: currentRegion(),
+          deal_id: dealId,
+          order_id: orderId,
+          room_id: roomId
         });
-        window.location.href = '/announce.html?' + params.toString();
-      }, 1500);
-    } catch (err) {
-      appendLog('Handshake error: ' + err.message, 'alert');
-      setStepState(step2Circle, step2Status, 'error', 'error');
-    }
-  }
+        const resp = await fetch(`${SYSTEM_STATUS_API}?${query.toString()}`);
+        const payload = await resp.json();
+        if (!resp.ok || payload.available === false) {
+          updatePythonSyncBadge(payload.reason ? 'Python sync offline' : 'Python sync degraded', 'warning');
+          if (payload.reason) appendLog('Python sync unavailable: ' + payload.reason, reason === 'poll' ? 'info' : 'warning');
+          return;
+        }
 
-  async function handleWithdrawal() {
-    const deal_id = getVal(dealIdInput);
-    if (!deal_id) { appendLog('Withdrawal requires a valid Deal ID.', 'warning'); return; }
-    appendLog('Initiating safe withdrawal request...', 'info');
-    try {
-      const res  = await fetch(functionHost + '/processWithdrawal', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ deal_id })
-      });
-      const data = await res.json();
-      if (!res.ok) { appendLog('Withdrawal failed: ' + (data.error || res.statusText), 'alert'); return; }
-      dealStatus.escrow_status          = 'released';
-      dealStatus.funds_locked           = false;
-      dealStatus.safe_withdrawal_ready  = true;
+        syncState.pythonAvailable = true;
+        updatePythonSyncBadge('Python sync online', 'active');
+        if (payload.deal) {
+          Object.assign(dealState, {
+            entry_fee_status: payload.deal.entry_fee_status || dealState.entry_fee_status,
+            handshake_status: payload.deal.handshake_status || dealState.handshake_status,
+            compliance_status: payload.deal.compliance_status || dealState.compliance_status,
+            escrow_status: payload.deal.escrow_status || dealState.escrow_status,
+            funds_locked: payload.deal.funds_locked ?? dealState.funds_locked,
+            ai_agent_status: payload.deal.ai_agent_status || dealState.ai_agent_status
+          });
+          updateDealStatusUI();
+        }
+        updateSystemSummaries(payload);
+      } catch (error) {
+        syncState.pythonAvailable = false;
+        updatePythonSyncBadge('Python sync offline', 'warning');
+        if (reason !== 'poll') appendLog('Python sync error: ' + error.message, 'warning');
+      } finally {
+        syncState.syncInFlight = false;
+      }
+    }
+
+    // ─── DEAL ACTIONS ─────────────────────────────────────────────────────────
+    async function handleEntryFee() {
+      const deal_id  = inp(dealIdInput);
+      const payer_id = inp(buyerIdInput);
+      if (!deal_id || !payer_id) {
+        appendLog('Entry fee: deal ID and buyer ID are required.', 'warning');
+        return;
+      }
+      appendLog('Processing $20.00 access activation fee...', 'info');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/processEntryFee`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ deal_id, payer_id, amount: ENTRY_FEE_AMOUNT, lc_reference_number: inp(lcReferenceInput) })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          appendLog('Entry fee failed: ' + (data.error || resp.statusText), 'alert');
+          return;
+        }
+        // Reflect authoritative state from response if available
+        if (data.deal) {
+          dealState.entry_fee_status  = data.deal.entry_fee_status  || 'paid';
+          dealState.compliance_status = data.deal.compliance_status || 'pending';
+        } else {
+          dealState.entry_fee_status = 'paid';
+        }
+        updateDealStatusUI();
+        setSystemStatus('Entry Fee Paid', 'active');
+        appendLog('$20.00 access fee recorded. Deal activation unlocked.', 'success');
+        updateSystemSummaries({ deal: data.deal });
+        await syncSystemTruth('entry-fee');
+      } catch (err) {
+        appendLog('Entry fee error: ' + err.message, 'alert');
+      }
+    }
+
+    async function handleHandshake() {
+      const deal_id  = inp(dealIdInput);
+      const payer_id = inp(buyerIdInput);
+      const amount   = num(dealAmountInput);
+      if (!deal_id || !payer_id || amount <= 0) {
+        appendLog('Handshake: deal ID, buyer ID, and a positive amount are required.', 'warning');
+        return;
+      }
+      if (dealState.entry_fee_status !== 'paid') {
+        appendLog('Handshake blocked: entry fee must be paid first.', 'warning');
+        return;
+      }
+      appendLog('Creating L/C session and locking 2% brokerage commission...', 'info');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/createHandshakeSession`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ deal_id, payer_id, amount, lc_reference_number: inp(lcReferenceInput) })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          appendLog('Handshake failed: ' + (data.error || resp.statusText), 'alert');
+          return;
+        }
+        if (data.deal) {
+          dealState.handshake_status  = data.deal.handshake_status  || 'confirmed';
+          dealState.escrow_status     = data.deal.escrow_status     || 'locked';
+          dealState.compliance_status = data.deal.compliance_status || 'verified';
+          dealState.ai_agent_status   = data.deal.ai_agent_status   || { agent1:'verified', agent2:'verified', agent3:'verified' };
+        } else {
+          dealState.handshake_status  = 'confirmed';
+          dealState.escrow_status     = 'locked';
+          dealState.compliance_status = 'verified';
+          dealState.ai_agent_status   = { agent1:'verified', agent2:'verified', agent3:'verified' };
+        }
+        txt(commissionAmountEl, fmtUsd(data.commission_amount ?? 0));
+        updateDealStatusUI();
+        setSystemStatus('L/C Locked · Escrow Active', 'active');
+        appendLog('Letter of credit created. 2% brokerage commission locked in escrow.', 'success');
+        updateSystemSummaries({ deal: data.deal });
+        await syncSystemTruth('handshake');
+        // Redirect to announcement after a short delay
+        setTimeout(() => {
+          const params = new URLSearchParams({
+            deal_id, buyer_name: payer_id, seller_name: 'Counterparty',
+            region: inp(regionSelect) || 'global',
+            lc_ref: inp(lcReferenceInput) || 'LCR-TBD',
+            amount: String(amount)
+          });
+          window.location.href = '/announce.html?' + params.toString();
+        }, 1800);
+      } catch (err) {
+        appendLog('Handshake error: ' + err.message, 'alert');
+      }
+    }
+
+    async function handleWithdrawal() {
+      const deal_id = inp(dealIdInput);
+      if (!deal_id) {
+        appendLog('Withdrawal: deal ID is required.', 'warning');
+        return;
+      }
+      appendLog('Initiating safe withdrawal — verifying agent status and compliance...', 'info');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/processWithdrawal`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ deal_id })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          appendLog('Withdrawal rejected: ' + (data.error || resp.statusText), 'alert');
+          return;
+        }
+        if (data.deal) {
+          dealState.escrow_status  = data.deal.escrow_status  || 'released';
+          dealState.funds_locked   = data.deal.funds_locked   ?? false;
+        } else {
+          dealState.escrow_status = 'released';
+          dealState.funds_locked  = false;
+        }
+        updateDealStatusUI();
+        setSystemStatus('Withdrawal Complete', 'active');
+        const payout = data.payout_amount != null ? fmtUsd(data.payout_amount) : '—';
+        appendLog('Escrow released. Net payout: ' + payout + '. LC: ' + (data.lc_reference_number || 'N/A'), 'success');
+        updateSystemSummaries({ deal: data.deal });
+        await syncSystemTruth('withdrawal');
+      } catch (err) {
+        appendLog('Withdrawal error: ' + err.message, 'alert');
+      }
+    }
+
+    // ─── MEETING ROOM ─────────────────────────────────────────────────────────
+    async function handleCreateRoom() {
+      const creator_company = inp(document.getElementById('room-company-input'));
+      if (!creator_company) {
+        setPillarStatus(roomStatusEl, 'Enter your company name.', 'error');
+        return;
+      }
+      setPillarStatus(roomStatusEl, 'Creating encrypted room...', 'loading');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/generateInstantRoom`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ creator_company })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          setPillarStatus(roomStatusEl, 'Error: ' + (data.error || resp.statusText), 'error');
+          appendLog('Meeting room creation failed: ' + (data.error || resp.statusText), 'alert');
+          return;
+        }
+        setPillarStatus(roomStatusEl, 'Room created — redirecting...', 'success');
+        appendLog('Secure meeting room created. Token: ' + (data.room_token || '—'), 'success');
+        txt(complianceSummaryEl, 'Room active · awaiting scans');
+        if (data.share_link) {
+          setTimeout(() => { window.location.href = data.share_link; }, 1200);
+        }
+      } catch (err) {
+        setPillarStatus(roomStatusEl, 'Network error.', 'error');
+        appendLog('Meeting room error: ' + err.message, 'alert');
+      }
+    }
+
+    // ─── SUPPLY CHAIN ─────────────────────────────────────────────────────────
+    async function handleInitShipment() {
+      const order_id   = inp(document.getElementById('sc-order-id'));
+      const origin     = inp(document.getElementById('sc-origin'));
+      const destination= inp(document.getElementById('sc-destination'));
+      const carrier_id = inp(document.getElementById('sc-carrier-id'));
+      if (!order_id || !origin || !destination) {
+        setPillarStatus(scStatusEl, 'Order ID, origin, and destination required.', 'error');
+        return;
+      }
+      setPillarStatus(scStatusEl, 'Initializing shipment record...', 'loading');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/supplyChainCoordinator`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ action: 'init_shipment', order_id, carrier_id, origin, destination })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          setPillarStatus(scStatusEl, 'Error: ' + (data.error || resp.statusText), 'error');
+          appendLog('Shipment init failed: ' + (data.error || resp.statusText), 'alert');
+          return;
+        }
+        const tracking = data.tracking_record;
+        setPillarStatus(scStatusEl, 'Manifest created · ' + (tracking?.id?.substring(0, 8) || '—'), 'success');
+        appendLog('Shipment initialized. Order: ' + order_id + ' | Route: ' + origin + ' → ' + destination, 'success');
+        updateSystemSummaries({ supply_chain: tracking, summaries: { supply_chain_status: tracking?.transit_status || 'in_preparation' } });
+        await syncSystemTruth('shipment');
+      } catch (err) {
+        setPillarStatus(scStatusEl, 'Network error.', 'error');
+        appendLog('Supply chain error: ' + err.message, 'alert');
+      }
+    }
+
+    // ─── AI COMPLIANCE SCAN ───────────────────────────────────────────────────
+    async function handleComplianceScan() {
+      const conversation_text = inp(document.getElementById('compliance-text-input'));
+      const room_id           = inp(document.getElementById('compliance-room-id'));
+      if (!conversation_text) {
+        setPillarStatus(complianceScanStatusEl, 'Enter contract text or trade note.', 'error');
+        return;
+      }
+      // room_id is required by aiComplianceLawyer; use a placeholder if blank
+      const effectiveRoomId = room_id || '00000000-0000-0000-0000-000000000000';
+      setPillarStatus(complianceScanStatusEl, 'Scanning for OFAC, AML, KYC violations...', 'loading');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/aiComplianceLawyer`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ room_id: effectiveRoomId, conversation_text })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          setPillarStatus(complianceScanStatusEl, 'Error: ' + (data.error || resp.statusText), 'error');
+          appendLog('Compliance scan failed: ' + (data.error || resp.statusText), 'alert');
+          return;
+        }
+        if (data.kill_switch_triggered) {
+          setPillarStatus(complianceScanStatusEl, '⚠ Critical violation detected — kill switch triggered.', 'error');
+          setSystemStatus('Kill Switch Triggered', 'alert');
+          appendLog('CRITICAL: Compliance kill switch triggered. ' + (data.kill_switch_reason || ''), 'alert');
+          const violations = Array.isArray(data.violations) ? data.violations : [];
+          violations.forEach(v => appendLog('Violation: ' + v.type + ' — ' + v.description, 'alert'));
+        } else {
+          const count = Array.isArray(data.violations) ? data.violations.length : 0;
+          setPillarStatus(complianceScanStatusEl, count === 0 ? 'Compliant — no violations found.' : count + ' issue(s) flagged.', count === 0 ? 'success' : 'loading');
+          appendLog('Compliance scan complete. Violations: ' + count + '. Legal frameworks applied: ' + (data.legal_frameworks_applied?.length || 0), count === 0 ? 'success' : 'warning');
+          if (Array.isArray(data.violations)) {
+            data.violations.forEach(v => appendLog('Flag: ' + v.type + ' [' + v.severity + '] — ' + v.description, 'warning'));
+          }
+        }
+        dealState.compliance_status = data.kill_switch_triggered ? 'failed' : (data.violations?.length ? 'pending' : 'verified');
+        updateDealStatusUI();
+        updateSystemSummaries({ room_session: { kill_switch_triggered: data.kill_switch_triggered }, summaries: { compliance_alerts: data.violations?.length || 0 } });
+        await syncSystemTruth('compliance');
+      } catch (err) {
+        setPillarStatus(complianceScanStatusEl, 'Network error.', 'error');
+        appendLog('Compliance scan error: ' + err.message, 'alert');
+      }
+    }
+
+    // ─── AI TRADE ANALYSIS ───────────────────────────────────────────────────
+    async function handleAnalyzeTrade() {
+      const context = [
+        'Deal ID: ' + inp(dealIdInput),
+        'Amount: ' + fmtUsd(num(dealAmountInput)),
+        'Region: ' + inp(regionSelect),
+        'LC Reference: ' + inp(lcReferenceInput),
+        'Entry fee: ' + dealState.entry_fee_status,
+        'Handshake: ' + dealState.handshake_status,
+        'Compliance: ' + dealState.compliance_status
+      ].join('. ');
+      appendLog('Sending current deal context to AI analysis engine...', 'info');
+      setSystemStatus('Analyzing', 'busy');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/aiAgentAnalyze`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ text: context, room: inp(dealIdInput) || 'homepage' })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          appendLog('AI analysis error: ' + (data.error || resp.statusText), 'alert');
+          setSystemStatus('Active', 'active');
+          return;
+        }
+        setSystemStatus('Analysis Ready', 'active');
+        const insights = Array.isArray(data.insights) ? data.insights : [];
+        appendLog('AI analysis complete. ' + insights.length + ' insight(s) returned.', 'success');
+        insights.forEach(i => appendLog('Insight: ' + i, 'warning'));
+        if (insights.length === 0) appendLog('No additional insights at this time.', 'info');
+      } catch (err) {
+        appendLog('AI analysis error: ' + err.message, 'alert');
+        setSystemStatus('Active', 'active');
+      }
+    }
+
+    // ─── NEGOTIATION CONVERSATION ────────────────────────────────────────────
+    function handleStartConversation() {
+      if (conversationLog) conversationLog.replaceChildren();
+      const userLang       = NEGOTIATION_PHRASES[inp(languageSelect)]             || NEGOTIATION_PHRASES.en;
+      const counterLang    = NEGOTIATION_PHRASES[inp(counterpartyLanguageSelect)] || NEGOTIATION_PHRASES.en;
+      appendConversation('You',          userLang.hello);
+      setTimeout(() => appendConversation('Counterparty', counterLang.hello),    500);
+      setTimeout(() => appendConversation('You',          userLang.reply),        1000);
+      setTimeout(() => appendConversation('Counterparty', counterLang.reply),     1500);
+      appendLog('Multilingual negotiation channel opened.', 'success');
+      setSystemStatus('Negotiation Active', 'active');
+    }
+
+    // ─── TIME ─────────────────────────────────────────────────────────────────
+    function updateLocalTime() {
+      updateTimeBars();
+    }
+
+    // ─── EVENT BINDINGS ───────────────────────────────────────────────────────
+    function on(el, event, fn) {
+      if (el) el.addEventListener(event, fn);
+    }
+
+    on(btnEntryFee,     'click', handleEntryFee);
+    on(btnHandshake,    'click', handleHandshake);
+    on(btnWithdrawal,   'click', handleWithdrawal);
+    on(btnConversation, 'click', handleStartConversation);
+    on(btnAnalyzeTrade, 'click', handleAnalyzeTrade);
+    on(btnCreateRoom,   'click', handleCreateRoom);
+    on(btnInitShipment, 'click', handleInitShipment);
+    on(btnCompliance,   'click', handleComplianceScan);
+
+    on(btnVaultPay, 'click', () => {
+      document.getElementById('deal-id-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      appendLog('Directed to deal activation. Fill in Deal ID and Buyer ID to begin.', 'info');
+    });
+
+    on(dealAmountInput, 'input', () => {
+      txt(dealAmountDisplayEl, fmtUsd(num(dealAmountInput)));
+    });
+
+    on(languageSelect, 'change', () => {
+      applyTranslations();
+      setQueryState();
+      updateRouteSummary();
+      updateLocalTime();
+      appendLog('Interface language updated.', 'success');
+    });
+
+    on(regionSelect, 'change', () => {
+      const region = regionSelect.selectedOptions?.[0]?.text || 'selected region';
+      setQueryState();
+      updateRouteSummary();
+      updateLocalTime();
+      appendLog('Operating region set to ' + region + '.', 'info');
+      syncSystemTruth('region-change');
+    });
+
+    on(counterpartyLanguageSelect, 'change', () => {
+      setQueryState();
+      updateRouteSummary();
+      updateLocalTime();
+      appendLog('Counterparty language updated.', 'info');
+    });
+
+    on(dealIdInput, 'blur', () => syncSystemTruth('deal-id'));
+    on(document.getElementById('sc-order-id'), 'blur', () => syncSystemTruth('order-id'));
+    on(document.getElementById('compliance-room-id'), 'blur', () => syncSystemTruth('room-id'));
+
+    // ─── INIT ─────────────────────────────────────────────────────────────────
+    window.addEventListener('load', () => {
+      hydrateLocalization();
+      applyTranslations();
+      setQueryState();
+      updateRouteSummary();
+      updateLocalTime();
+      setInterval(updateLocalTime, 1000);
+      txt(dealAmountDisplayEl, fmtUsd(num(dealAmountInput)));
+      txt(commissionAmountEl,  fmtUsd(0));
       updateDealStatusUI();
-      appendLog('Withdrawal accepted. Escrow release executing. Payout: ' + fmtUsd(data.payout_amount ?? 0), 'success');
-      showConversation('Withdrawal ready for LC ' + (data.lc_reference_number || 'unknown') + '. Net payout: ' + fmtUsd(data.payout_amount ?? 0) + '.', 'System');
-    } catch (err) {
-      appendLog('Withdrawal error: ' + err.message, 'alert');
-    }
-  }
-
-  // ── Locale sync ──────────────────────────────────────────────
-  // Keep nav language selector and negotiation user-language selector in sync
-  listen(languageSelect, 'change', () => {
-    const v = languageSelect.value;
-    if (userLanguageSelect && userLanguageSelect.value !== v) userLanguageSelect.value = v;
-    document.documentElement.lang = v || 'en';
-    appendLog('Language updated: ' + (languageSelect.selectedOptions?.[0]?.text || v), 'success');
-  });
-  listen(userLanguageSelect, 'change', () => {
-    const v = userLanguageSelect.value;
-    if (languageSelect && languageSelect.value !== v) languageSelect.value = v;
-    document.documentElement.lang = v || 'en';
-  });
-  listen(regionSelect, 'change', () => {
-    appendLog('Region set to: ' + (regionSelect.selectedOptions?.[0]?.text || regionSelect.value), 'info');
-  });
-
-  // ── Payment steps ────────────────────────────────────────────
-  listen(nextPaymentStepBtn, 'click', () => {
-    if (currentPaymentStep >= paymentSteps.length) currentPaymentStep = 0;
-    setText(paymentStepDisplay, 'Step ' + (currentPaymentStep + 1) + ': ' + paymentSteps[currentPaymentStep]);
-    appendLog('Guide: ' + paymentSteps[currentPaymentStep], 'success');
-    currentPaymentStep += 1;
-  });
-
-  // ── Negotiation ──────────────────────────────────────────────
-  listen(startConversationBtn, 'click', () => {
-    if (conversationLog) conversationLog.innerHTML = '';
-    const uLang  = langTemplates[userLanguageSelect?.value || languageSelect?.value] || langTemplates.en;
-    const cpLang = langTemplates[counterpartyLanguageSelect?.value] || langTemplates.en;
-    showConversation(uLang.hello, 'You');
-    setTimeout(() => showConversation(cpLang.hello, 'Counterparty'), 600);
-    setTimeout(() => showConversation(uLang.reply, 'You'), 1200);
-    setTimeout(() => showConversation(cpLang.reply, 'Counterparty'), 1800);
-    appendLog('Multilingual negotiation session initialized.', 'success');
-    setSystemStatus('Negotiation Active · Language channels engaged', 'bg-blue-50 text-blue-700 border-blue-200');
-  });
-
-  listen(checkHandshakeBtn, 'click', () => {
-    if (dealStatus.handshake_status === 'confirmed') {
-      const tpl = langTemplates[userLanguageSelect?.value || languageSelect?.value] || langTemplates.en;
-      showConversation(tpl.handshake, 'System');
-      appendLog('Handshake verified: confirmed state from escrow system.', 'success');
-      setSystemStatus('Handshake Clear · Final Decision Pending', 'bg-emerald-50 text-emerald-700 border-emerald-200');
-    } else {
-      showConversation('Handshake status: ' + dealStatus.handshake_status + '. Complete the activation workflow to proceed.', 'System');
-      appendLog('Handshake status: ' + dealStatus.handshake_status + '.', 'info');
-    }
-  });
-
-  // ── Deal amount live display ─────────────────────────────────
-  listen(dealAmountInput, 'input', () => {
-    setText(dealAmountDisplay,   fmtUsd(dealAmountInput.value || 0));
-    setText(commissionAmountText, fmtUsd(getNum(dealAmountInput) * 0.02));
-  });
-
-  // ── Button wiring ────────────────────────────────────────────
-  listen(processEntryFeeBtn,   'click', handleEntryFee);
-  listen(processHandshakeBtn,  'click', handleHandshake);
-  listen(triggerWithdrawalBtn, 'click', handleWithdrawal);
-
-  // ── Clock interval ───────────────────────────────────────────
-  setInterval(updateClocks, 1000);
-
-  // ── Init ─────────────────────────────────────────────────────
-  window.addEventListener('load', () => {
-    updateClocks();
-    setText(paymentStepDisplay,  'Step 1: ' + paymentSteps[0]);
-    setText(commissionAmountText, fmtUsd(0));
-    setText(dealAmountDisplay,   fmtUsd(dealAmountInput?.value || 0));
-    updateDealStatusUI();
-    appendLog('Greens ACC system initialized. AI compliance and escrow monitoring active.', 'info');
-    appendLog('Secure trade policy active: no illegal transactions, no money laundering, no sanctions violations.', 'warning');
-  });
-</script>
+      updateSystemSummaries();
+      updatePythonSyncBadge('Python sync standby', 'warning');
+      appendLog('Greens ACC platform initialized. All systems active.', 'success');
+      appendLog('Secure trade policy in effect: OFAC, AML, KYC monitoring online.', 'warning');
+      syncSystemTruth('load');
+      setInterval(() => syncSystemTruth('poll'), 15000);
+    });
+  </script>
 </body>
 </html>

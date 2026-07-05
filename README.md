@@ -1,10 +1,11 @@
-# GreenACC
+# Greens ACC
 
-GreenACC is a static website with Supabase backend support for secure trade escrow, AI-monitored handshake workflows, and payment lifecycle tracking.
+Greens ACC is a static website with Supabase backend support for secure trade escrow, AI-monitored handshake workflows, and payment lifecycle tracking.
 
 ## Project structure
 
 - `index.html` — main static site
+- `backend/server.py` — Python command-center server that serves `dist/`, proxies Supabase functions, and exposes `/api/system-status`
 - `package.json` — build, start, and test scripts
 - `supabase/schema.sql` — database schema for deals and payments
 - `supabase/functions/processEntryFee.js` — edge function to process the flat $20 entry fee
@@ -22,7 +23,7 @@ GreenACC is a static website with Supabase backend support for secure trade escr
 ## Usage
 
 - `npm run build` — build static site to `dist/`
-- `npm start` — serve the site locally on port `5000`
+- `npm start` — build the site, start the Python integration server on port `5000`, and expose `/api/system-status`
 - `npm test` — validate schema and edge function syntax
 
 ## Payment workflow
@@ -50,6 +51,9 @@ GreenACC is a static website with Supabase backend support for secure trade escr
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `STRIPE_SECRET_KEY`
+- For the Python integration server, also set:
+   - `SUPABASE_FUNCTIONS_BASE_URL` — base URL used to proxy `/supabase/functions/*`
+   - `PORT` — optional override for the default `5000`
 
 ## Files added in this update
 
@@ -160,13 +164,13 @@ In production, replace the mock endpoint URLs with real API credentials for your
 
 ## Enterprise Instant Meeting Lobby (No Registration Required)
 
-GreenACC now supports zero-friction, instant secure meeting rooms for global enterprises. Companies can bypass traditional registration and instantly spin up temporary encrypted meeting spaces with $20 session fees.
+Greens ACC now supports zero-friction, instant secure meeting rooms for global enterprises. Companies can bypass traditional registration and instantly spin up temporary encrypted meeting spaces with $20 session fees.
 
 ### Features:
 
 1. **Instant Secure Entry** — Generate unique cryptographic room tokens with one click. No account creation, no tedious registration. Share the token link with counterparty for immediate friction-free access.
 
-2. **Virtual Desk Data Bridge** — Securely stream corporate files into the meeting without storing them on GreenACC servers:
+2. **Virtual Desk Data Bridge** — Securely stream corporate files into the meeting without storing them on Greens ACC servers:
    - Supports OAuth integration (Google Drive, OneDrive, Dropbox)
    - Encrypted file streaming with AES-256-GCM
    - Instant document recall while in the meeting
@@ -234,7 +238,7 @@ GreenACC now supports zero-friction, instant secure meeting rooms for global ent
 ### Security & Compliance:
 
 - **E2E Encryption** — Room tokens encrypt meeting content
-- **File Streaming Not Storage** — Documents streamed from source, not saved on GreenACC servers
+- **File Streaming Not Storage** — Documents streamed from source, not saved on Greens ACC servers
 - **OFAC Compliance** — Automated sanctions screening on all conversation content
 - **Export Control** — Flags ITAR, EAR, and restricted technology mentions
 - **Audit Trail** — All violations logged in `compliance_logs` table
@@ -251,7 +255,7 @@ GreenACC now supports zero-friction, instant secure meeting rooms for global ent
 
 ---
 
-## Summary: Why GreenACC is a Massive Differentiator
+## Summary: Why Greens ACC is a Massive Differentiator
 
 ✅ **Zero Registration** — Instant room tokens. No tedious account creation.  
 ✅ **Secure File Bridge** — Stream corporate files without storing them.  
@@ -260,4 +264,4 @@ GreenACC now supports zero-friction, instant secure meeting rooms for global ent
 ✅ **Real-Time Compliance** — Global trade law enforcement without manual review.  
 ✅ **Enterprise Grade** — Trusted by Toyota, Nissan, and global logistics giants.  
 
-GreenACC combines the simplicity of Google Meet with the compliance rigor of enterprise banking. Your deals are faster, safer, and globally compliant.
+Greens ACC combines the simplicity of Google Meet with the compliance rigor of enterprise banking. Your deals are faster, safer, and globally compliant.
