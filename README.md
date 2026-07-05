@@ -1,4 +1,4 @@
-# GreenACC
+# Greens ACC
 
 GreenACC is a static website with Supabase backend support for secure trade escrow, AI-monitored handshake workflows, and payment lifecycle tracking.
 
@@ -261,3 +261,41 @@ GreenACC now supports zero-friction, instant secure meeting rooms for global ent
 ✅ **Enterprise Grade** — Trusted by Toyota, Nissan, and global logistics giants.  
 
 GreenACC combines the simplicity of Google Meet with the compliance rigor of enterprise banking. Your deals are faster, safer, and globally compliant.
+
+
+## Integrated Backend Platform (Express + Stripe)
+
+This repository now includes a production-oriented backend foundation for Greens ACC:
+
+- `server.js` + `app.js` for API bootstrapping
+- `middleware/` for identity checks, risk scoring, shield controls, trade monitoring, honeypot routing, and notifications
+- `routes/payments.js` to run the full payment security pipeline before Stripe PaymentIntent creation
+- `routes/webhook.js` to verify Stripe webhook signatures using `STRIPE_WEBHOOK_SECRET`
+- `routes/users.js` and `routes/admin.js` for trusted user and audit access flows
+- `database/security-events.log` audit trail generated at runtime
+- `.github/workflows/deploy.yml` CI/deploy scaffold for GitHub Actions
+
+### Required backend environment variables
+
+Use `.env.example` as a template and configure these values in your deployment platform and GitHub Secrets:
+
+- `PORT`
+- `CORS_ORIGIN`
+- `ADMIN_API_TOKEN`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+
+### Backend run commands
+
+- `npm run start:backend` — start the integrated backend API
+- `npm run dev:backend` — start backend API in development mode
+
+### Payment security workflow
+
+1. Identity verification (`middleware/auth.js`)
+2. SecurityWatcher risk scoring (`middleware/securityWatcher.js`)
+3. Shield policy checks (`middleware/shield.js`)
+4. Trading Monitor anomaly checks (`middleware/tradingMonitor.js`)
+5. Honeypot redirect for unverified/high-risk traffic (`middleware/honeypot.js`)
+6. Payment gateway approval/manual-review/block decision (`routes/payments.js`)
+7. Notifier + audit trail logging (`middleware/notifier.js`, `database/auditStore.js`)
