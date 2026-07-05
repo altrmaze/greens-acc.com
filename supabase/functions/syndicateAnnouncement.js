@@ -31,7 +31,7 @@ export async function POST(request) {
       const payload = {
         title: `${press_release.split('\n')[2]}`, // extract title
         content: press_release,
-        source: 'GreenACC',
+        source: 'Greens ACC',
         timestamp: new Date().toISOString()
       };
 
