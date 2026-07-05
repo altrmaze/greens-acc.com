@@ -1,0 +1,14 @@
+name: Deploy Placeholder
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dummy Step
+        run: echo "Placeholder to register workflow filename with GitHub"
