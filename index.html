@@ -1391,6 +1391,29 @@
         return { ok: resp.ok, status: resp.status, data };
     }
 
+    async function checkAiAgentBridge() {
+        try {
+            const resp = await fetch('/api/ai-agents/status', {
+                method: 'GET',
+                headers: { Accept: 'application/json' }
+            });
+            const data = await resp.json().catch(() => ({}));
+            if (!resp.ok) {
+                log('AI bridge status check failed.', 'warning');
+                return;
+            }
+            const total = Number(data.agents_total || 0);
+            const configured = data.configured === true;
+            if (configured && total > 0) {
+                log('AI bridge ready: ' + total + ' agent endpoints connected.', 'success');
+            } else {
+                log('AI bridge not configured. Set SUPABASE_FUNCTIONS_BASE_URL for live agents.', 'warning');
+            }
+        } catch (e) {
+            log('AI bridge check error: ' + e.message, 'error');
+        }
+    }
+
     // ── Deal Flow Handlers ─────────────────────────────────────────────
     async function handleEntryFee() {
         const dealId = (el('deal-id-input') || {}).value?.trim();
@@ -1814,9 +1837,7 @@
         log('Greens ACC platform initialized.', 'success');
         log('System integrity check complete. All engines operational.', 'success');
         log('Secure trade policy enforced: no sanctions, no illegal commodities, full AML/KYC.', 'warning');
-    });
-
-log('Secure trade policy enforced: no sanctions, no illegal commodities, full AML/KYC.', 'warning');
+        checkAiAgentBridge();
     });
 
 })();

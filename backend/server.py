@@ -30,6 +30,16 @@ REGION_TIMEZONES = {
     "mn": "Asia/Ulaanbaatar",
 }
 
+AI_AGENT_FUNCTIONS = [
+    "aiAgentAnalyze",
+    "aiSecretaryTools",
+    "aiComplianceLawyer",
+    "auditContractCompliance",
+    "supplyChainCoordinator",
+    "dealClearanceRoom",
+    "dealFulfillment",
+]
+
 
 def json_bytes(payload: dict[str, Any]) -> bytes:
     return json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -66,6 +76,32 @@ def supabase_get(path: str, query: str) -> list[dict[str, Any]]:
         return json.loads(response.read().decode("utf-8"))
 
 
+def extract_function_name(path: str) -> str:
+    prefix = "/supabase/functions/"
+    if not path.startswith(prefix):
+        return ""
+    return path[len(prefix) :].strip("/")
+
+
+def build_function_target(function_name: str, query: str = "") -> str:
+    if not SUPABASE_FUNCTIONS_BASE_URL:
+        return ""
+    base = SUPABASE_FUNCTIONS_BASE_URL.rstrip("/")
+    if not function_name:
+        return base
+
+    if "functions.supabase.co" in base or base.endswith("/functions/v1") or "/supabase/functions" in base:
+        target = f"{base}/{function_name}"
+    elif base.endswith(".supabase.co"):
+        target = f"{base}/functions/v1/{function_name}"
+    else:
+        target = f"{base}/supabase/functions/{function_name}"
+
+    if query:
+        target = f"{target}?{query}"
+    return target
+
+
 class GreensHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, directory=str(DIST_DIR), **kwargs)
@@ -82,6 +118,9 @@ class GreensHandler(SimpleHTTPRequestHandler):
         parsed = parse.urlparse(self.path)
         if parsed.path == "/api/system-status":
             self.handle_system_status(parsed)
+            return
+        if parsed.path == "/api/ai-agents/status":
+            self.handle_ai_agents_status()
             return
         super().do_GET()
 
@@ -295,6 +334,28 @@ class GreensHandler(SimpleHTTPRequestHandler):
                 },
             )
 
+    def handle_ai_agents_status(self) -> None:
+        configured = bool(SUPABASE_FUNCTIONS_BASE_URL)
+        agents = []
+        for name in AI_AGENT_FUNCTIONS:
+            agents.append(
+                {
+                    "name": name,
+                    "configured": configured,
+                    "proxy_path": f"/supabase/functions/{name}",
+                    "upstream_url": build_function_target(name),
+                }
+            )
+        self._write_json(
+            HTTPStatus.OK,
+            {
+                "backend": "python",
+                "configured": configured,
+                "agents_total": len(AI_AGENT_FUNCTIONS),
+                "agents": agents,
+            },
+        )
+
     def proxy_supabase_function(self, parsed: parse.ParseResult) -> None:
         if not SUPABASE_FUNCTIONS_BASE_URL:
             self._write_json(
@@ -306,19 +367,34 @@ class GreensHandler(SimpleHTTPRequestHandler):
             )
             return
 
-        target = f"{SUPABASE_FUNCTIONS_BASE_URL.rstrip('/')}{parsed.path}"
-        if parsed.query:
-            target = f"{target}?{parsed.query}"
+        function_name = extract_function_name(parsed.path)
+        target = build_function_target(function_name, parsed.query)
+        if not function_name or not target:
+            self._write_json(
+                HTTPStatus.BAD_REQUEST,
+                {
+                    "error": "Invalid Supabase function path",
+                    "backend": "python",
+                },
+            )
+            return
 
         length = int(self.headers.get("Content-Length", "0") or "0")
         body = self.rfile.read(length) if length else None
+        upstream_headers = {
+            "Content-Type": self.headers.get("Content-Type", "application/json"),
+            "Accept": self.headers.get("Accept", "application/json"),
+        }
+        auth_header = self.headers.get("Authorization")
+        if auth_header:
+            upstream_headers["Authorization"] = auth_header
+        apikey_header = self.headers.get("apikey")
+        if apikey_header:
+            upstream_headers["apikey"] = apikey_header
         upstream = request.Request(
             target,
             data=body,
-            headers={
-                "Content-Type": self.headers.get("Content-Type", "application/json"),
-                "Accept": self.headers.get("Accept", "application/json"),
-            },
+            headers=upstream_headers,
             method="POST",
         )
 
