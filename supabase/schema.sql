@@ -207,3 +207,61 @@ create table if not exists public.supply_chain_tracking (
 
 create index if not exists idx_supply_chain_order on public.supply_chain_tracking (order_id);
 create index if not exists idx_supply_chain_status on public.supply_chain_tracking (transit_status);
+
+-- ============================================================
+-- DEAL CLEARANCE ROOM TABLES
+-- ============================================================
+
+-- Master clearance record per (user, deal) pair
+create table if not exists public.deal_clearances (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  user_id uuid not null,
+  commodity_type text not null default 'general',
+  status text not null default 'PENDING_DOCUMENTS'
+    check (status in ('PENDING_DOCUMENTS','PENDING_REVIEW','APPROVED','REJECTED')),
+  ncnda_signed boolean not null default false,
+  ncnda_signed_at timestamptz,
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (deal_id, user_id)
+);
+
+create index if not exists idx_deal_clearances_deal on public.deal_clearances (deal_id);
+create index if not exists idx_deal_clearances_user on public.deal_clearances (user_id);
+create index if not exists idx_deal_clearances_status on public.deal_clearances (status);
+
+-- Documents uploaded per clearance
+create table if not exists public.deal_documents (
+  id uuid primary key default gen_random_uuid(),
+  clearance_id uuid not null references public.deal_clearances(id) on delete cascade,
+  document_type text not null,
+  file_name text not null,
+  file_size_bytes int,
+  status text not null default 'PENDING_REVIEW'
+    check (status in ('PENDING_REVIEW','APPROVED','REJECTED')),
+  reviewer_notes text,
+  uploaded_at timestamptz not null default now()
+);
+
+create index if not exists idx_deal_documents_clearance on public.deal_documents (clearance_id);
+create index if not exists idx_deal_documents_status on public.deal_documents (status);
+
+-- Appointment slots booked inside the waiting room
+create table if not exists public.deal_appointments (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  user_id uuid not null,
+  scheduled_at timestamptz not null,
+  duration_minutes int not null default 60,
+  timezone text not null default 'UTC',
+  status text not null default 'pending'
+    check (status in ('pending','confirmed','cancelled')),
+  notes text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_deal_appointments_deal on public.deal_appointments (deal_id);
+create index if not exists idx_deal_appointments_user on public.deal_appointments (user_id);
+create index if not exists idx_deal_appointments_status on public.deal_appointments (status);
