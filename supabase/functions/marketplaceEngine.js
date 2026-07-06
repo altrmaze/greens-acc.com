@@ -122,3 +122,7 @@ export async function POST(request) {
 
   return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), { status: 400 });
 }
+
+export async function GET(_request) {
+  return new Response(JSON.stringify({ standby: true, message: "hi Ayman" }), { status: 200 });
+}

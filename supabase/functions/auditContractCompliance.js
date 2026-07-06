@@ -91,3 +91,7 @@ export async function POST(request) {
     timestamp: new Date().toISOString()
   }), { status: 200 });
 }
+
+export async function GET(_request) {
+  return new Response(JSON.stringify({ standby: true, message: "hi Ayman" }), { status: 200 });
+}
