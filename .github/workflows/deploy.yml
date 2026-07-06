@@ -1,0 +1,66 @@
+name: Secure Production Deployment Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/homepage/**'
+      - 'supabase/**'
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Code Linting & Tests
+        run: npm test
+
+  supabase-dry-run:
+    runs-on: ubuntu-latest
+    needs: validate-and-test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Verify Database Migrations (Dry Run)
+        run: supabase db lint
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+  # Actual deployment ONLY triggers after a human approves and merges the PR to main
+  deploy-to-production:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [validate-and-test, supabase-dry-run]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+
+      - name: Push Database Changes to Production
+        run: supabase db push --linked
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
+
+      - name: Deploy Frontend / Dashboard Sync
+        run: npm run deploy:prod

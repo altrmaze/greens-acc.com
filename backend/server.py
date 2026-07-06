@@ -87,10 +87,68 @@ class GreensHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         parsed = parse.urlparse(self.path)
+        if parsed.path == "/api/v1/memo/analyze":
+            self.handle_memo_analyze()
+            return
         if parsed.path.startswith("/supabase/functions/"):
             self.proxy_supabase_function(parsed)
             return
         self.send_error(HTTPStatus.NOT_FOUND, "Unknown endpoint")
+
+    def handle_memo_analyze(self) -> None:
+        length = int(self.headers.get("Content-Length", "0") or "0")
+        try:
+            body: dict[str, Any] = json.loads(self.rfile.read(length)) if length else {}
+        except (json.JSONDecodeError, ValueError):
+            self._write_json(HTTPStatus.BAD_REQUEST, {"detail": "Invalid JSON body."})
+            return
+
+        contract_text: str = body.get("contract_text", "")
+        if not contract_text.strip():
+            self._write_json(HTTPStatus.BAD_REQUEST, {"detail": "Contract text cannot be empty."})
+            return
+
+        text_lower = contract_text.lower()
+        risk_factors: list[str] = []
+
+        import re  # noqa: PLC0415
+
+        if not re.search(r"\b(FOB|CIF|EXW|DDP|CFR|CIP|DAP|DPU|FCA|CPT|FAS)\b", contract_text, re.IGNORECASE):
+            risk_factors.append("Missing Incoterms 2020 delivery assignment (e.g., FOB, CIF, EXW).")
+
+        if not re.search(r"governing law|jurisdiction", text_lower):
+            risk_factors.append("Governing law or jurisdiction clause is absent.")
+
+        if not re.search(r"payment terms|letter of credit|\bLC\b|wire transfer|escrow", text_lower):
+            risk_factors.append("Payment terms are not explicitly defined.")
+
+        if not re.search(r"dispute|arbitration|mediation|\bICC\b|UNCITRAL", text_lower):
+            risk_factors.append("No dispute resolution mechanism found.")
+
+        if not re.search(r"force majeure|act of god|unforeseeable", text_lower):
+            risk_factors.append("Force majeure clause is absent.")
+
+        if not re.search(r"termination|cancellation", text_lower):
+            risk_factors.append("Termination or cancellation provisions are missing.")
+
+        compliance_status = "PASS" if not risk_factors else "ACTION REQUIRED"
+
+        words = contract_text.split()
+        excerpt = " ".join(words[:40]) + ("..." if len(words) > 40 else "")
+        summary = (
+            f"Contract text reviewed ({len(words)} words). "
+            f"Excerpt: {excerpt} "
+            f"Found {len(risk_factors)} issue(s) requiring attention."
+        )
+
+        self._write_json(
+            HTTPStatus.OK,
+            {
+                "summary": summary,
+                "risk_factors": risk_factors,
+                "compliance_status": compliance_status,
+            },
+        )
 
     def end_headers(self) -> None:
         self._send_cors_headers()
