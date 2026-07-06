@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greens ACC — Deal Fulfillment & Logistics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}.blink{animation:blink 2s ease-in-out infinite;}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.fade-in{animation:fadeIn .4s ease forwards;}
+    @keyframes travel{0%{left:0}100%{left:calc(100% - 16px)}}.vessel-dot{animation:travel 8s ease-in-out infinite alternate;}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;}
+    .btn-primary{background:#059669;color:#fff;border-radius:9px;font-weight:600;font-size:13px;border:none;cursor:pointer;padding:10px 20px;transition:background .15s;}
+    .btn-primary:hover{background:#047857;}
+    .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+    .btn-secondary{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:9px;font-weight:600;font-size:13px;cursor:pointer;padding:10px 20px;}
+    .step-node{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid #e2e8f0;background:#f8fafc;transition:all .3s;}
+    .step-node.done{background:#059669;border-color:#059669;}
+    .step-node.active{background:#fff;border-color:#059669;box-shadow:0 0 0 4px rgba(5,150,105,.15);}
+    .step-line{flex:1;height:2px;background:#e2e8f0;transition:background .3s;}
+    .step-line.done{background:#059669;}
+    .milestone-row{padding:8px 12px;border-bottom:1px solid #f1f5f9;font-size:11px;display:flex;gap:8px;align-items:flex-start;}
+    .milestone-row:last-child{border-bottom:none;}
+    .trade-route{position:relative;height:80px;background:linear-gradient(to right,#0ea5e9,#0284c7);border-radius:10px;overflow:hidden;}
+    .trade-route::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M0 30 Q15 10 30 30 Q45 50 60 30' stroke='rgba(255,255,255,0.1)' fill='none' stroke-width='1'/%3E%3C/svg%3E") repeat-x center;}
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased">
+
+<!-- TICKER -->
+<div class="bg-slate-950 text-slate-400 text-[10px] py-1.5 overflow-hidden border-b border-slate-800 font-mono">
+  <span class="inline-flex items-center gap-2 px-6">
+    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full blink"></span>
+    GREENS ACC — POST-DEAL FULFILLMENT ENGINE
+    <span class="text-slate-600 mx-2">|</span>
+    ESCROW & LOGISTICS ACTIVE
+    <span class="text-slate-600 mx-2">|</span>
+    FUEL &amp; PETROLEUM COMMODITIES <span class="text-red-400 ml-1">NOT TRACKED</span>
+  </span>
+</div>
+
+<!-- HEADER -->
+<header class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="h-9 w-9 bg-emerald-600 rounded-xl flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      </div>
+      <div>
+        <div class="font-bold text-slate-900 text-sm">Greens ACC — Deal Fulfillment</div>
+        <div class="text-[11px] text-slate-500" id="hdr-sub">Loading fulfillment…</div>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <a href="/deal-room.html" id="back-clearance" class="btn-secondary text-xs">← Clearance Room</a>
+      <a href="/" class="btn-secondary text-xs">Dashboard</a>
+    </div>
+  </div>
+</header>
+
+<div class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+  <!-- ESCROW BANNER -->
+  <div id="escrow-banner" class="card p-6 text-center border-emerald-200 bg-emerald-50/50">
+    <div class="text-4xl mb-3" id="escrow-icon">🤝</div>
+    <div class="text-xl font-bold text-slate-900 mb-1" id="escrow-title">Deal Handshake Confirmed</div>
+    <div class="text-sm text-slate-600 max-w-lg mx-auto mb-4" id="escrow-desc">
+      The negotiation has concluded. Complete the 2% platform escrow to release the live logistics tracking dashboard.
+    </div>
+
+    <!-- Commission summary -->
+    <div class="inline-flex items-center gap-6 bg-white border border-slate-200 rounded-xl px-6 py-4 mb-5">
+      <div class="text-center">
+        <div class="text-[10px] text-slate-400 font-mono uppercase">Deal Value</div>
+        <div class="text-lg font-bold text-slate-900" id="gross-value-display">$0.00</div>
+      </div>
+      <div class="w-px h-8 bg-slate-200"></div>
+      <div class="text-center">
+        <div class="text-[10px] text-slate-400 font-mono uppercase">Commission (2%)</div>
+        <div class="text-lg font-bold text-emerald-700" id="fee-display">$0.00</div>
+      </div>
+      <div class="w-px h-8 bg-slate-200"></div>
+      <div class="text-center">
+        <div class="text-[10px] text-slate-400 font-mono uppercase">Status</div>
+        <div class="text-sm font-bold" id="payment-status-label">PENDING</div>
+      </div>
+    </div>
+
+    <div id="pay-action-area">
+      <button id="btn-pay-commission" class="btn-primary text-sm px-8 py-3">
+        Settle Platform Escrow — <span id="btn-fee-label">$0.00</span>
+      </button>
+      <div class="text-xs text-slate-400 mt-2">Secure Stripe checkout. You will be redirected to complete payment.</div>
+    </div>
+
+    <div id="paid-indicator" class="hidden mt-2">
+      <div class="inline-flex items-center gap-2 bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-full px-5 py-2 text-sm font-bold">
+        <span>✅</span> Platform Escrow Settled — Logistics Unlocked
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGISTICS TRACKER (unlocked after payment) -->
+  <div id="logistics-section" class="space-y-5">
+
+    <!-- Step pipeline -->
+    <div class="card p-6">
+      <div class="font-bold text-slate-900 text-sm mb-5">Global Supply Chain Tracker</div>
+
+      <!-- Step nodes -->
+      <div class="flex items-center gap-2 mb-6" id="steps-pipeline">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Active step detail -->
+      <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex items-center gap-4" id="active-step-detail">
+        <div class="text-3xl" id="active-step-icon">⚓</div>
+        <div>
+          <div class="font-bold text-slate-900 text-sm" id="active-step-title">Port of Origin</div>
+          <div class="text-xs text-slate-500 mt-0.5" id="active-step-desc">Cargo manifested and loaded at origin port.</div>
+        </div>
+        <div class="ml-auto text-right">
+          <div class="text-[10px] text-slate-400 font-mono">CURRENT STEP</div>
+          <div class="text-xs font-mono font-bold text-emerald-700 mt-0.5" id="active-step-key">ORIGIN_PORT</div>
+        </div>
+      </div>
+
+      <!-- Trade route visual -->
+      <div class="mt-5">
+        <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+          <span id="origin-label">Origin Port</span>
+          <span class="font-mono text-[10px]">— TRADE ROUTE —</span>
+          <span id="dest-label">Destination Port</span>
+        </div>
+        <div class="trade-route">
+          <div class="vessel-dot absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg flex items-center justify-center text-[10px]">🚢</div>
+          <div class="absolute inset-0 flex items-center justify-center text-white/20 text-xs font-mono">INTERNATIONAL WATERS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deal & shipment details -->
+    <div class="grid sm:grid-cols-2 gap-5">
+      <div class="card p-5">
+        <div class="font-bold text-slate-900 text-sm mb-3">Shipment Details</div>
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between"><span class="text-slate-400">Deal ID</span><span class="font-mono font-semibold" id="detail-deal-id">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Commodity</span><span class="font-semibold" id="detail-commodity">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Origin Port</span><span class="font-semibold" id="detail-origin">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Destination Port</span><span class="font-semibold" id="detail-dest">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Vessel / Tracking ID</span><span class="font-mono font-semibold" id="detail-vessel">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Est. Delivery</span><span class="font-semibold" id="detail-eta">—</span></div>
+        </div>
+      </div>
+
+      <div class="card p-5">
+        <div class="font-bold text-slate-900 text-sm mb-3">Financial Summary</div>
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between"><span class="text-slate-400">Gross Deal Value</span><span class="font-bold text-slate-900" id="fin-gross">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Platform Commission (2%)</span><span class="font-bold text-emerald-700" id="fin-fee">—</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Stripe Payment Status</span><span class="font-bold" id="fin-status">—</span></div>
+          <div class="h-px bg-slate-100 my-1"></div>
+          <div class="flex justify-between"><span class="text-slate-400">Logistics Status</span><span class="font-bold text-blue-700" id="fin-logistics">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Milestone log -->
+    <div class="card p-5">
+      <div class="font-bold text-slate-900 text-sm mb-3">Milestone Event Log</div>
+      <div id="milestone-log" class="bg-slate-50 border border-slate-100 rounded-xl divide-y divide-slate-100 max-h-48 overflow-y-auto">
+        <div class="milestone-row text-slate-400 italic">No milestones yet.</div>
+      </div>
+    </div>
+
+    <!-- Resell CTA -->
+    <div class="card p-5 bg-blue-50/50 border-blue-200 text-center" id="resell-cta" style="display:none">
+      <div class="text-2xl mb-2">🔄</div>
+      <div class="font-bold text-slate-900 text-sm mb-1">Asset Delivered — Ready for Secondary Trade</div>
+      <div class="text-xs text-slate-500 mb-4 max-w-sm mx-auto">Your commodity has been delivered. You may now list this asset on the Greens ACC Secondary Marketplace.</div>
+      <a href="/marketplace.html" class="btn-primary text-sm">List on Secondary Marketplace →</a>
+    </div>
+
+  </div><!-- /logistics-section -->
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const params = new URLSearchParams(window.location.search);
+  const DEAL_ID   = params.get('dealId') || params.get('deal_id') || 'DEMO-001';
+  const USER_ID   = params.get('userId') || params.get('user_id') || 'demo-user';
+  const GROSS_VAL = parseFloat(params.get('grossValue') || params.get('gross_value') || '250000');
+
+  const STEPS = ['ORIGIN_PORT','IN_TRANSIT','CUSTOMS_CLEARANCE','DELIVERED'];
+  const STEP_META = {
+    ORIGIN_PORT:       { label:'Port of Origin',      icon:'⚓', desc:'Cargo manifested and loaded at origin port.' },
+    IN_TRANSIT:        { label:'High Seas Transit',    icon:'🚢', desc:'Vessel underway on international trade route.' },
+    CUSTOMS_CLEARANCE: { label:'Customs & Inspection', icon:'🛃', desc:'Cargo at destination customs authority.' },
+    DELIVERED:         { label:'Consignee Delivery',   icon:'✅', desc:'Cargo released to consignee.' },
+  };
+
+  let state = { fulfillment: null, paymentStatus: 'PENDING', logisticsStep: 'ORIGIN_PORT' };
+
+  function el(id) { return document.getElementById(id); }
+  function setText(id, v) { const e = el(id); if (e) e.textContent = v; }
+  function show(id) { const e = el(id); if (e) e.style.display = ''; }
+  function hide(id) { const e = el(id); if (e) e.style.display = 'none'; }
+  function fmtUsd(n) { return Number(n).toLocaleString('en-US',{style:'currency',currency:'USD'}); }
+
+  async function callAPI(fn, payload) {
+    try {
+      const r = await fetch('/supabase/functions/' + fn, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+      });
+      return { ok: r.ok, data: await r.json().catch(() => ({})) };
+    } catch(e) { return { ok: false, data: { error: e.message } }; }
+  }
+
+  async function init() {
+    const fee = GROSS_VAL * 0.02;
+    setText('gross-value-display', fmtUsd(GROSS_VAL));
+    setText('fee-display', fmtUsd(fee));
+    setText('btn-fee-label', fmtUsd(fee));
+    setText('hdr-sub', 'Deal: ' + DEAL_ID);
+    el('back-clearance').href = '/deal-room.html?dealId=' + encodeURIComponent(DEAL_ID) + '&userId=' + encodeURIComponent(USER_ID);
+
+    // Attempt to load existing fulfillment
+    const { ok, data } = await callAPI('dealFulfillment', { action: 'get_fulfillment', deal_id: DEAL_ID });
+    if (ok && data.fulfillment) {
+      applyFulfillment(data.fulfillment);
+    } else {
+      // Demo mode: show pending state
+      renderSteps('ORIGIN_PORT', false);
+      updateEscrowBanner('PENDING', GROSS_VAL);
+    }
+
+    el('btn-pay-commission').addEventListener('click', triggerCheckout);
+    initRealtime();
+  }
+
+  function applyFulfillment(f) {
+    state.fulfillment = f;
+    state.paymentStatus = f.stripe_payment_status;
+    state.logisticsStep = f.current_logistics_status;
+
+    const isPaid = f.stripe_payment_status === 'PAID';
+    updateEscrowBanner(f.stripe_payment_status, f.gross_value_usd);
+    renderSteps(f.current_logistics_status, isPaid);
+    updateDetailCards(f);
+    renderMilestones(f.milestone_log || []);
+    if (f.current_logistics_status === 'DELIVERED') {
+      el('resell-cta').style.display = '';
+    }
+  }
+
+  function updateEscrowBanner(status, grossVal) {
+    const fee = Number(grossVal) * 0.02;
+    setText('gross-value-display', fmtUsd(Number(grossVal)));
+    setText('fee-display', fmtUsd(fee));
+    setText('btn-fee-label', fmtUsd(fee));
+
+    const statusEl = el('payment-status-label');
+    if (status === 'PAID') {
+      setText('escrow-title', 'Escrow Settled — Logistics Active');
+      setText('escrow-desc', 'Platform commission of 2% has been received. Your global logistics tracker is live below.');
+      el('escrow-icon').textContent = '✅';
+      el('escrow-banner').classList.replace('border-emerald-200', 'border-emerald-400');
+      hide('pay-action-area');
+      show('paid-indicator');
+      if (statusEl) { statusEl.textContent = 'PAID'; statusEl.className = 'text-sm font-bold text-emerald-700'; }
+    } else if (status === 'FAILED') {
+      setText('escrow-title', 'Payment Failed');
+      setText('escrow-desc', 'The escrow payment could not be processed. Please retry.');
+      el('escrow-icon').textContent = '❌';
+      if (statusEl) { statusEl.textContent = 'FAILED'; statusEl.className = 'text-sm font-bold text-red-600'; }
+    } else {
+      if (statusEl) { statusEl.textContent = 'PENDING'; statusEl.className = 'text-sm font-bold text-amber-600'; }
+    }
+  }
+
+  function renderSteps(currentStep, isPaid) {
+    const pipe = el('steps-pipeline');
+    if (!pipe) return;
+    pipe.innerHTML = '';
+    const currentIdx = STEPS.indexOf(currentStep);
+
+    STEPS.forEach((step, i) => {
+      const meta = STEP_META[step];
+      const isDone = i < currentIdx;
+      const isActive = i === currentIdx;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'flex flex-col items-center gap-1.5 flex-1';
+
+      const node = document.createElement('div');
+      node.className = 'step-node' + (isDone ? ' done' : isActive ? ' active' : '');
+      node.textContent = isDone ? '✓' : meta.icon;
+
+      const label = document.createElement('div');
+      label.className = 'text-[10px] font-semibold text-center ' + (isActive ? 'text-emerald-700' : isDone ? 'text-slate-500' : 'text-slate-300');
+      label.textContent = meta.label;
+
+      wrapper.appendChild(node);
+      wrapper.appendChild(label);
+
+      if (isActive) {
+        setText('active-step-icon', meta.icon);
+        setText('active-step-title', meta.label);
+        setText('active-step-desc', meta.desc);
+        setText('active-step-key', step);
+      }
+
+      pipe.appendChild(wrapper);
+
+      // Connector line (not after last)
+      if (i < STEPS.length - 1) {
+        const line = document.createElement('div');
+        line.className = 'step-line mt-5 -mx-2' + (isDone ? ' done' : '');
+        pipe.appendChild(line);
+      }
+    });
+
+    // Show/hide logistics section
+    if (!isPaid) {
+      el('logistics-section').style.opacity = '0.3';
+      el('logistics-section').style.pointerEvents = 'none';
+    } else {
+      el('logistics-section').style.opacity = '1';
+      el('logistics-section').style.pointerEvents = '';
+    }
+  }
+
+  function updateDetailCards(f) {
+    setText('detail-deal-id', f.deal_id);
+    setText('detail-commodity', f.commodity_type || '—');
+    setText('detail-origin', f.origin_port || '—');
+    setText('detail-dest', f.destination_port || '—');
+    setText('detail-vessel', f.vessel_tracking_id || '—');
+    setText('detail-eta', f.estimated_delivery_date ? new Date(f.estimated_delivery_date).toLocaleDateString('en-GB', { year:'numeric', month:'short', day:'numeric' }) : '—');
+    setText('origin-label', f.origin_port || 'Origin Port');
+    setText('dest-label', f.destination_port || 'Destination Port');
+    setText('fin-gross', fmtUsd(f.gross_value_usd));
+    setText('fin-fee', fmtUsd(f.platform_fee_usd || f.gross_value_usd * 0.02));
+    const statusColors = { PAID:'text-emerald-700', PENDING:'text-amber-600', FAILED:'text-red-600', REFUNDED:'text-slate-500' };
+    const finStatus = el('fin-status');
+    if (finStatus) { finStatus.textContent = f.stripe_payment_status; finStatus.className = 'font-bold ' + (statusColors[f.stripe_payment_status] || ''); }
+    setText('fin-logistics', f.current_logistics_status.replace(/_/g,' '));
+  }
+
+  function renderMilestones(log) {
+    const container = el('milestone-log');
+    if (!container || !log.length) return;
+    container.innerHTML = '';
+    [...log].reverse().forEach(m => {
+      const row = document.createElement('div');
+      row.className = 'milestone-row';
+      const icon = document.createElement('span');
+      icon.textContent = STEP_META[m.step] ? STEP_META[m.step].icon : '📌';
+      const body = document.createElement('div');
+      const top = document.createElement('div');
+      top.className = 'flex items-center gap-2';
+      const label = document.createElement('span');
+      label.className = 'font-semibold text-slate-800';
+      label.textContent = STEP_META[m.step] ? STEP_META[m.step].label : m.step;
+      const ts = document.createElement('span');
+      ts.className = 'text-slate-400';
+      ts.textContent = new Date(m.timestamp).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+      top.appendChild(label);
+      top.appendChild(ts);
+      const note = document.createElement('div');
+      note.className = 'text-slate-500 mt-0.5';
+      note.textContent = m.note || '';
+      body.appendChild(top);
+      body.appendChild(note);
+      row.appendChild(icon);
+      row.appendChild(body);
+      container.appendChild(row);
+    });
+  }
+
+  async function triggerCheckout() {
+    el('btn-pay-commission').disabled = true;
+    el('btn-pay-commission').textContent = 'Redirecting to Stripe…';
+
+    const { ok, data } = await callAPI('dealFulfillment', {
+      action: 'get_checkout_url',
+      deal_id: DEAL_ID,
+      buyer_id: USER_ID,
+      gross_value_usd: GROSS_VAL,
+    });
+
+    if (ok && data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      // Demo fallback: navigate to success
+      window.location.href = '/success.html?deal_id=' + encodeURIComponent(DEAL_ID) + '&type=commission';
+    }
+  }
+
+  function initRealtime() {
+    const supabaseUrl  = (window.__ENV__ && window.__ENV__.SUPABASE_URL) || '';
+    const supabaseKey  = (window.__ENV__ && window.__ENV__.SUPABASE_ANON_KEY) || '';
+    if (!supabaseUrl || !supabaseKey) return;
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    _supabase
+      .channel('fulfillment:' + DEAL_ID)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'deal_fulfillments' }, payload => {
+        if (payload.new && payload.new.deal_id === DEAL_ID) {
+          applyFulfillment(payload.new);
+        }
+      })
+      .subscribe();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

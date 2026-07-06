@@ -84,7 +84,7 @@ export async function POST(request) {
   const reqHeaders = {
     'Content-Type': 'application/json',
     apikey: serviceRoleKey,
-    Authorization: `******
+    Authorization: 'Bearer ' + serviceRoleKey,
     Prefer: 'return=representation',
   };
 
@@ -135,7 +135,6 @@ export async function POST(request) {
       { headers: reqHeaders }
     );
     const docs = await docsResp.json();
-
     const category = detectCommodityCategory(clearance.commodity_type || '');
     const requirements = DOC_REQUIREMENTS[category] || DOC_REQUIREMENTS.general;
 
@@ -207,7 +206,6 @@ export async function POST(request) {
       const err = await patchResp.json().catch(() => ({}));
       return new Response(JSON.stringify({ error: 'Failed to record NCNDA signature', details: err }), { status: patchResp.status });
     }
-
     return new Response(JSON.stringify({ success: true, ncnda_signed_at: new Date().toISOString() }), { status: 200 });
   }
 

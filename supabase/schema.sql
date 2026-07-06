@@ -265,3 +265,58 @@ create table if not exists public.deal_appointments (
 create index if not exists idx_deal_appointments_deal on public.deal_appointments (deal_id);
 create index if not exists idx_deal_appointments_user on public.deal_appointments (user_id);
 create index if not exists idx_deal_appointments_status on public.deal_appointments (status);
+
+-- Government filing tracker — human-initiated, manually tracked compliance submissions
+-- This is a record-keeping ledger. No automated bot submissions to external portals.
+create table if not exists public.proxy_gov_filings (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  deal_id uuid not null,
+  agency_target_name text not null,
+  document_type_scope text not null,
+  execution_status text not null default 'DRAFT'
+    check (execution_status in ('DRAFT','SUBMITTED','ACKNOWLEDGED','REISSUED','REJECTED','FAILED')),
+  preferred_language text not null default 'en',
+  proxy_authorization_signed boolean not null default false,
+  tracking_reference_logs jsonb not null default '{}',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_proxy_gov_filings_deal on public.proxy_gov_filings (deal_id);
+create index if not exists idx_proxy_gov_filings_user on public.proxy_gov_filings (user_id);
+create index if not exists idx_proxy_gov_filings_status on public.proxy_gov_filings (execution_status);
+
+-- ============================================================
+-- FULFILLMENT & SECONDARY MARKETPLACE TABLES
+-- ============================================================
+
+-- Post-handshake fulfillment record per deal (escrow + logistics)
+create table if not exists public.deal_fulfillments (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null unique,
+  buyer_id uuid,
+  seller_id uuid,
+  gross_value_usd numeric(15,2) not null default 0.00,
+  platform_fee_usd numeric(15,2) generated always as (round(gross_value_usd * 0.02, 2)) stored,
+  stripe_session_id text,
+  stripe_payment_status text not null default 'PENDING'
+    check (stripe_payment_status in ('PENDING','PAID','FAILED','REFUNDED')),
+  current_logistics_status text not null default 'ORIGIN_PORT'
+    check (current_logistics_status in ('ORIGIN_PORT','IN_TRANSIT','CUSTOMS_CLEARANCE','DELIVERED')),
+  vessel_tracking_id text,
+  origin_port text,
+  destination_port text,
+  estimated_delivery_date date,
+  route_coordinates jsonb not null default '[]',
+  milestone_log jsonb not null default '[]',
+  commodity_type text,
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_deal_fulfillments_deal on public.deal_fulfillments (deal_id);
+create index if not exists idx_deal_fulfillments_buyer on public.deal_fulfillments (buyer_id);
+create index if not exists idx_deal_fulfillments_seller on public.deal_fulfillments (seller_id);
+create index if not exists idx_deal_fulfillments_status on public.deal_fulfillments (stripe_payment_status);
+create index if not exists idx_deal_fulfillments_logistics on public.deal_fulfillments (current_logistics_status);
