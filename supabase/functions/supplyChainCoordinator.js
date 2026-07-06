@@ -37,7 +37,7 @@ export async function POST(request) {
       headers: {
         'Content-Type': 'application/json',
         apikey: serviceRoleKey,
-        Authorization: `******
+        Authorization: `******`,
         Prefer: 'return=representation'
       },
       body: JSON.stringify(payload)
@@ -68,7 +68,7 @@ export async function POST(request) {
       {
         headers: {
           apikey: serviceRoleKey,
-          Authorization: `******
+          Authorization: `******`,
         }
       }
     );
@@ -84,7 +84,7 @@ export async function POST(request) {
         headers: {
           'Content-Type': 'application/json',
           apikey: serviceRoleKey,
-          Authorization: `******
+          Authorization: `******`,
           Prefer: 'return=representation'
         },
         body: JSON.stringify({

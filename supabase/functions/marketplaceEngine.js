@@ -35,7 +35,7 @@ export async function POST(request) {
         headers: {
           'Content-Type': 'application/json',
           apikey: serviceRoleKey,
-          Authorization: `******
+          Authorization: `******`,
         },
         body: JSON.stringify({
           account_status: 'suspended_compliance',
@@ -67,7 +67,7 @@ export async function POST(request) {
       headers: {
         'Content-Type': 'application/json',
         apikey: serviceRoleKey,
-        Authorization: `******
+        Authorization: `******`,
         Prefer: 'return=representation'
       },
       body: JSON.stringify(payload)
@@ -104,7 +104,7 @@ export async function POST(request) {
         headers: {
           'Content-Type': 'application/json',
           apikey: serviceRoleKey,
-          Authorization: `******
+          Authorization: `******`,
           Prefer: 'return=representation'
         },
         body: JSON.stringify({ is_verified: true, status: 'active_global' })
