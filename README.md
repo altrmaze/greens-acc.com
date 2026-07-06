@@ -8,8 +8,10 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - `backend/server.py` — Python command-center server that serves `dist/`, proxies Supabase functions, and exposes `/api/system-status`
 - `package.json` — build, start, and test scripts
 - `supabase/schema.sql` — database schema for deals and payments
+- `seller-create.html` — seller-facing wizard for drafting deals before activation review
 - `supabase/functions/processEntryFee.js` — edge function to process the flat $20 entry fee
 - `supabase/functions/processWithdrawal.js` — edge function to release escrow only after all 3 AI agents verify compliance
+- `supabase/functions/createDeal.js` — seller deal creation workflow with compliance screening
 
 ## Supabase integration
 
@@ -25,6 +27,12 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - `npm run build` — build static site to `dist/`
 - `npm start` — build the site, start the Python integration server on port `5000`, and expose `/api/system-status`
 - `npm test` — validate schema and edge function syntax
+
+## Seller deal creation workflow
+
+- Sellers can create draft deals from `seller-create.html`.
+- New deal records are stored in `green_acc_deals` with seller publishing metadata such as `publisher_company`, `publisher_type`, `buyer_qualifications`, and `required_documents`.
+- New seller-created deals are inserted with status `awaiting_payment` until the activation step is completed.
 
 ## Payment workflow
 

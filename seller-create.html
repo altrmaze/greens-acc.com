@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greens ACC — Seller Deal Creation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; }
+    .field { width:100%; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; font-size:14px; outline:none; }
+    .field:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.08); }
+    .lbl { display:block; margin-bottom:6px; font-size:12px; font-weight:700; color:#334155; }
+    .btn-primary { background:#059669; color:#fff; border:none; border-radius:10px; padding:10px 18px; font-weight:700; cursor:pointer; }
+    .btn-primary:hover { background:#047857; }
+    .btn-primary:disabled { opacity:.45; cursor:not-allowed; }
+    .btn-secondary { background:#fff; color:#0f172a; border:1px solid #cbd5e1; border-radius:10px; padding:10px 18px; font-weight:700; cursor:pointer; }
+    .btn-secondary:hover { border-color:#059669; background:#f0fdf4; }
+    .step-pill { display:inline-flex; align-items:center; justify-content:center; min-width:34px; height:34px; border-radius:9999px; border:1px solid #cbd5e1; background:#fff; font-size:12px; font-weight:700; color:#64748b; }
+    .step-pill.active { border-color:#059669; background:#ecfdf5; color:#047857; }
+    .step-pill.done { border-color:#10b981; background:#059669; color:#fff; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-4xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
+      <div>
+        <div class="text-xl font-bold text-slate-900">Greens ACC</div>
+        <div class="text-sm text-slate-500">Seller deal publishing workflow</div>
+      </div>
+      <a href="index.html" class="btn-secondary text-sm">← Dashboard</a>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <div class="card p-6 mb-6">
+      <div class="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900">Create a seller deal</h1>
+          <p class="text-sm text-slate-500 mt-1">Submit seller details, buyer requirements, and document rules before payment review.</p>
+        </div>
+        <div class="flex items-center gap-2" aria-label="Workflow steps">
+          <span class="step-pill active" id="step-pill-1">1</span>
+          <span class="step-pill" id="step-pill-2">2</span>
+          <span class="step-pill" id="step-pill-3">3</span>
+        </div>
+      </div>
+    </div>
+
+    <form id="seller-deal-form" class="space-y-6">
+      <section class="card p-6" data-step="1">
+        <div class="text-sm font-bold text-slate-900 mb-1">Step 1 — Deal details</div>
+        <div class="text-xs text-slate-500 mb-5">Describe the opportunity and identify the publishing company.</div>
+        <div class="grid gap-4">
+          <div>
+            <label class="lbl" for="title">Deal title</label>
+            <input id="title" class="field" maxlength="100" placeholder="Example: Organic sesame supply allocation" required>
+          </div>
+          <div>
+            <label class="lbl" for="description">Deal description</label>
+            <textarea id="description" class="field min-h-32" placeholder="Provide detailed terms, scope, volume, and delivery expectations." required></textarea>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="lbl" for="publisher-company">Publisher company</label>
+              <input id="publisher-company" class="field" placeholder="Registered legal entity" required>
+            </div>
+            <div>
+              <label class="lbl" for="publisher-type">Publisher type</label>
+              <select id="publisher-type" class="field">
+                <option>Direct Seller</option>
+                <option>Mandate</option>
+                <option>Broker</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="lbl" for="user-id">Publisher user ID (optional)</label>
+            <input id="user-id" class="field" placeholder="Auth user UUID if already signed in">
+          </div>
+        </div>
+      </section>
+
+      <section class="card p-6 hidden" data-step="2">
+        <div class="text-sm font-bold text-slate-900 mb-1">Step 2 — Buyer requirements</div>
+        <div class="text-xs text-slate-500 mb-5">Define who can participate and which documents must be supplied.</div>
+        <div class="space-y-4">
+          <div>
+            <label class="lbl" for="buyer-qualifications">Buyer qualifications</label>
+            <textarea id="buyer-qualifications" class="field min-h-28" placeholder="State the buyer approval criteria, commercial history, and compliance thresholds." required></textarea>
+          </div>
+          <fieldset>
+            <legend class="lbl mb-3">Required documents</legend>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <label class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                <input type="checkbox" class="mt-1 doc-option" value="Letter of Intent (LOI)">
+                <span>Letter of Intent (LOI)</span>
+              </label>
+              <label class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                <input type="checkbox" class="mt-1 doc-option" value="Proof of Funds (POF)">
+                <span>Proof of Funds (POF)</span>
+              </label>
+              <label class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                <input type="checkbox" class="mt-1 doc-option" value="Bank Comfort Letter (BCL)">
+                <span>Bank Comfort Letter (BCL)</span>
+              </label>
+              <label class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                <input type="checkbox" class="mt-1 doc-option" value="Company Registration and Tax Certificates">
+                <span>Company Registration and Tax Certificates</span>
+              </label>
+              <label class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm sm:col-span-2">
+                <input type="checkbox" class="mt-1 doc-option" value="Import or Export Licenses">
+                <span>Import or Export Licenses</span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+      </section>
+
+      <section class="card p-6 hidden" data-step="3">
+        <div class="text-sm font-bold text-slate-900 mb-1">Step 3 — Payment review</div>
+        <div class="text-xs text-slate-500 mb-5">Submitting this form creates the deal in <strong>awaiting_payment</strong> status for the next activation step.</div>
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 space-y-2 text-sm text-slate-700">
+          <div class="font-semibold text-emerald-800">Before you submit</div>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Fuel, diesel, gasoline, and petroleum commodities are blocked automatically.</li>
+            <li>The deal remains unpublished until the activation/payment stage is completed.</li>
+            <li>Greens ACC will store the required buyer document checklist with the deal record.</li>
+          </ul>
+        </div>
+        <div id="submit-message" class="mt-4 text-sm text-slate-500 min-h-5"></div>
+        <div id="success-panel" class="hidden mt-4 rounded-2xl border border-emerald-200 bg-white p-5">
+          <div class="text-sm font-bold text-emerald-700">Deal created successfully</div>
+          <div class="text-sm text-slate-600 mt-2">Deal ID: <span id="created-deal-id" class="font-mono font-semibold text-slate-900"></span></div>
+          <div class="text-sm text-slate-600 mt-1">Status: <span id="created-deal-status" class="font-semibold text-slate-900"></span></div>
+          <a href="index.html" class="btn-primary inline-block mt-4 text-sm">Return to dashboard</a>
+        </div>
+      </section>
+
+      <div class="flex items-center justify-between gap-3">
+        <button type="button" id="back-btn" class="btn-secondary">Back</button>
+        <div class="flex items-center gap-3">
+          <span id="step-label" class="text-sm text-slate-500">Step 1 of 3</span>
+          <button type="button" id="next-btn" class="btn-primary">Next</button>
+          <button type="submit" id="submit-btn" class="btn-primary hidden">Create Deal</button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const totalSteps = 3;
+      let currentStep = 1;
+
+      function byId(id) { return document.getElementById(id); }
+
+      function selectedDocuments() {
+        return Array.from(document.querySelectorAll('.doc-option:checked')).map((input) => input.value);
+      }
+
+      function setMessage(text, isError) {
+        const node = byId('submit-message');
+        node.textContent = text || '';
+        node.style.color = isError ? '#dc2626' : '#475569';
+      }
+
+      function validateStep(step) {
+        if (step === 1) {
+          const title = byId('title').value.trim();
+          const description = byId('description').value.trim();
+          const company = byId('publisher-company').value.trim();
+          if (title.length < 5) return 'Deal title must be at least 5 characters.';
+          if (description.length < 20) return 'Deal description must be at least 20 characters.';
+          if (!company) return 'Publisher company is required.';
+        }
+        if (step === 2) {
+          const qualifications = byId('buyer-qualifications').value.trim();
+          if (qualifications.length < 10) return 'Buyer qualifications must be at least 10 characters.';
+        }
+        return '';
+      }
+
+      function renderSteps() {
+        document.querySelectorAll('[data-step]').forEach((section) => {
+          section.classList.toggle('hidden', Number(section.getAttribute('data-step')) !== currentStep);
+        });
+
+        for (let index = 1; index <= totalSteps; index += 1) {
+          const pill = byId('step-pill-' + index);
+          pill.classList.toggle('active', index === currentStep);
+          pill.classList.toggle('done', index < currentStep);
+        }
+
+        byId('step-label').textContent = 'Step ' + currentStep + ' of ' + totalSteps;
+        byId('back-btn').disabled = currentStep === 1;
+        byId('next-btn').classList.toggle('hidden', currentStep === totalSteps);
+        byId('submit-btn').classList.toggle('hidden', currentStep !== totalSteps);
+      }
+
+      byId('back-btn').addEventListener('click', function () {
+        if (currentStep > 1) {
+          currentStep -= 1;
+          renderSteps();
+        }
+      });
+
+      byId('next-btn').addEventListener('click', function () {
+        const error = validateStep(currentStep);
+        if (error) {
+          setMessage(error, true);
+          return;
+        }
+        setMessage('', false);
+        if (currentStep < totalSteps) {
+          currentStep += 1;
+          renderSteps();
+        }
+      });
+
+      byId('seller-deal-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const error = validateStep(currentStep);
+        if (error) {
+          setMessage(error, true);
+          return;
+        }
+
+        const submitBtn = byId('submit-btn');
+        submitBtn.disabled = true;
+        setMessage('Creating deal…', false);
+
+        try {
+          const response = await fetch('/supabase/functions/createDeal', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify({
+              title: byId('title').value.trim(),
+              description: byId('description').value.trim(),
+              publisher_company: byId('publisher-company').value.trim(),
+              publisher_type: byId('publisher-type').value,
+              buyer_qualifications: byId('buyer-qualifications').value.trim(),
+              required_documents: selectedDocuments(),
+              user_id: byId('user-id').value.trim() || null
+            })
+          });
+
+          const data = await response.json().catch(function () { return {}; });
+          if (!response.ok) {
+            throw new Error(data.error || 'Deal creation failed.');
+          }
+
+          setMessage(data.next_step || 'Deal created.', false);
+          byId('created-deal-id').textContent = data.deal && data.deal.id ? data.deal.id : 'Unavailable';
+          byId('created-deal-status').textContent = data.deal && data.deal.status ? data.deal.status : 'awaiting_payment';
+          byId('success-panel').classList.remove('hidden');
+        } catch (error) {
+          setMessage(error.message || 'Network error while creating deal.', true);
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+
+      renderSteps();
+    })();
+  </script>
+</body>
+</html>
