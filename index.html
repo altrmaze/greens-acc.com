@@ -909,6 +909,190 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════
+     STAFF PORTAL — RBAC Login & Role-Isolated Dashboards
+═══════════════════════════════════════════════════ -->
+<section id="staff-portal" class="bg-slate-900 py-12 border-t border-slate-700">
+  <div class="max-w-5xl mx-auto px-6">
+
+    <div class="flex items-center gap-2 mb-8">
+      <div class="w-2 h-2 rounded-full bg-emerald-400 blink"></div>
+      <span class="text-slate-400 text-xs font-mono uppercase tracking-widest">Greens ACC — Staff Portal</span>
+    </div>
+
+    <!-- Login form (shown when logged out) -->
+    <div id="sp-login" class="max-w-sm mx-auto">
+      <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700">
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center justify-center w-12 h-12 bg-emerald-900 rounded-xl mb-3">
+            <svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          </div>
+          <div class="text-white font-bold text-sm">Staff Access</div>
+          <div class="text-slate-400 text-xs mt-1">Sign in with your corporate account</div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Email</label>
+          <input id="sp-email" type="email" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" placeholder="you@greens-acc.com" autocomplete="username">
+        </div>
+        <div class="mb-5">
+          <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
+          <input id="sp-password" type="password" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button id="sp-login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-lg py-2.5 transition-colors">Sign In</button>
+        <div id="sp-login-msg" class="mt-3 text-xs text-center text-red-400 hidden"></div>
+      </div>
+    </div>
+
+    <!-- Dashboard (shown when logged in) -->
+    <div id="sp-dashboard" class="hidden">
+
+      <!-- Top bar -->
+      <div class="flex items-center justify-between mb-8 bg-slate-800 rounded-xl px-5 py-3 border border-slate-700">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-emerald-700 rounded-full flex items-center justify-center text-white text-xs font-bold" id="sp-avatar">?</div>
+          <div>
+            <div class="text-white text-sm font-semibold" id="sp-username-display">Loading...</div>
+            <div class="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-700 border border-slate-600 inline-block mt-0.5" id="sp-role-badge">—</div>
+          </div>
+        </div>
+        <button id="sp-logout-btn" class="text-xs text-slate-400 hover:text-red-400 transition-colors font-semibold">Sign Out</button>
+      </div>
+
+      <!-- ── Super Admin Panel (clearance: admin) ── -->
+      <div id="sp-panel-admin" class="sp-panel hidden">
+        <div class="mb-5">
+          <div class="text-white font-bold text-base flex items-center gap-2">🔑 Super Admin — Root Control Centre</div>
+          <div class="text-slate-400 text-xs mt-1">Total platform authority, systemic toggle control, override rights.</div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div class="sp-module-card">Platform Toggle Controls</div>
+          <div class="sp-module-card">User Management</div>
+          <div class="sp-module-card">Global Audit Logs</div>
+          <div class="sp-module-card">System Overrides</div>
+          <div class="sp-module-card">RBAC Configuration</div>
+          <div class="sp-module-card">Billing Root Access</div>
+        </div>
+      </div>
+
+      <!-- ── Account Manager Panel (clearance: account_manager) ── -->
+      <div id="sp-panel-account_manager" class="sp-panel hidden">
+        <div class="mb-5">
+          <div class="text-white font-bold text-base flex items-center gap-2">📊 Account Manager — Oversight &amp; Approvals</div>
+          <div class="text-slate-400 text-xs mt-1">Executive analytics, cross-border contract authorizations, management logs &amp; manifest approval panels.</div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div class="sp-module-card">Corporate Balance Sheet</div>
+          <div class="sp-module-card">Ledger Creation Tools</div>
+          <div class="sp-module-card">Trade Manifest Approvals</div>
+          <div class="sp-module-card">Accounting Audit Logs</div>
+          <div class="sp-module-card">International Trade Contracts</div>
+          <div class="sp-module-card">Client Analytics Dashboard</div>
+        </div>
+      </div>
+
+      <!-- ── Financial Manager Panel (clearance: financial_manager) ── -->
+      <div id="sp-panel-financial_manager" class="sp-panel hidden">
+        <div class="mb-5">
+          <div class="text-white font-bold text-base flex items-center gap-2">💹 Financial Manager — Macro Finance</div>
+          <div class="text-slate-400 text-xs mt-1">Master macro-financial reporting, cross-border tax configuration &amp; currency fluctuation dashboards.</div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div class="sp-module-card">Macro Financial Summary</div>
+          <div class="sp-module-card">Cross-Border Tax Config</div>
+          <div class="sp-module-card">Currency Fluctuation Dashboard</div>
+          <div class="sp-module-card">Operational Cost Reports</div>
+          <div class="sp-module-card">FX Risk Metrics</div>
+          <div class="sp-module-card">Budget Projections</div>
+        </div>
+      </div>
+
+      <!-- ── Accounting Staff Panel (clearance: accounting_staff) — RESTRICTED ── -->
+      <div id="sp-panel-accounting_staff" class="sp-panel hidden">
+        <div class="mb-5">
+          <div class="text-white font-bold text-base flex items-center gap-2">📋 Accounting — Data Entry Workspace</div>
+          <div class="text-slate-400 text-xs mt-1">Individual ledger inputs, invoice processing &amp; billing records.</div>
+        </div>
+        <div class="bg-amber-900/30 border border-amber-700 rounded-xl px-4 py-3 mb-5 text-xs text-amber-300">
+          ⚠ Restricted access: global financial summaries, contract approval buttons, and management reports are not available at this clearance level.
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div class="sp-module-card">New Invoice Entry</div>
+          <div class="sp-module-card">Individual Billing Log</div>
+          <div class="sp-module-card">Manual Ledger Input</div>
+          <div class="sp-module-card">My Submitted Records</div>
+        </div>
+      </div>
+
+      <!-- ── Software Engineer Panel (clearance: software_engineer) ── -->
+      <div id="sp-panel-software_engineer" class="sp-panel hidden">
+        <div class="mb-5">
+          <div class="text-white font-bold text-base flex items-center gap-2">⚡ Engineering Console</div>
+          <div class="text-slate-400 text-xs mt-1">Development console access, live application monitors, server telemetry, and terminal integrations.</div>
+        </div>
+        <!-- Embedded Codespaces iframe -->
+        <div class="w-full rounded-xl overflow-hidden border border-gray-700 flex flex-col" style="height:calc(100vh - 200px); min-height:480px;">
+          <div class="bg-[#202020] px-4 py-2 text-xs text-gray-400 flex justify-between items-center border-b border-gray-800 font-mono">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500 blink"></span>
+              <span class="font-semibold text-gray-300">EMBEDDED CODESPACE HUB: greens-acc.com</span>
+            </div>
+            <span class="text-gray-500 text-[10px]">BRANCH: main</span>
+          </div>
+          <iframe
+            src="https://github.com/codespaces/embed/altrmaze/greens-acc.com?hide_repo_header=true&theme=dark"
+            title="Integrated Development Terminal Frame"
+            class="w-full flex-grow bg-[#1e1e1e]"
+            allow="clipboard-read; clipboard-write; encrypted-media;"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads">
+          </iframe>
+        </div>
+      </div>
+
+      <!-- ── Analyzer Panel (clearance: analyzer) ── -->
+      <div id="sp-panel-analyzer" class="sp-panel hidden">
+        <div class="mb-5">
+          <div class="text-white font-bold text-base flex items-center gap-2">🔬 Analyzing Team — Read-Only Views</div>
+          <div class="text-slate-400 text-xs mt-1">Market projection tables, predictive model histories, and general system views.</div>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div class="sp-module-card">Market Projection Tables</div>
+          <div class="sp-module-card">Predictive Model History</div>
+          <div class="sp-module-card">System View</div>
+          <div class="sp-module-card">Trade Analytics</div>
+          <div class="sp-module-card">Risk Dashboard</div>
+          <div class="sp-module-card">Report Archive</div>
+        </div>
+      </div>
+
+      <!-- Fallback for unknown role -->
+      <div id="sp-panel-unknown" class="sp-panel hidden">
+        <div class="p-6 bg-red-900/40 border border-red-700 rounded-xl text-red-300 text-sm">
+          ⚠ Your account role is not recognized. Please contact your system administrator.
+        </div>
+      </div>
+
+    </div><!-- /sp-dashboard -->
+  </div>
+</section>
+
+<style>
+  .sp-module-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .sp-module-card:hover {
+    border-color: #10b981;
+    color: #ffffff;
+  }
+</style>
+
+<!-- ═══════════════════════════════════════════════════
      FOOTER
 ═══════════════════════════════════════════════════ -->
 <footer class="border-t border-slate-200 bg-white mt-16">
@@ -1948,3 +2132,140 @@ log('Secure trade policy enforced: no sanctions, no illegal commodities, full AM
   });
 })();
 </script>
+
+<!-- ═══════════════════════════════════════════════════
+     STAFF PORTAL SCRIPT — RBAC Auth & Role Isolation
+═══════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  // ── Supabase client ──────────────────────────────────────────────
+  // Credentials are injected at runtime by backend/server.py via
+  // window.__ENV__. Never hard-code keys in source.
+  const supabaseUrl = (window.__ENV__ && window.__ENV__.SUPABASE_URL)   || '';
+  const supabaseKey = (window.__ENV__ && window.__ENV__.SUPABASE_ANON_KEY) || '';
+
+  if (!supabaseUrl || !supabaseKey) {
+    // Portal is still rendered; auth calls will fail gracefully with Supabase errors.
+    console.warn('[StaffPortal] SUPABASE_URL / SUPABASE_ANON_KEY not set — auth disabled.');
+  }
+
+  const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+  // ── Role → clearance label map ───────────────────────────────────
+  const ROLE_LABELS = {
+    admin:              '🔑 Super Admin — Clearance 1',
+    account_manager:    '📊 Account Manager — Clearance 2',
+    financial_manager:  '💹 Financial Manager — Clearance 3',
+    accounting_staff:   '📋 Accounting Staff — Clearance 4',
+    software_engineer:  '⚡ Software Engineer — Clearance 5',
+    analyzer:           '🔬 Analyzer — Clearance 6',
+  };
+
+  // ── DOM helpers ──────────────────────────────────────────────────
+  function show(id)      { var e = document.getElementById(id); if (e) e.classList.remove('hidden'); }
+  function hide(id)      { var e = document.getElementById(id); if (e) e.classList.add('hidden');    }
+  function setText(id,t) { var e = document.getElementById(id); if (e) e.textContent = String(t||''); }
+
+  // ── Show role-specific panel ─────────────────────────────────────
+  function mountRolePanel(role) {
+    document.querySelectorAll('.sp-panel').forEach(function (p) { p.classList.add('hidden'); });
+    var panelId = 'sp-panel-' + (role || 'unknown');
+    var panel = document.getElementById(panelId);
+    if (panel) {
+      panel.classList.remove('hidden');
+    } else {
+      show('sp-panel-unknown');
+    }
+  }
+
+  // ── Sign in ──────────────────────────────────────────────────────
+  async function handleLogin() {
+    var email    = (document.getElementById('sp-email')    || {}).value || '';
+    var password = (document.getElementById('sp-password') || {}).value || '';
+    var msgEl    = document.getElementById('sp-login-msg');
+    var btn      = document.getElementById('sp-login-btn');
+
+    if (!email || !password) {
+      if (msgEl) { msgEl.textContent = 'Please enter email and password.'; msgEl.classList.remove('hidden'); }
+      return;
+    }
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
+    if (msgEl) { msgEl.classList.add('hidden'); }
+
+    var result = await _supabase.auth.signInWithPassword({ email: email, password: password });
+    if (result.error) {
+      if (msgEl) { msgEl.textContent = result.error.message; msgEl.classList.remove('hidden'); }
+      if (btn)   { btn.disabled = false; btn.textContent = 'Sign In'; }
+      return;
+    }
+
+    await loadDashboard(result.data.user);
+  }
+
+  // ── Load dashboard ───────────────────────────────────────────────
+  async function loadDashboard(user) {
+    var profileResult = await _supabase
+      .from('profiles')
+      .select('username, role, priority_level')
+      .eq('id', user.id)
+      .single();
+
+    var profile = profileResult.data || {};
+    var role     = profile.role     || 'unknown';
+    var username = profile.username || user.email || 'Staff';
+
+    hide('sp-login');
+    show('sp-dashboard');
+
+    // Avatar initials
+    var avatarEl = document.getElementById('sp-avatar');
+    if (avatarEl) avatarEl.textContent = username.slice(0, 1).toUpperCase();
+
+    setText('sp-username-display', username);
+    setText('sp-role-badge', ROLE_LABELS[role] || role);
+
+    mountRolePanel(role);
+  }
+
+  // ── Sign out ─────────────────────────────────────────────────────
+  async function handleLogout() {
+    await _supabase.auth.signOut();
+    hide('sp-dashboard');
+    show('sp-login');
+    var btn = document.getElementById('sp-login-btn');
+    if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
+    var passEl = document.getElementById('sp-password');
+    if (passEl) passEl.value = '';
+  }
+
+  // ── Resume existing session on page load ─────────────────────────
+  async function checkExistingSession() {
+    var sessionResult = await _supabase.auth.getSession();
+    var session = sessionResult.data && sessionResult.data.session;
+    if (session && session.user) {
+      await loadDashboard(session.user);
+    }
+  }
+
+  // ── Wire events ──────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', function () {
+    var loginBtn  = document.getElementById('sp-login-btn');
+    var logoutBtn = document.getElementById('sp-logout-btn');
+    var pwInput   = document.getElementById('sp-password');
+
+    if (loginBtn)  loginBtn.addEventListener('click', handleLogin);
+    if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
+    if (pwInput)   pwInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    checkExistingSession();
+  });
+})();
+</script>
+</body>
+</html>
