@@ -28,6 +28,12 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - `npm start` — build the site, start the Python integration server on port `5000`, and expose `/api/system-status`
 - `npm test` — validate schema and edge function syntax
 
+## Additional backend endpoints
+
+- `GET /api/v1/green-bananas/content` — returns merged survey content for the legacy-compatible dashboard path.
+- `POST /api/v1/green-bananas/survey/submit` — accepts `{ "user_id": string, "content": object }` and stores it in memory or `gb_surveys` when Supabase is configured.
+- `POST /api/v1/payments/webhook` — validates Stripe signatures when `STRIPE_WEBHOOK_SECRET` is set and forwards payment events to the existing Supabase `stripeWebhook` function when available.
+
 ## Seller deal creation workflow
 
 - Sellers can create draft deals from `seller-create.html`.
