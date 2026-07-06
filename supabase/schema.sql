@@ -320,3 +320,45 @@ create index if not exists idx_deal_fulfillments_buyer on public.deal_fulfillmen
 create index if not exists idx_deal_fulfillments_seller on public.deal_fulfillments (seller_id);
 create index if not exists idx_deal_fulfillments_status on public.deal_fulfillments (stripe_payment_status);
 create index if not exists idx_deal_fulfillments_logistics on public.deal_fulfillments (current_logistics_status);
+
+-- ============================================================
+-- MEETING ROOM TABLES
+-- ============================================================
+
+-- Documents uploaded during a live negotiation session
+create table if not exists public.meeting_room_documents (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  uploader_id uuid not null,
+  file_name text not null,
+  file_path text not null,
+  mime_type text not null,
+  file_size_bytes int,
+  scan_status text not null default 'PENDING'
+    check (scan_status in ('PENDING','CLEAN','QUARANTINED')),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_meeting_docs_deal on public.meeting_room_documents (deal_id);
+create index if not exists idx_meeting_docs_uploader on public.meeting_room_documents (uploader_id);
+
+-- Private AI Secretary memos — contract-text analysis only, not counter-party surveillance.
+-- The AI analyses the deal documents and surfaces flags (e.g. "Penalty clause §4.2 is unusually broad").
+-- It does NOT monitor the other party's reading time, mouse activity, or engagement index.
+create table if not exists public.meeting_memos (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  receiver_id uuid not null,
+  memo_type text not null default 'CONTRACT_FLAG'
+    check (memo_type in ('CONTRACT_FLAG','COMPLIANCE_ALERT','DOCUMENT_NOTE','GENERAL')),
+  content_message text not null,
+  source_clause text,
+  severity text not null default 'INFO'
+    check (severity in ('INFO','WARNING','CRITICAL')),
+  is_read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_meeting_memos_deal on public.meeting_memos (deal_id);
+create index if not exists idx_meeting_memos_receiver on public.meeting_memos (receiver_id);
+create index if not exists idx_meeting_memos_read on public.meeting_memos (is_read);

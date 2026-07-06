@@ -873,6 +873,37 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════
+     VIDEO ONBOARDING GUIDE
+═══════════════════════════════════════════════════ -->
+<section id="video-guide" class="bg-white py-10 border-t border-slate-200">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="text-center mb-6">
+      <div class="section-header mb-1">Platform Walkthrough</div>
+      <div class="section-sub">Watch the step-by-step onboarding sequence — asset sourcing, compliance waiting rooms, and deal clearance</div>
+    </div>
+    <div class="relative aspect-video w-full bg-slate-900 rounded-2xl border border-slate-200 overflow-hidden shadow-lg" id="video-container">
+      <!-- Play overlay (shown before video plays) -->
+      <div id="video-overlay" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-slate-950/80 cursor-pointer group" onclick="playVideoGuide()">
+        <div class="w-16 h-16 bg-blue-600 group-hover:bg-blue-500 rounded-full flex items-center justify-center transition-transform group-hover:scale-105 shadow-xl">
+          <svg class="w-6 h-6 fill-white ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <p class="text-xs font-mono text-slate-400">Click to play — Greens ACC Complete Platform Walkthrough</p>
+      </div>
+      <!-- YouTube iframe (injected on play) -->
+      <div id="video-frame" class="hidden w-full h-full"></div>
+      <div class="absolute bottom-2 left-2 bg-slate-950/80 border border-slate-700 px-2.5 py-1 rounded-md text-[10px] font-mono text-slate-400 pointer-events-none">
+        GREENS ACC — SECURE PLAYER
+      </div>
+    </div>
+    <div class="flex items-center justify-center gap-6 mt-4 text-xs text-slate-400">
+      <span>🔒 No tracking pixels</span>
+      <span>📋 5-minute overview</span>
+      <span>🌐 Available in 5 languages</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
      DEALS GRID — Locked B2B International Matrix
 ═══════════════════════════════════════════════════ -->
 <section id="deals-grid" class="bg-slate-50 py-10 border-t border-slate-200">
@@ -1150,6 +1181,9 @@
     const ENTRY_FEE_AMOUNT = 20.00;
     const HANDSHAKE_COMMISSION_RATE = 0.02;
 
+    // ── Shared portal context (read by deals grid script) ─────────────
+    window.__gaccPortal = { activated: false, dealId: '', payerId: '' };
+
     // ── State ──────────────────────────────────────────────────────────
     const state = {
         deal: {
@@ -1337,6 +1371,11 @@
         if (deal.lc_reference_number) state.deal.lc_reference_number = deal.lc_reference_number;
         if (deal.safe_withdrawal_ready != null) state.deal.safe_withdrawal_ready = deal.safe_withdrawal_ready;
         if (deal.withdrawal_triggered != null) state.deal.withdrawal_triggered = deal.withdrawal_triggered;
+        // Sync activation state for the deals grid
+        const dealId  = (el('deal-id-input')  || {}).value?.trim() || '';
+        const payerId = (el('payer-id-input') || {}).value?.trim() || '';
+        const activated = state.deal.entry_fee_status === 'paid' || state.deal.entry_fee_status === 'verified';
+        window.__gaccPortal = { activated, dealId, payerId };
         updateDealStatusUI();
     }
 
@@ -2055,12 +2094,12 @@ log('Secure trade policy enforced: no sanctions, no illegal commodities, full AM
   'use strict';
 
   const DEMO_DEALS = [
-    { ref: 'TL-2025-001', commodity: 'Organic Wheat — 2,400 MT', origin: 'Ukraine → Egypt', value: '$1.92M', incoterm: 'CIF Alexandria', status: 'Active' },
-    { ref: 'TL-2025-002', commodity: 'Green Coffee Beans — 480 MT', origin: 'Ethiopia → Germany', value: '$864K', incoterm: 'FOB Djibouti', status: 'Negotiating' },
-    { ref: 'TL-2025-003', commodity: 'Cotton Bale — 900 MT', origin: 'Uzbekistan → Bangladesh', value: '$1.17M', incoterm: 'CFR Chittagong', status: 'Active' },
-    { ref: 'TL-2025-004', commodity: 'Copper Cathode — 600 MT', origin: 'Zambia → China', value: '$5.4M', incoterm: 'CIF Shanghai', status: 'Under Review' },
-    { ref: 'TL-2025-005', commodity: 'Frozen Chicken — 1,200 MT', origin: 'Brazil → Saudi Arabia', value: '$2.16M', incoterm: 'CIF Jeddah', status: 'Active' },
-    { ref: 'TL-2025-006', commodity: 'Hardwood Timber — 320 CBM', origin: 'Malaysia → UAE', value: '$448K', incoterm: 'FOB Port Klang', status: 'Negotiating' },
+    { ref: 'TL-2025-001', commodity: 'Organic Wheat — 2,400 MT', origin: 'Ukraine → Egypt', value: '$1.92M', incoterm: 'CIF Alexandria', status: 'Active', category: 'agri' },
+    { ref: 'TL-2025-002', commodity: 'Green Coffee Beans — 480 MT', origin: 'Ethiopia → Germany', value: '$864K', incoterm: 'FOB Djibouti', status: 'Negotiating', category: 'agri' },
+    { ref: 'TL-2025-003', commodity: 'Cotton Bale — 900 MT', origin: 'Uzbekistan → Bangladesh', value: '$1.17M', incoterm: 'CFR Chittagong', status: 'Active', category: 'agri' },
+    { ref: 'TL-2025-004', commodity: 'Copper Cathode — 600 MT', origin: 'Zambia → China', value: '$5.4M', incoterm: 'CIF Shanghai', status: 'Under Review', category: 'metals' },
+    { ref: 'TL-2025-005', commodity: 'Frozen Chicken — 1,200 MT', origin: 'Brazil → Saudi Arabia', value: '$2.16M', incoterm: 'CIF Jeddah', status: 'Active', category: 'food' },
+    { ref: 'TL-2025-006', commodity: 'Hardwood Timber — 320 CBM', origin: 'Malaysia → UAE', value: '$448K', incoterm: 'FOB Port Klang', status: 'Negotiating', category: 'timber' },
   ];
 
   const grid = document.getElementById('deals-locked-grid');
@@ -2125,7 +2164,17 @@ log('Secure trade policy enforced: no sanctions, no illegal commodities, full AM
     card.appendChild(lock);
 
     card.addEventListener('click', function () {
-      if (modal) modal.classList.remove('hidden');
+      var portal = window.__gaccPortal || {};
+      if (portal.activated) {
+        var params = new URLSearchParams({
+          dealId: portal.dealId || deal.ref,
+          userId: portal.payerId || '',
+          commodity: deal.category || 'general',
+        });
+        window.location.href = 'deal-room.html?' + params.toString();
+      } else {
+        if (modal) modal.classList.remove('hidden');
+      }
     });
 
     grid.appendChild(card);
@@ -2266,6 +2315,35 @@ log('Secure trade policy enforced: no sanctions, no illegal commodities, full AM
     checkExistingSession();
   });
 })();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     VIDEO GUIDE SCRIPT
+═══════════════════════════════════════════════════ -->
+<script>
+// VIDEO_ID placeholder — replace with your YouTube video ID when available.
+// e.g. 'dQw4w9WgXcQ'
+var GREENS_ACC_VIDEO_ID = '';
+
+function playVideoGuide() {
+  var overlay = document.getElementById('video-overlay');
+  var frame   = document.getElementById('video-frame');
+  if (!overlay || !frame) return;
+  overlay.classList.add('hidden');
+  frame.classList.remove('hidden');
+  if (GREENS_ACC_VIDEO_ID) {
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(GREENS_ACC_VIDEO_ID) + '?autoplay=1&rel=0&modestbranding=1';
+    iframe.title = 'Greens ACC Platform Walkthrough';
+    iframe.className = 'w-full h-full border-none';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    frame.appendChild(iframe);
+  } else {
+    // No video ID configured yet — show a placeholder
+    frame.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-slate-900 text-slate-400 text-sm font-mono">Video coming soon — set GREENS_ACC_VIDEO_ID in the page script.</div>';
+  }
+}
 </script>
 </body>
 </html>

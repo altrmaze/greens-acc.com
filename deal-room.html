@@ -986,7 +986,7 @@
                     d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
       const btn = document.createElement('button');
       btn.className = 'slot-btn text-center';
-      btn.innerHTML = label.replace('\n', '<br>');
+      btn.innerHTML = label.replace(/\n/g, '<br>');
       btn.dataset.iso = iso;
       btn.onclick = () => {
         document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
