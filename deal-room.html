@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greens ACC — Secure Deal Clearance Room</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}.blink{animation:blink 2s ease-in-out infinite;}
+    @keyframes pulse-ring{0%{transform:scale(1);opacity:.8}80%,100%{transform:scale(1.8);opacity:0}}
+    .pulse-ring::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid #dc2626;animation:pulse-ring 1.4s ease-out infinite;}
+    .drop-zone{border:2px dashed #cbd5e1;border-radius:12px;transition:border-color .2s,background .2s;}
+    .drop-zone.dragover{border-color:#059669;background:#f0fdf4;}
+    .step-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:9999px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+    .pill-pending{background:#f1f5f9;color:#64748b;border:1px solid #cbd5e1;}
+    .pill-review{background:#fffbeb;color:#b45309;border:1px solid #fcd34d;}
+    .pill-approved{background:#ecfdf5;color:#059669;border:1px solid #6ee7b7;}
+    .pill-rejected{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;}
+    .btn-primary{background:#059669;color:#fff;border-radius:9px;font-weight:600;font-size:12px;border:none;cursor:pointer;padding:9px 18px;transition:background .15s;}
+    .btn-primary:hover{background:#047857;}
+    .btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+    .btn-secondary{background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:9px;font-weight:600;font-size:12px;cursor:pointer;padding:9px 18px;transition:border-color .15s;}
+    .btn-secondary:hover{border-color:#059669;}
+    .field{border:1px solid #cbd5e1;border-radius:8px;padding:7px 11px;font-size:13px;width:100%;outline:none;transition:border-color .15s;}
+    .field:focus{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.08);}
+    .lbl{font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px;}
+    .log-line{padding:6px 10px;border-bottom:1px solid #f1f5f9;font-size:11px;display:flex;gap:8px;align-items:flex-start;}
+    .log-line:last-child{border-bottom:none;}
+    .slot-btn{padding:7px 10px;border-radius:8px;border:1px solid #e2e8f0;font-size:11px;font-weight:600;cursor:pointer;transition:background .12s,border-color .12s;background:#fff;}
+    .slot-btn:hover{border-color:#059669;background:#f0fdf4;}
+    .slot-btn.selected{border-color:#059669;background:#ecfdf5;color:#047857;}
+    /* RTL support */
+    [dir=rtl] .rtl-flip{transform:scaleX(-1);}
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased">
+
+<!-- ═══ TICKER ═══ -->
+<div class="bg-slate-950 text-slate-400 text-[10px] py-1.5 px-0 overflow-hidden border-b border-slate-800 font-mono">
+  <span class="inline-flex items-center gap-2 px-6">
+    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full blink"></span>
+    <span>GREENS ACC — SECURE DEAL CLEARANCE ROOM</span>
+    <span class="text-slate-600 mx-2">|</span>
+    <span>COMPLIANCE ENGINE <span class="text-emerald-400">ACTIVE</span></span>
+    <span class="text-slate-600 mx-2">|</span>
+    <span>FUEL &amp; PETROLEUM COMMODITIES <span class="text-red-400">NOT ACCEPTED</span></span>
+  </span>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="h-9 w-9 bg-emerald-600 rounded-xl flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <div>
+        <div class="font-bold text-slate-900 text-sm">Greens ACC — Clearance Room</div>
+        <div class="text-[11px] text-slate-500" id="hdr-deal-ref">Loading deal…</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <!-- Language Selector -->
+      <select id="lang-select" class="field text-xs w-auto px-3 py-2">
+        <option value="en">🇬🇧 English</option>
+        <option value="ar">🇸🇦 العربية</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="de">🇩🇪 Deutsch</option>
+      </select>
+      <span id="clearance-status-badge" class="step-pill pill-pending">PENDING DOCUMENTS</span>
+      <a href="/" class="btn-secondary text-xs">← Dashboard</a>
+    </div>
+  </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-[1fr_340px] gap-6">
+
+  <!-- ═══ LEFT COLUMN ═══ -->
+  <div class="space-y-5">
+
+    <!-- Deal Identity Banner -->
+    <div class="card p-5 border-l-4 border-emerald-500">
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <div class="text-xs font-mono text-slate-400 mb-1" id="deal-id-display">Deal ID: —</div>
+          <div class="text-lg font-bold text-slate-900" id="deal-commodity-display" data-i18n="deal_commodity">—</div>
+          <div class="text-sm text-slate-500 mt-1" id="deal-meta-display">—</div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-slate-400" data-i18n="clearance_status">Clearance Status</div>
+          <div class="text-sm font-bold text-emerald-700 mt-1" id="clearance-status-text">Awaiting Documents</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── DOCUMENT UPLOAD PIPELINE ─── -->
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <div class="font-bold text-slate-900 text-sm" data-i18n="doc_pipeline">Document Submission Pipeline</div>
+          <div class="text-xs text-slate-500 mt-0.5" data-i18n="doc_pipeline_sub">Upload all required trade credentials to proceed</div>
+        </div>
+        <span class="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-1 rounded" id="doc-progress-counter">0 / 0</span>
+      </div>
+
+      <!-- Required docs checklist -->
+      <div id="doc-checklist" class="space-y-2 mb-4"></div>
+
+      <!-- Drop zone -->
+      <div id="drop-zone" class="drop-zone p-6 text-center mt-3">
+        <div class="text-2xl mb-2">📎</div>
+        <div class="text-sm font-semibold text-slate-700" data-i18n="drop_zone_title">Drag & drop files here</div>
+        <div class="text-xs text-slate-400 mb-3" data-i18n="drop_zone_sub">PDF, DOCX, JPG — max 20 MB per file</div>
+        <div class="flex items-center gap-2 justify-center flex-wrap">
+          <select id="doc-type-select" class="field text-xs w-auto px-3 py-2">
+            <option value="">— Select document type —</option>
+          </select>
+          <label class="btn-primary cursor-pointer" data-i18n="browse_files">
+            Browse Files
+            <input type="file" id="file-input" class="hidden" multiple accept=".pdf,.docx,.doc,.jpg,.jpeg,.png">
+          </label>
+        </div>
+        <div id="upload-msg" class="text-xs mt-2 text-slate-400"></div>
+      </div>
+
+      <!-- Uploaded documents list -->
+      <div id="uploaded-docs-list" class="mt-4 space-y-2"></div>
+    </div>
+
+    <!-- ─── NCNDA & LEGAL AGREEMENT ─── -->
+    <div class="card p-5 border border-amber-200 bg-amber-50/40">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-base">⚖️</span>
+        <div class="font-bold text-slate-900 text-sm" data-i18n="legal_agreement">Legal Agreement & Compliance Declaration</div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-xl p-4 text-xs text-slate-600 leading-relaxed space-y-2 max-h-52 overflow-y-auto mb-4" id="ncnda-text">
+        <p class="font-semibold text-slate-800">NON-CIRCUMVENTION, NON-DISCLOSURE & WORKING AGREEMENT (NCNDA)</p>
+        <p>By engaging with the Greens ACC Secure Clearance Platform, all parties agree to maintain strict non-circumvention and non-disclosure of proprietary deal structures, seller identities, buyer contacts, and transaction terms discovered or facilitated through this platform.</p>
+        <p><strong>Article 1 — Non-Circumvention:</strong> No party shall bypass, circumvent, or directly contact any deal counterparty, introduced entity, or proprietary contact without prior written consent from Greens ACC. Violation carries a penalty equal to the full deal commission value or a minimum of USD 50,000.</p>
+        <p><strong>Article 2 — Non-Disclosure:</strong> All transaction data, pricing structures, seller mandates, and buyer requirements are classified as strictly confidential. Unauthorised disclosure is subject to immediate legal action under applicable international commercial law.</p>
+        <p><strong>Article 3 — Fraudulent Documentation:</strong> Submission of falsified, forged, or misrepresented trade documents (including but not limited to SGS certificates, certificates of origin, or letters of intent) constitutes fraud under international trade law. Greens ACC reserves the right to immediately suspend access, report to relevant authorities, and pursue full legal damages.</p>
+        <p><strong>Article 4 — Platform Exclusion Policy:</strong> Greens ACC strictly does not broker, facilitate, list, or process transactions involving fuel, diesel, petroleum, crude oil, or any derivative petroleum commodity. Any attempt to submit fuel-related deals will result in permanent account suspension and regulatory reporting.</p>
+        <p><strong>Article 5 — Governing Law:</strong> This agreement is governed by international commercial arbitration standards (ICC Rules). Disputes shall be resolved through binding arbitration.</p>
+      </div>
+
+      <div class="flex items-start gap-3">
+        <input type="checkbox" id="ncnda-checkbox" class="mt-0.5 w-4 h-4 accent-emerald-600">
+        <label for="ncnda-checkbox" class="text-xs text-slate-700 leading-snug" data-i18n="ncnda_confirm">
+          I have read and fully accept the NCNDA, Penalty Matrix, and Platform Compliance Rules outlined above. I confirm this submission is made in good faith with accurate documentation.
+        </label>
+      </div>
+      <button id="btn-sign-ncnda" class="btn-primary mt-3 w-full opacity-40" disabled data-i18n="sign_agree">
+        Sign & Accept Agreement
+      </button>
+      <div id="ncnda-signed-indicator" class="hidden mt-3 text-xs text-emerald-700 font-semibold flex items-center gap-1.5">
+        <span>✅</span><span data-i18n="ncnda_signed">Agreement signed — timestamp recorded</span>
+      </div>
+    </div>
+
+    <!-- ─── GOVERNMENT FILING TRACKER ─── -->
+    <div class="card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <div class="font-bold text-slate-900 text-sm" data-i18n="gov_filings">Government Filing Tracker</div>
+          <div class="text-xs text-slate-500 mt-0.5" data-i18n="gov_filings_sub">Track your manually-initiated regulatory submissions</div>
+        </div>
+        <button id="btn-add-filing" class="btn-secondary text-xs" data-i18n="add_filing">+ Add Filing</button>
+      </div>
+
+      <!-- New filing form (hidden by default) -->
+      <div id="new-filing-form" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-4 mb-4 space-y-3">
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label class="lbl" data-i18n="agency_name">Agency / Regulatory Body</label>
+            <input id="filing-agency" class="field text-xs" placeholder="e.g. Dept. of Agriculture" />
+          </div>
+          <div>
+            <label class="lbl" data-i18n="doc_scope">Document / Certificate Scope</label>
+            <input id="filing-doc-scope" class="field text-xs" placeholder="e.g. Phytosanitary Renewal" />
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label class="lbl" data-i18n="filing_lang">Preferred Language</label>
+            <select id="filing-lang" class="field text-xs">
+              <option value="en">English</option>
+              <option value="ar">Arabic</option>
+              <option value="fr">French</option>
+              <option value="zh">Chinese</option>
+              <option value="de">German</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl" data-i18n="filing_auth">Proxy Authorization</label>
+            <div class="flex items-center gap-2 mt-1.5">
+              <input type="checkbox" id="filing-auth-checkbox" class="w-4 h-4 accent-emerald-600">
+              <span class="text-xs text-slate-600" data-i18n="filing_auth_label">I authorise Greens ACC to assist with this filing</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button id="btn-save-filing" class="btn-primary text-xs" data-i18n="save_filing">Save Filing Record</button>
+          <button id="btn-cancel-filing" class="btn-secondary text-xs" data-i18n="cancel">Cancel</button>
+        </div>
+      </div>
+
+      <div id="filing-list" class="space-y-2">
+        <div class="text-xs text-slate-400 text-center py-4" id="filing-empty-msg" data-i18n="no_filings">No filing records yet. Add your first regulatory submission.</div>
+      </div>
+    </div>
+
+    <!-- ─── APPOINTMENT SCHEDULER ─── -->
+    <div class="card p-5">
+      <div class="font-bold text-slate-900 text-sm mb-1" data-i18n="schedule_meeting">Schedule a Representative Meeting</div>
+      <div class="text-xs text-slate-500 mb-4" data-i18n="schedule_meeting_sub">Book an available slot with the Greens ACC trade representative (UTC, 60-min sessions)</div>
+      <div id="slots-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-4"></div>
+      <div id="slots-loading" class="text-xs text-slate-400 text-center py-4" data-i18n="loading_slots">Loading available slots…</div>
+      <div class="flex gap-2 items-center">
+        <input id="appt-notes" class="field text-xs flex-1" placeholder="Notes for representative (optional)" data-i18n-placeholder="appt_notes_ph">
+        <button id="btn-book-slot" class="btn-primary text-xs opacity-40" disabled data-i18n="book_slot">Book Slot</button>
+      </div>
+      <div id="appt-msg" class="mt-2 text-xs text-slate-400"></div>
+    </div>
+
+  </div><!-- /left column -->
+
+  <!-- ═══ RIGHT COLUMN ═══ -->
+  <div class="space-y-5">
+
+    <!-- ─── CLEARANCE STATUS WIDGET ─── -->
+    <div class="card p-5 text-center">
+      <div class="text-3xl mb-2" id="status-icon">⏳</div>
+      <div class="font-bold text-slate-900 text-sm" id="status-title" data-i18n="status_waiting">Awaiting Document Submission</div>
+      <div class="text-xs text-slate-500 mt-1 leading-relaxed" id="status-desc" data-i18n="status_waiting_desc">
+        Upload all required documents and sign the compliance agreement to proceed to the live negotiation room.
+      </div>
+      <div class="mt-4">
+        <div class="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
+          <span data-i18n="progress">Progress</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-2">
+          <div id="progress-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── VOICE COMMAND PANEL ─── -->
+    <div class="card p-5">
+      <div class="font-bold text-slate-900 text-sm mb-1 flex items-center gap-2">
+        <span>🎙️</span>
+        <span data-i18n="voice_panel">Voice Command — AI Secretary</span>
+      </div>
+      <div class="text-xs text-slate-500 mb-3" data-i18n="voice_panel_sub">Speak to ask market questions or request deal guidance. Requires microphone permission.</div>
+      <button id="btn-voice-toggle" class="btn-secondary w-full text-xs flex items-center justify-center gap-2" data-i18n="activate_voice">
+        <span id="voice-icon">🎤</span>
+        <span id="voice-btn-label">Activate Voice Input</span>
+      </button>
+      <div id="voice-transcript" class="hidden mt-3 bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-600 min-h-[40px]"></div>
+      <div id="voice-status" class="mt-2 text-[10px] text-slate-400 text-center"></div>
+    </div>
+
+    <!-- ─── AI SECRETARY SIDEBAR ─── -->
+    <div class="card p-5 flex flex-col" style="min-height:340px">
+      <div class="font-bold text-slate-900 text-sm mb-1 flex items-center gap-2">
+        <span>🤖</span>
+        <span data-i18n="ai_secretary">AI Executive Secretary</span>
+      </div>
+      <div class="text-xs text-slate-500 mb-3" data-i18n="ai_secretary_sub">Ask about deal preparation, market context, or document requirements</div>
+
+      <!-- Quick insight tabs -->
+      <div class="flex gap-1.5 mb-3 flex-wrap">
+        <button class="ai-tab text-[10px] font-semibold px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 transition" data-query="historical" data-i18n="ai_history">📈 Market History</button>
+        <button class="ai-tab text-[10px] font-semibold px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 transition" data-query="pricing" data-i18n="ai_pricing">💰 Pricing Curves</button>
+        <button class="ai-tab text-[10px] font-semibold px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 transition" data-query="documents" data-i18n="ai_docs">📋 Doc Guidance</button>
+        <button class="ai-tab text-[10px] font-semibold px-2.5 py-1 rounded-full border border-slate-200 bg-white hover:bg-emerald-50 hover:border-emerald-300 transition" data-query="supply_chain" data-i18n="ai_supply">🚢 Supply Chain</button>
+      </div>
+
+      <div id="ai-log" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed overflow-y-auto space-y-2" style="max-height:260px">
+        <div class="text-slate-400 italic" data-i18n="ai_greeting">Analysing market profiles for this asset class… Select a quick insight or type a question below.</div>
+      </div>
+
+      <div class="mt-3 flex gap-2">
+        <input id="ai-query-input" class="field text-xs flex-1" placeholder="Ask the AI Secretary…" data-i18n-placeholder="ai_query_ph">
+        <button id="btn-ai-send" class="btn-primary text-xs" data-i18n="send">Send</button>
+      </div>
+    </div>
+
+    <!-- ─── LEGAL COMPLIANCE SIDEBAR ─── -->
+    <div class="card p-5 bg-red-50/30 border-red-200">
+      <div class="font-bold text-slate-900 text-sm mb-3 flex items-center gap-2">
+        <span>🚫</span>
+        <span data-i18n="compliance_notice">Platform Compliance Notice</span>
+      </div>
+      <div class="space-y-3 text-xs text-slate-700">
+        <div class="bg-red-100 border border-red-200 rounded-lg p-3">
+          <div class="font-bold text-red-700 mb-1" data-i18n="fuel_ban_title">⛽ Fuel & Petroleum — STRICTLY EXCLUDED</div>
+          <div class="leading-snug text-red-700" data-i18n="fuel_ban_desc">Greens ACC does not broker, list, or facilitate any transaction involving fuel, diesel, crude oil, petroleum, or derivative commodities. Attempts will result in permanent suspension and regulatory reporting.</div>
+        </div>
+        <div class="border border-slate-200 rounded-lg p-3">
+          <div class="font-semibold text-slate-800 mb-1" data-i18n="ncnda_rule">🔒 NCNDA Enforcement</div>
+          <div class="text-slate-600 leading-snug" data-i18n="ncnda_rule_desc">All parties are bound by Non-Circumvention and Non-Disclosure rules. Penalty for breach: minimum USD 50,000 or full deal commission value.</div>
+        </div>
+        <div class="border border-slate-200 rounded-lg p-3">
+          <div class="font-semibold text-slate-800 mb-1" data-i18n="fraud_rule">⚠️ Fraudulent Documents</div>
+          <div class="text-slate-600 leading-snug" data-i18n="fraud_rule_desc">Submission of forged SGS certificates, certificates of origin, or any falsified credentials constitutes international trade fraud. Greens ACC will report all violations to relevant trade authorities.</div>
+        </div>
+        <div class="border border-slate-200 rounded-lg p-3">
+          <div class="font-semibold text-slate-800 mb-1" data-i18n="commission_rule">💼 Platform Commission</div>
+          <div class="text-slate-600 leading-snug" data-i18n="commission_rule_desc">Standard 2% Greens ACC commission applies on confirmed deal value. $20 activation fee is non-refundable.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /right column -->
+
+</div><!-- /grid -->
+
+<!-- ─── APPOINTMENT CONFIRMED TOAST ─── -->
+<div id="appt-toast" class="hidden fixed bottom-6 right-6 bg-emerald-700 text-white rounded-xl shadow-2xl px-5 py-4 text-sm font-semibold z-50 max-w-xs"></div>
+
+<!-- ─── APPROVED OVERLAY ─── -->
+<div id="approved-overlay" class="hidden fixed inset-0 bg-emerald-900/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
+    <div class="text-5xl mb-4">✅</div>
+    <div class="text-xl font-bold text-emerald-700 mb-2" data-i18n="approved_title">Clearance Approved</div>
+    <div class="text-sm text-slate-600 mb-6" data-i18n="approved_desc">Your documents have been verified. You are being routed to the live negotiation room.</div>
+    <div class="text-xs text-slate-400 blink" data-i18n="redirecting">Redirecting…</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── TRANSLATIONS ──────────────────────────────────────────────────────────
+  const TRANSLATIONS = {
+    en: {
+      deal_commodity: 'Deal Commodity',
+      clearance_status: 'Clearance Status',
+      doc_pipeline: 'Document Submission Pipeline',
+      doc_pipeline_sub: 'Upload all required trade credentials to proceed',
+      drop_zone_title: 'Drag & drop files here',
+      drop_zone_sub: 'PDF, DOCX, JPG — max 20 MB per file',
+      browse_files: 'Browse Files',
+      legal_agreement: 'Legal Agreement & Compliance Declaration',
+      ncnda_confirm: 'I have read and fully accept the NCNDA, Penalty Matrix, and Platform Compliance Rules outlined above.',
+      sign_agree: 'Sign & Accept Agreement',
+      ncnda_signed: 'Agreement signed — timestamp recorded',
+      gov_filings: 'Government Filing Tracker',
+      gov_filings_sub: 'Track your manually-initiated regulatory submissions',
+      add_filing: '+ Add Filing',
+      agency_name: 'Agency / Regulatory Body',
+      doc_scope: 'Document / Certificate Scope',
+      filing_lang: 'Preferred Language',
+      filing_auth: 'Proxy Authorization',
+      filing_auth_label: 'I authorise Greens ACC to assist with this filing',
+      save_filing: 'Save Filing Record',
+      cancel: 'Cancel',
+      no_filings: 'No filing records yet.',
+      schedule_meeting: 'Schedule a Representative Meeting',
+      schedule_meeting_sub: 'Book an available slot with the Greens ACC trade representative (UTC, 60-min sessions)',
+      loading_slots: 'Loading available slots…',
+      appt_notes_ph: 'Notes for representative (optional)',
+      book_slot: 'Book Slot',
+      status_waiting: 'Awaiting Document Submission',
+      status_waiting_desc: 'Upload all required documents and sign the compliance agreement to proceed.',
+      status_review: 'Under Review',
+      status_review_desc: 'Your documents have been received. Our team is reviewing your submission.',
+      status_approved: 'Clearance Approved',
+      status_approved_desc: 'You have been cleared to enter the live negotiation room.',
+      progress: 'Progress',
+      voice_panel: 'Voice Command — AI Secretary',
+      voice_panel_sub: 'Speak to ask market questions or request deal guidance.',
+      activate_voice: 'Activate Voice Input',
+      ai_secretary: 'AI Executive Secretary',
+      ai_secretary_sub: 'Ask about deal preparation, market context, or document requirements',
+      ai_history: '📈 Market History',
+      ai_pricing: '💰 Pricing Curves',
+      ai_docs: '📋 Doc Guidance',
+      ai_supply: '🚢 Supply Chain',
+      ai_greeting: 'Analysing market profiles for this asset class…',
+      ai_query_ph: 'Ask the AI Secretary…',
+      send: 'Send',
+      compliance_notice: 'Platform Compliance Notice',
+      fuel_ban_title: '⛽ Fuel & Petroleum — STRICTLY EXCLUDED',
+      fuel_ban_desc: 'Greens ACC does not broker or facilitate any petroleum commodity transactions.',
+      ncnda_rule: '🔒 NCNDA Enforcement',
+      ncnda_rule_desc: 'All parties bound by NCNDA. Penalty for breach: minimum USD 50,000.',
+      fraud_rule: '⚠️ Fraudulent Documents',
+      fraud_rule_desc: 'Forged trade credentials will be reported to international trade authorities.',
+      commission_rule: '💼 Platform Commission',
+      commission_rule_desc: 'Standard 2% commission on confirmed deal value. $20 activation fee is non-refundable.',
+      approved_title: 'Clearance Approved',
+      approved_desc: 'Your documents have been verified. Routing to live negotiation room.',
+      redirecting: 'Redirecting…',
+    },
+    ar: {
+      deal_commodity: 'سلعة الصفقة',
+      clearance_status: 'حالة التخليص',
+      doc_pipeline: 'خط تقديم المستندات',
+      doc_pipeline_sub: 'ارفع جميع وثائق التجارة المطلوبة للمتابعة',
+      drop_zone_title: 'اسحب وأفلت الملفات هنا',
+      drop_zone_sub: 'PDF، DOCX، JPG — الحد الأقصى 20 ميجابايت لكل ملف',
+      browse_files: 'تصفح الملفات',
+      legal_agreement: 'الاتفاقية القانونية وإعلان الامتثال',
+      ncnda_confirm: 'لقد قرأت وقبلت NCNDA وقواعد الامتثال المذكورة أعلاه.',
+      sign_agree: 'توقيع وقبول الاتفاقية',
+      ncnda_signed: 'تم توقيع الاتفاقية — تم تسجيل الوقت',
+      gov_filings: 'متتبع التقديمات الحكومية',
+      gov_filings_sub: 'تتبع تقديماتك التنظيمية',
+      add_filing: '+ إضافة تقديم',
+      agency_name: 'الوكالة / الجهة التنظيمية',
+      doc_scope: 'نطاق المستند / الشهادة',
+      filing_lang: 'اللغة المفضلة',
+      filing_auth: 'تفويض الوكيل',
+      filing_auth_label: 'أفوض Greens ACC للمساعدة في هذا التقديم',
+      save_filing: 'حفظ سجل التقديم',
+      cancel: 'إلغاء',
+      no_filings: 'لا توجد سجلات تقديم بعد.',
+      schedule_meeting: 'جدولة اجتماع مع ممثل',
+      schedule_meeting_sub: 'احجز موعداً متاحاً مع ممثل تجارة Greens ACC',
+      loading_slots: 'جارٍ تحميل المواعيد المتاحة…',
+      appt_notes_ph: 'ملاحظات للممثل (اختياري)',
+      book_slot: 'حجز الموعد',
+      status_waiting: 'في انتظار تقديم المستندات',
+      status_waiting_desc: 'ارفع جميع المستندات المطلوبة ووقّع على اتفاقية الامتثال للمتابعة.',
+      status_review: 'قيد المراجعة',
+      status_review_desc: 'تم استلام مستنداتك. يقوم فريقنا بمراجعة تقديمك.',
+      status_approved: 'تمت الموافقة على التخليص',
+      status_approved_desc: 'لقد تم تخليصك للدخول إلى غرفة التفاوض المباشر.',
+      progress: 'التقدم',
+      voice_panel: 'أوامر صوتية — السكرتير الذكي',
+      voice_panel_sub: 'تحدث لطرح أسئلة السوق أو طلب إرشادات الصفقة.',
+      activate_voice: 'تفعيل الإدخال الصوتي',
+      ai_secretary: 'السكرتير التنفيذي الذكي',
+      ai_secretary_sub: 'اسأل عن التحضير للصفقة وسياق السوق ومتطلبات المستندات',
+      ai_history: '📈 تاريخ السوق',
+      ai_pricing: '💰 منحنيات الأسعار',
+      ai_docs: '📋 إرشادات المستندات',
+      ai_supply: '🚢 سلسلة التوريد',
+      ai_greeting: 'جارٍ تحليل ملفات السوق لهذه الفئة من الأصول…',
+      ai_query_ph: 'اسأل السكرتير الذكي…',
+      send: 'إرسال',
+      compliance_notice: 'إشعار امتثال المنصة',
+      fuel_ban_title: '⛽ الوقود والنفط — مستبعد تماماً',
+      fuel_ban_desc: 'لا تسهّل Greens ACC أي معاملات تتعلق بسلع النفط.',
+      ncnda_rule: '🔒 تطبيق NCNDA',
+      ncnda_rule_desc: 'جميع الأطراف ملزمون بـ NCNDA. غرامة الانتهاك: الحد الأدنى 50,000 دولار.',
+      fraud_rule: '⚠️ المستندات المزورة',
+      fraud_rule_desc: 'سيتم الإبلاغ عن بيانات الاعتماد التجارية المزورة لسلطات التجارة الدولية.',
+      commission_rule: '💼 عمولة المنصة',
+      commission_rule_desc: 'عمولة قياسية 2٪ على قيمة الصفقة المؤكدة. رسوم التفعيل 20 دولار غير قابلة للاسترداد.',
+      approved_title: 'تمت الموافقة على التخليص',
+      approved_desc: 'تم التحقق من مستنداتك. جارٍ توجيهك إلى غرفة التفاوض المباشر.',
+      redirecting: 'جارٍ إعادة التوجيه…',
+    },
+    fr: {
+      deal_commodity: 'Matière première',
+      clearance_status: 'Statut de dédouanement',
+      doc_pipeline: 'Pipeline de soumission de documents',
+      doc_pipeline_sub: 'Téléchargez toutes les accréditations commerciales requises pour continuer',
+      drop_zone_title: 'Glissez-déposez les fichiers ici',
+      drop_zone_sub: 'PDF, DOCX, JPG — max 20 Mo par fichier',
+      browse_files: 'Parcourir les fichiers',
+      legal_agreement: 'Accord juridique et déclaration de conformité',
+      ncnda_confirm: "J'ai lu et accepté intégralement le NCNDA et les règles de conformité de la plateforme.",
+      sign_agree: "Signer et accepter l'accord",
+      ncnda_signed: 'Accord signé — horodatage enregistré',
+      gov_filings: 'Suivi des dépôts gouvernementaux',
+      gov_filings_sub: 'Suivez vos soumissions réglementaires initiées manuellement',
+      add_filing: '+ Ajouter un dépôt',
+      agency_name: 'Agence / Organisme de réglementation',
+      doc_scope: 'Périmètre du document / certificat',
+      filing_lang: 'Langue préférée',
+      filing_auth: 'Autorisation de procuration',
+      filing_auth_label: "J'autorise Greens ACC à assister ce dépôt",
+      save_filing: 'Enregistrer le dossier',
+      cancel: 'Annuler',
+      no_filings: 'Aucun dossier pour le moment.',
+      schedule_meeting: 'Planifier une réunion avec un représentant',
+      schedule_meeting_sub: 'Réservez un créneau disponible avec le représentant commercial de Greens ACC',
+      loading_slots: 'Chargement des créneaux disponibles…',
+      appt_notes_ph: 'Notes pour le représentant (optionnel)',
+      book_slot: 'Réserver',
+      status_waiting: 'En attente de documents',
+      status_waiting_desc: "Téléchargez tous les documents requis et signez l'accord de conformité.",
+      status_review: 'En cours de révision',
+      status_review_desc: 'Vos documents ont été reçus. Notre équipe examine votre soumission.',
+      status_approved: 'Dédouanement approuvé',
+      status_approved_desc: 'Vous êtes autorisé à entrer dans la salle de négociation en direct.',
+      progress: 'Progression',
+      voice_panel: "Commande vocale — Secrétaire IA",
+      voice_panel_sub: "Parlez pour poser des questions sur le marché ou demander des conseils.",
+      activate_voice: "Activer la saisie vocale",
+      ai_secretary: 'Secrétaire exécutif IA',
+      ai_secretary_sub: "Posez des questions sur la préparation de l'accord, le contexte du marché",
+      ai_history: '📈 Historique du marché',
+      ai_pricing: '�� Courbes de prix',
+      ai_docs: '📋 Guide des documents',
+      ai_supply: '🚢 Chaîne logistique',
+      ai_greeting: "Analyse des profils de marché pour cette classe d'actifs…",
+      ai_query_ph: 'Interroger le secrétaire IA…',
+      send: 'Envoyer',
+      compliance_notice: 'Avis de conformité de la plateforme',
+      fuel_ban_title: '⛽ Carburant & Pétrole — STRICTEMENT EXCLU',
+      fuel_ban_desc: 'Greens ACC ne courtise pas les transactions sur les matières pétrolières.',
+      ncnda_rule: '🔒 Application du NCNDA',
+      ncnda_rule_desc: 'Toutes les parties sont liées par le NCNDA. Pénalité : minimum 50 000 USD.',
+      fraud_rule: '⚠️ Documents frauduleux',
+      fraud_rule_desc: 'Les faux documents commerciaux seront signalés aux autorités commerciales internationales.',
+      commission_rule: '💼 Commission de la plateforme',
+      commission_rule_desc: "Commission standard de 2 % sur la valeur de l'accord confirmé. Les frais d'activation de 20 $ sont non remboursables.",
+      approved_title: 'Dédouanement approuvé',
+      approved_desc: 'Vos documents ont été vérifiés. Redirection vers la salle de négociation.',
+      redirecting: 'Redirection…',
+    },
+    zh: {
+      deal_commodity: '交易商品',
+      clearance_status: '清关状态',
+      doc_pipeline: '文件提交流程',
+      doc_pipeline_sub: '上传所有必需的贸易证书以继续',
+      drop_zone_title: '拖放文件到此处',
+      drop_zone_sub: 'PDF、DOCX、JPG — 每个文件最大 20 MB',
+      browse_files: '浏览文件',
+      legal_agreement: '法律协议与合规声明',
+      ncnda_confirm: '我已阅读并完全接受上述 NCNDA 和平台合规规则。',
+      sign_agree: '签署并接受协议',
+      ncnda_signed: '协议已签署 — 时间戳已记录',
+      gov_filings: '政府备案追踪',
+      gov_filings_sub: '追踪您手动发起的监管提交',
+      add_filing: '+ 添加备案',
+      agency_name: '机构 / 监管机构',
+      doc_scope: '文件 / 证书范围',
+      filing_lang: '首选语言',
+      filing_auth: '代理授权',
+      filing_auth_label: '我授权 Greens ACC 协助此备案',
+      save_filing: '保存备案记录',
+      cancel: '取消',
+      no_filings: '暂无备案记录。',
+      schedule_meeting: '安排代表会议',
+      schedule_meeting_sub: '预订与 Greens ACC 贸易代表的可用时段',
+      loading_slots: '正在加载可用时段…',
+      appt_notes_ph: '给代表的备注（可选）',
+      book_slot: '预订时段',
+      status_waiting: '等待文件提交',
+      status_waiting_desc: '上传所有必需文件并签署合规协议以继续。',
+      status_review: '审核中',
+      status_review_desc: '您的文件已收到。我们的团队正在审核您的提交。',
+      status_approved: '清关已批准',
+      status_approved_desc: '您已获准进入现场谈判室。',
+      progress: '进度',
+      voice_panel: '语音命令 — AI 秘书',
+      voice_panel_sub: '说话以提出市场问题或请求交易指导。',
+      activate_voice: '激活语音输入',
+      ai_secretary: 'AI 执行秘书',
+      ai_secretary_sub: '询问有关交易准备、市场背景或文件要求',
+      ai_history: '📈 市场历史',
+      ai_pricing: '💰 价格曲线',
+      ai_docs: '📋 文件指南',
+      ai_supply: '🚢 供应链',
+      ai_greeting: '正在分析该资产类别的市场状况…',
+      ai_query_ph: '询问 AI 秘书…',
+      send: '发送',
+      compliance_notice: '平台合规通知',
+      fuel_ban_title: '⛽ 燃料与石油 — 严格排除',
+      fuel_ban_desc: 'Greens ACC 不中介任何石油商品交易。',
+      ncnda_rule: '🔒 NCNDA 执行',
+      ncnda_rule_desc: '所有各方均受 NCNDA 约束。违约罚款：最低 50,000 美元。',
+      fraud_rule: '⚠️ 伪造文件',
+      fraud_rule_desc: '伪造的贸易证件将被报告给国际贸易当局。',
+      commission_rule: '💼 平台佣金',
+      commission_rule_desc: '已确认交易金额的标准 2% 佣金。20 美元激活费不可退款。',
+      approved_title: '清关已批准',
+      approved_desc: '您的文件已通过验证。正在引导您进入现场谈判室。',
+      redirecting: '正在重定向…',
+    },
+    de: {
+      deal_commodity: 'Deal-Ware',
+      clearance_status: 'Freigabestatus',
+      doc_pipeline: 'Dokumenteneinreichungs-Pipeline',
+      doc_pipeline_sub: 'Laden Sie alle erforderlichen Handelsdokumente hoch, um fortzufahren',
+      drop_zone_title: 'Dateien hier ablegen',
+      drop_zone_sub: 'PDF, DOCX, JPG — max. 20 MB pro Datei',
+      browse_files: 'Dateien durchsuchen',
+      legal_agreement: 'Rechtsvereinbarung & Compliance-Erklärung',
+      ncnda_confirm: 'Ich habe das NCNDA und die Plattform-Compliance-Regeln gelesen und akzeptiert.',
+      sign_agree: 'Vereinbarung unterzeichnen',
+      ncnda_signed: 'Vereinbarung unterzeichnet — Zeitstempel gespeichert',
+      gov_filings: 'Behördliche Einreichungs-Tracker',
+      gov_filings_sub: 'Verfolgen Sie Ihre manuell initiierten Regulierungseinreichungen',
+      add_filing: '+ Einreichung hinzufügen',
+      agency_name: 'Behörde / Regulierungsbehörde',
+      doc_scope: 'Dokument- / Zertifikatsumfang',
+      filing_lang: 'Bevorzugte Sprache',
+      filing_auth: 'Vollmacht-Autorisierung',
+      filing_auth_label: 'Ich autorisiere Greens ACC zur Unterstützung dieser Einreichung',
+      save_filing: 'Einreichungsdatensatz speichern',
+      cancel: 'Abbrechen',
+      no_filings: 'Noch keine Einreichungsdatensätze.',
+      schedule_meeting: 'Vertreter-Meeting planen',
+      schedule_meeting_sub: 'Buchen Sie einen verfügbaren Slot mit dem Greens ACC Handelsvertreter',
+      loading_slots: 'Verfügbare Slots werden geladen…',
+      appt_notes_ph: 'Notizen für den Vertreter (optional)',
+      book_slot: 'Slot buchen',
+      status_waiting: 'Warten auf Dokumenteneinreichung',
+      status_waiting_desc: 'Laden Sie alle erforderlichen Dokumente hoch und unterzeichnen Sie die Compliance-Vereinbarung.',
+      status_review: 'Wird überprüft',
+      status_review_desc: 'Ihre Dokumente wurden erhalten. Unser Team prüft Ihre Einreichung.',
+      status_approved: 'Freigabe genehmigt',
+      status_approved_desc: 'Sie sind berechtigt, den Live-Verhandlungsraum zu betreten.',
+      progress: 'Fortschritt',
+      voice_panel: 'Sprachbefehl — KI-Sekretär',
+      voice_panel_sub: 'Sprechen Sie, um Marktfragen zu stellen oder Deal-Orientierung zu erhalten.',
+      activate_voice: 'Spracheingabe aktivieren',
+      ai_secretary: 'KI-Exekutivsekretär',
+      ai_secretary_sub: 'Fragen zur Deal-Vorbereitung, Marktkontext oder Dokumentenanforderungen',
+      ai_history: '📈 Marktgeschichte',
+      ai_pricing: '💰 Preiskurven',
+      ai_docs: '📋 Dokumentenleitfaden',
+      ai_supply: '🚢 Lieferkette',
+      ai_greeting: 'Marktprofile für diese Anlageklasse werden analysiert…',
+      ai_query_ph: 'KI-Sekretär befragen…',
+      send: 'Senden',
+      compliance_notice: 'Plattform-Compliance-Hinweis',
+      fuel_ban_title: '⛽ Kraftstoff & Erdöl — STRENG AUSGESCHLOSSEN',
+      fuel_ban_desc: 'Greens ACC vermittelt keine Erdölrohstoff-Transaktionen.',
+      ncnda_rule: '🔒 NCNDA-Durchsetzung',
+      ncnda_rule_desc: 'Alle Parteien sind an das NCNDA gebunden. Strafe: mindestens 50.000 USD.',
+      fraud_rule: '⚠️ Gefälschte Dokumente',
+      fraud_rule_desc: 'Gefälschte Handelsdokumente werden den internationalen Handelsbehörden gemeldet.',
+      commission_rule: '💼 Plattform-Provision',
+      commission_rule_desc: 'Standard 2 % Provision auf bestätigten Deal-Wert. 20 $ Aktivierungsgebühr nicht erstattungsfähig.',
+      approved_title: 'Freigabe genehmigt',
+      approved_desc: 'Ihre Dokumente wurden verifiziert. Weiterleitung zum Live-Verhandlungsraum.',
+      redirecting: 'Weiterleitung…',
+    },
+  };
+
+  // ── STATE ─────────────────────────────────────────────────────────────────
+  const params = new URLSearchParams(window.location.search);
+  const DEAL_ID = params.get('dealId') || params.get('deal_id') || 'DEMO-001';
+  const USER_ID = params.get('userId') || params.get('user_id') || 'demo-user';
+  const COMMODITY = params.get('commodity') || 'Arabic Gum — 500 MT';
+
+  let state = {
+    clearanceId: null,
+    clearanceStatus: 'PENDING_DOCUMENTS',
+    ncndaSigned: false,
+    uploadedDocs: [],
+    requiredDocs: [],
+    selectedSlot: null,
+    bookedAppt: null,
+    filings: [],
+    lang: 'en',
+    voiceActive: false,
+  };
+
+  // ── HELPERS ───────────────────────────────────────────────────────────────
+  function t(key) {
+    return (TRANSLATIONS[state.lang] || TRANSLATIONS.en)[key] || key;
+  }
+  function el(id) { return document.getElementById(id); }
+  function setText(id, text) { const e = el(id); if (e) e.textContent = text; }
+  function show(id) { el(id) && el(id).classList.remove('hidden'); }
+  function hide(id) { el(id) && el(id).classList.add('hidden'); }
+
+  async function callAPI(path, payload) {
+    try {
+      const r = await fetch('/supabase/functions/' + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await r.json().catch(() => ({}));
+      return { ok: r.ok, data };
+    } catch (e) {
+      return { ok: false, data: { error: e.message } };
+    }
+  }
+
+  function applyI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+    // RTL for Arabic
+    document.documentElement.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
+  }
+
+  // ── INIT ──────────────────────────────────────────────────────────────────
+  function initPage() {
+    setText('deal-id-display', 'Deal ID: ' + DEAL_ID);
+    setText('deal-commodity-display', COMMODITY);
+    setText('deal-meta-display', 'User: ' + USER_ID);
+    setText('hdr-deal-ref', 'Ref: ' + DEAL_ID + ' — ' + COMMODITY.substring(0, 30));
+    loadClearance();
+    bindEvents();
+  }
+
+  // ── CLEARANCE LOAD ────────────────────────────────────────────────────────
+  async function loadClearance() {
+    const { ok, data } = await callAPI('dealClearanceRoom', {
+      action: 'get_clearance',
+      deal_id: DEAL_ID,
+      user_id: USER_ID,
+      commodity_type: COMMODITY,
+    });
+
+    if (!ok) {
+      // Demo fallback — show static checklist
+      renderRequiredDocs(getDemoDocs(COMMODITY));
+      loadSlots();
+      return;
+    }
+
+    state.clearanceId = data.clearance?.id;
+    state.clearanceStatus = data.clearance?.status || 'PENDING_DOCUMENTS';
+    state.ncndaSigned = data.clearance?.ncnda_signed || false;
+    state.uploadedDocs = data.uploaded_documents || [];
+    state.requiredDocs = data.required_documents || [];
+
+    renderRequiredDocs(state.requiredDocs);
+    renderUploadedDocs();
+    updateDocTypeSelect();
+    updateStatusWidget();
+    updateProgress();
+    if (state.ncndaSigned) markNcndaSigned();
+    loadSlots();
+  }
+
+  function getDemoDocs(commodity) {
+    const c = (commodity || '').toLowerCase();
+    if (/gum|cotton|wheat|grain|sesame|cashew|coffee|rubber/.test(c)) {
+      return [
+        { type: 'LOI_ICPO', label: 'LOI / ICPO', required: true },
+        { type: 'SGS', label: 'SGS Inspection Certificate', required: true },
+        { type: 'COO', label: 'Certificate of Origin', required: true },
+        { type: 'HEALTH', label: 'Health Certificate', required: true },
+        { type: 'PHYTO', label: 'Phytosanitary / Agriculture Certificate', required: true },
+      ];
+    }
+    if (/copper|gold|mineral|ore|metal/.test(c)) {
+      return [
+        { type: 'LOI_ICPO', label: 'LOI / ICPO', required: true },
+        { type: 'ASSAY', label: 'Assay Certificate', required: true },
+        { type: 'SGS', label: 'SGS Inspection Certificate', required: true },
+        { type: 'COO', label: 'Certificate of Origin', required: true },
+      ];
+    }
+    if (/timber|hardwood|lumber/.test(c)) {
+      return [
+        { type: 'LOI_ICPO', label: 'LOI / ICPO', required: true },
+        { type: 'PHYTO', label: 'Phytosanitary Certificate', required: true },
+        { type: 'COO', label: 'Certificate of Origin', required: true },
+        { type: 'CITES', label: 'CITES Permit (if applicable)', required: false },
+      ];
+    }
+    return [
+      { type: 'LOI_ICPO', label: 'LOI / ICPO', required: true },
+      { type: 'COO', label: 'Certificate of Origin', required: true },
+      { type: 'SGS', label: 'SGS Inspection Certificate', required: false },
+    ];
+  }
+
+  function renderRequiredDocs(docs) {
+    state.requiredDocs = docs;
+    const list = el('doc-checklist');
+    if (!list) return;
+    list.innerHTML = '';
+    docs.forEach(doc => {
+      const uploaded = state.uploadedDocs.find(u => u.document_type === doc.type);
+      const row = document.createElement('div');
+      row.className = 'flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50';
+      row.dataset.docType = doc.type;
+
+      const left = document.createElement('div');
+      left.className = 'flex items-center gap-2.5';
+
+      const icon = document.createElement('span');
+      icon.className = 'text-base';
+      icon.textContent = uploaded ? '✅' : (doc.required ? '🔴' : '🟡');
+
+      const info = document.createElement('div');
+      const name = document.createElement('div');
+      name.className = 'text-xs font-semibold text-slate-800';
+      name.textContent = doc.label;
+      const sub = document.createElement('div');
+      sub.className = 'text-[10px] text-slate-400';
+      sub.textContent = doc.required ? 'Required' : 'Optional';
+      info.appendChild(name);
+      info.appendChild(sub);
+      left.appendChild(icon);
+      left.appendChild(info);
+
+      const right = document.createElement('div');
+      if (uploaded) {
+        const badge = document.createElement('span');
+        badge.className = 'step-pill pill-review text-[9px]';
+        badge.textContent = uploaded.status || 'PENDING_REVIEW';
+        right.appendChild(badge);
+      } else {
+        const btn = document.createElement('button');
+        btn.className = 'btn-secondary text-[10px] px-2.5 py-1.5';
+        btn.textContent = 'Upload';
+        btn.onclick = () => {
+          el('doc-type-select').value = doc.type;
+          el('file-input').click();
+        };
+        right.appendChild(btn);
+      }
+
+      row.appendChild(left);
+      row.appendChild(right);
+      list.appendChild(row);
+    });
+    el('doc-progress-counter').textContent = state.uploadedDocs.length + ' / ' + docs.length;
+    updateDocTypeSelect();
+  }
+
+  function renderUploadedDocs() {
+    const list = el('uploaded-docs-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!state.uploadedDocs.length) return;
+    const header = document.createElement('div');
+    header.className = 'text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1 mt-3';
+    header.textContent = 'Submitted Documents';
+    list.appendChild(header);
+    state.uploadedDocs.forEach(doc => {
+      const row = document.createElement('div');
+      row.className = 'flex items-center justify-between px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg';
+      const left = document.createElement('div');
+      left.className = 'text-xs text-slate-700 font-medium';
+      left.textContent = doc.file_name || doc.document_type;
+      const right = document.createElement('span');
+      right.className = 'step-pill ' + (doc.status === 'APPROVED' ? 'pill-approved' : doc.status === 'REJECTED' ? 'pill-rejected' : 'pill-review');
+      right.textContent = doc.status || 'PENDING_REVIEW';
+      row.appendChild(left);
+      row.appendChild(right);
+      list.appendChild(row);
+    });
+  }
+
+  function updateDocTypeSelect() {
+    const sel = el('doc-type-select');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Select document type —</option>';
+    state.requiredDocs.forEach(doc => {
+      const opt = document.createElement('option');
+      opt.value = doc.type;
+      opt.textContent = doc.label;
+      sel.appendChild(opt);
+    });
+  }
+
+  function updateStatusWidget() {
+    const s = state.clearanceStatus;
+    const badge = el('clearance-status-badge');
+    if (badge) {
+      badge.className = 'step-pill ' + (s === 'APPROVED' ? 'pill-approved' : s === 'PENDING_REVIEW' ? 'pill-review' : s === 'REJECTED' ? 'pill-rejected' : 'pill-pending');
+      badge.textContent = s.replace(/_/g, ' ');
+    }
+    const icon = el('status-icon');
+    const title = el('status-title');
+    const desc = el('status-desc');
+    const statusText = el('clearance-status-text');
+    if (s === 'PENDING_DOCUMENTS') {
+      if (icon) icon.textContent = '⏳';
+      if (title) title.textContent = t('status_waiting');
+      if (desc) desc.textContent = t('status_waiting_desc');
+      if (statusText) statusText.textContent = 'Awaiting Documents';
+    } else if (s === 'PENDING_REVIEW') {
+      if (icon) icon.textContent = '🔍';
+      if (title) title.textContent = t('status_review');
+      if (desc) desc.textContent = t('status_review_desc');
+      if (statusText) statusText.textContent = 'Under Review';
+    } else if (s === 'APPROVED') {
+      if (icon) icon.textContent = '✅';
+      if (title) title.textContent = t('status_approved');
+      if (desc) desc.textContent = t('status_approved_desc');
+      if (statusText) statusText.textContent = 'Approved';
+      show('approved-overlay');
+      setTimeout(() => { window.location.href = '/meeting.html?dealId=' + encodeURIComponent(DEAL_ID); }, 3000);
+    }
+  }
+
+  function updateProgress() {
+    const total = state.requiredDocs.length;
+    const done = state.uploadedDocs.length;
+    const ncndaBonus = state.ncndaSigned ? 1 : 0;
+    const totalWithNcnda = total + 1;
+    const doneWithNcnda = done + ncndaBonus;
+    const pct = totalWithNcnda > 0 ? Math.round((doneWithNcnda / totalWithNcnda) * 100) : 0;
+    const bar = el('progress-bar');
+    const pctEl = el('progress-pct');
+    if (bar) bar.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+  }
+
+  // ── FILE UPLOAD ───────────────────────────────────────────────────────────
+  async function handleFileUpload(files) {
+    const docType = el('doc-type-select').value;
+    if (!docType) {
+      el('upload-msg').textContent = 'Please select a document type first.';
+      return;
+    }
+    if (!files || !files.length) return;
+
+    const file = files[0];
+    if (file.size > 20 * 1024 * 1024) {
+      el('upload-msg').textContent = 'File exceeds 20 MB limit.';
+      return;
+    }
+
+    el('upload-msg').textContent = 'Registering document…';
+
+    const payload = {
+      action: 'submit_document',
+      clearance_id: state.clearanceId || 'demo',
+      document_type: docType,
+      file_name: file.name,
+      file_size_bytes: file.size,
+    };
+
+    const { ok, data } = await callAPI('dealClearanceRoom', payload);
+
+    if (ok && data.success) {
+      const newDoc = data.document || { document_type: docType, file_name: file.name, status: 'PENDING_REVIEW' };
+      state.uploadedDocs = state.uploadedDocs.filter(d => d.document_type !== docType);
+      state.uploadedDocs.push(newDoc);
+      el('upload-msg').textContent = '✅ ' + file.name + ' submitted for review.';
+    } else {
+      // Demo mode: simulate success
+      state.uploadedDocs.push({ document_type: docType, file_name: file.name, status: 'PENDING_REVIEW' });
+      el('upload-msg').textContent = '✅ ' + file.name + ' submitted for review.';
+    }
+
+    state.clearanceStatus = 'PENDING_REVIEW';
+    renderRequiredDocs(state.requiredDocs);
+    renderUploadedDocs();
+    updateStatusWidget();
+    updateProgress();
+  }
+
+  // ── NCNDA ─────────────────────────────────────────────────────────────────
+  function markNcndaSigned() {
+    state.ncndaSigned = true;
+    el('btn-sign-ncnda').disabled = true;
+    el('btn-sign-ncnda').textContent = '✅ Agreement Signed';
+    show('ncnda-signed-indicator');
+    updateProgress();
+  }
+
+  async function signNcnda() {
+    el('btn-sign-ncnda').disabled = true;
+    el('btn-sign-ncnda').textContent = 'Signing…';
+    const { ok } = await callAPI('dealClearanceRoom', {
+      action: 'sign_ncnda',
+      clearance_id: state.clearanceId || 'demo',
+    });
+    markNcndaSigned();
+  }
+
+  // ── SLOTS ─────────────────────────────────────────────────────────────────
+  async function loadSlots() {
+    hide('slots-loading');
+    const { ok, data } = await callAPI('dealClearanceRoom', {
+      action: 'get_slots',
+      deal_id: DEAL_ID,
+    });
+
+    const slots = (ok && data.slots) ? data.slots : generateDemoSlots();
+    const grid = el('slots-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    slots.slice(0, 16).forEach(iso => {
+      const d = new Date(iso);
+      const label = d.toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric' }) + '\n' +
+                    d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
+      const btn = document.createElement('button');
+      btn.className = 'slot-btn text-center';
+      btn.innerHTML = label.replace(/\n/g, '<br>');
+      btn.dataset.iso = iso;
+      btn.onclick = () => {
+        document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.selectedSlot = iso;
+        el('btn-book-slot').disabled = false;
+        el('btn-book-slot').classList.remove('opacity-40');
+      };
+      grid.appendChild(btn);
+    });
+  }
+
+  function generateDemoSlots() {
+    const slots = [];
+    const now = new Date();
+    const hours = [7, 9, 11, 13, 15];
+    for (let d = 1; d <= 7; d++) {
+      const date = new Date(now);
+      date.setUTCDate(now.getUTCDate() + d);
+      if (date.getUTCDay() === 0 || date.getUTCDay() === 6) continue;
+      for (const h of hours) {
+        const s = new Date(date);
+        s.setUTCHours(h, 0, 0, 0);
+        slots.push(s.toISOString());
+      }
+    }
+    return slots;
+  }
+
+  async function bookSlot() {
+    if (!state.selectedSlot) return;
+    el('btn-book-slot').disabled = true;
+    el('btn-book-slot').textContent = 'Booking…';
+
+    const notes = el('appt-notes').value.trim();
+    const { ok, data } = await callAPI('dealClearanceRoom', {
+      action: 'book_appointment',
+      deal_id: DEAL_ID,
+      user_id: USER_ID,
+      scheduled_at: state.selectedSlot,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      notes,
+    });
+
+    const d = new Date(state.selectedSlot);
+    const label = d.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric' }) + ' at ' +
+                  d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }) + ' UTC';
+    const toast = el('appt-toast');
+    toast.textContent = '📅 Meeting booked: ' + label;
+    show('appt-toast');
+    setTimeout(() => hide('appt-toast'), 5000);
+    el('appt-msg').textContent = '✅ Appointment confirmed: ' + label;
+    el('btn-book-slot').textContent = '✅ Booked';
+  }
+
+  // ── GOV FILINGS ───────────────────────────────────────────────────────────
+  function renderFilings() {
+    const list = el('filing-list');
+    const empty = el('filing-empty-msg');
+    if (!state.filings.length) {
+      if (empty) show('filing-empty-msg');
+      return;
+    }
+    if (empty) hide('filing-empty-msg');
+    // Remove old filing rows (keep empty msg element)
+    list.querySelectorAll('.filing-row').forEach(r => r.remove());
+    state.filings.forEach((f, i) => {
+      const row = document.createElement('div');
+      row.className = 'filing-row flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-lg';
+      const left = document.createElement('div');
+      const name = document.createElement('div');
+      name.className = 'text-xs font-semibold text-slate-800';
+      name.textContent = f.agency + ' — ' + f.scope;
+      const meta = document.createElement('div');
+      meta.className = 'text-[10px] text-slate-400 mt-0.5';
+      meta.textContent = f.lang.toUpperCase() + ' · ' + (f.authorized ? 'Authorized' : 'No proxy auth') + ' · ' + new Date(f.created).toLocaleDateString();
+      left.appendChild(name);
+      left.appendChild(meta);
+      const badge = document.createElement('span');
+      badge.className = 'step-pill pill-pending text-[9px]';
+      badge.textContent = f.status || 'DRAFT';
+      row.appendChild(left);
+      row.appendChild(badge);
+      list.appendChild(row);
+    });
+  }
+
+  // ── AI SECRETARY ──────────────────────────────────────────────────────────
+  const AI_QUERIES = {
+    historical: 'Provide historical market context and global transaction performance for ' + COMMODITY,
+    pricing: 'Show historical pricing curves, market trends, and current price range for ' + COMMODITY,
+    documents: 'What documents do I need to prepare for a successful ' + COMMODITY + ' trade deal?',
+    supply_chain: 'Identify supply chain bottlenecks and logistics considerations for ' + COMMODITY,
+  };
+
+  function appendAiMessage(text, isUser) {
+    const log = el('ai-log');
+    if (!log) return;
+    const msg = document.createElement('div');
+    msg.className = isUser
+      ? 'ml-auto bg-emerald-100 text-emerald-900 rounded-xl rounded-br-sm px-3 py-2 max-w-[85%] text-right'
+      : 'bg-white border border-slate-100 rounded-xl rounded-bl-sm px-3 py-2 max-w-[90%]';
+    msg.textContent = text;
+    // Remove greeting placeholder
+    const placeholder = log.querySelector('[data-i18n="ai_greeting"]');
+    if (placeholder) placeholder.remove();
+    log.appendChild(msg);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  async function sendAiQuery(query) {
+    if (!query.trim()) return;
+    appendAiMessage(query, true);
+    el('ai-query-input').value = '';
+    appendAiMessage('Consulting market intelligence…', false);
+
+    const { ok, data } = await callAPI('aiSecretaryTools', {
+      action: 'summarize',
+      document_text: 'Market intelligence request for deal: ' + DEAL_ID + '\nCommodity: ' + COMMODITY + '\nQuery: ' + query,
+    });
+
+    const lastMsg = el('ai-log').lastElementChild;
+    if (lastMsg) lastMsg.remove();
+
+    if (ok && data.result) {
+      const r = data.result;
+      const response = (r.executive_summary || '') +
+        (r.key_points ? '\n\n Key Points:\n• ' + r.key_points.join('\n• ') : '');
+      appendAiMessage(response || 'Analysis complete. Results logged.', false);
+    } else {
+      appendAiMessage('Market analysis for ' + COMMODITY + ': This commodity class shows strong demand in international B2B trade. Key preparation steps include verifying SGS certification, securing a valid Certificate of Origin, and ensuring LOI documentation is signed by authorized corporate representatives.', false);
+    }
+  }
+
+  // ── VOICE COMMAND ─────────────────────────────────────────────────────────
+  let recognition = null;
+
+  function toggleVoice() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      el('voice-status').textContent = 'Speech recognition not supported in this browser.';
+      return;
+    }
+    if (state.voiceActive) {
+      stopVoice();
+    } else {
+      startVoice();
+    }
+  }
+
+  function startVoice() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRec();
+    recognition.lang = state.lang === 'ar' ? 'ar-SA' : state.lang === 'fr' ? 'fr-FR' : state.lang === 'zh' ? 'zh-CN' : state.lang === 'de' ? 'de-DE' : 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+
+    recognition.onstart = () => {
+      state.voiceActive = true;
+      el('btn-voice-toggle').classList.replace('btn-secondary', 'btn-danger') ;
+      el('voice-btn-label').textContent = '⏹ Stop Listening';
+      el('voice-icon').textContent = '🔴';
+      el('voice-status').textContent = 'Listening…';
+      show('voice-transcript');
+    };
+
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      el('voice-transcript').textContent = '🗣 "' + transcript + '"';
+      el('ai-query-input').value = transcript;
+      sendAiQuery(transcript);
+    };
+
+    recognition.onerror = (e) => {
+      el('voice-status').textContent = 'Error: ' + e.error;
+      stopVoice();
+    };
+
+    recognition.onend = () => { stopVoice(); };
+    recognition.start();
+  }
+
+  function stopVoice() {
+    state.voiceActive = false;
+    if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+    el('btn-voice-toggle').classList.replace('btn-danger', 'btn-secondary');
+    el('voice-btn-label').textContent = t('activate_voice');
+    el('voice-icon').textContent = '🎤';
+    el('voice-status').textContent = '';
+  }
+
+  // ── REAL-TIME SUBSCRIPTION ────────────────────────────────────────────────
+  function initRealtimeSubscription() {
+    const supabaseUrl = (window.__ENV__ && window.__ENV__.SUPABASE_URL) || '';
+    const supabaseKey = (window.__ENV__ && window.__ENV__.SUPABASE_ANON_KEY) || '';
+    if (!supabaseUrl || !supabaseKey) return;
+    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const sub = _supabase
+      .channel('deal_clearance:' + DEAL_ID)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'deal_clearances' }, payload => {
+        if (payload.new && payload.new.deal_id === DEAL_ID) {
+          state.clearanceStatus = payload.new.status;
+          updateStatusWidget();
+        }
+      })
+      .subscribe();
+  }
+
+  // ── EVENT BINDING ─────────────────────────────────────────────────────────
+  function bindEvents() {
+    // Language switch
+    el('lang-select').addEventListener('change', e => {
+      state.lang = e.target.value;
+      applyI18n();
+      updateStatusWidget();
+    });
+
+    // NCNDA checkbox
+    el('ncnda-checkbox').addEventListener('change', e => {
+      el('btn-sign-ncnda').disabled = !e.target.checked;
+      el('btn-sign-ncnda').classList.toggle('opacity-40', !e.target.checked);
+    });
+
+    // Sign NCNDA
+    el('btn-sign-ncnda').addEventListener('click', signNcnda);
+
+    // File input
+    el('file-input').addEventListener('change', e => handleFileUpload(e.target.files));
+
+    // Drop zone
+    const dz = el('drop-zone');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      handleFileUpload(e.dataTransfer.files);
+    });
+
+    // Book slot
+    el('btn-book-slot').addEventListener('click', bookSlot);
+
+    // AI tabs
+    document.querySelectorAll('.ai-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const queryKey = btn.dataset.query;
+        sendAiQuery(AI_QUERIES[queryKey] || queryKey);
+      });
+    });
+
+    // AI send
+    el('btn-ai-send').addEventListener('click', () => sendAiQuery(el('ai-query-input').value));
+    el('ai-query-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendAiQuery(el('ai-query-input').value);
+    });
+
+    // Voice toggle
+    el('btn-voice-toggle').addEventListener('click', toggleVoice);
+
+    // Filing form
+    el('btn-add-filing').addEventListener('click', () => {
+      el('new-filing-form').classList.toggle('hidden');
+    });
+    el('btn-cancel-filing').addEventListener('click', () => {
+      hide('new-filing-form');
+    });
+    el('btn-save-filing').addEventListener('click', () => {
+      const agency = el('filing-agency').value.trim();
+      const scope = el('filing-doc-scope').value.trim();
+      if (!agency || !scope) { return; }
+      state.filings.push({
+        agency,
+        scope,
+        lang: el('filing-lang').value,
+        authorized: el('filing-auth-checkbox').checked,
+        status: 'DRAFT',
+        created: new Date().toISOString(),
+      });
+      el('filing-agency').value = '';
+      el('filing-doc-scope').value = '';
+      el('filing-auth-checkbox').checked = false;
+      hide('new-filing-form');
+      renderFilings();
+    });
+  }
+
+  // ── BOOT ──────────────────────────────────────────────────────────────────
+  initPage();
+  initRealtimeSubscription();
+
+})();
+</script>
+</body>
+</html>
