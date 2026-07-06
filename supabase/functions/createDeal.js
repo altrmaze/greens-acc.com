@@ -101,7 +101,7 @@ export async function POST(request) {
   return new Response(JSON.stringify({
     success: true,
     deal,
-    next_step: 'Complete the $20 activation workflow before publication review.',
+    next_step: 'Continue to the $20 Stripe activation checkout before publication review.',
   }), { status: 201 });
 }
 

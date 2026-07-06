@@ -1,25 +1,41 @@
 export async function POST(request) {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const stripeKey = process.env.STRIPE_SECRET_KEY;
 
-  if (!supabaseUrl || !serviceRoleKey) {
-    return new Response(JSON.stringify({ error: 'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY' }), { status: 500 });
-  }
   if (!stripeKey) {
     return new Response(JSON.stringify({ error: 'Missing STRIPE_SECRET_KEY' }), { status: 500 });
   }
 
-  const body = await request.json();
-  const dealId = body?.deal_id;
-  const payerId = body?.payer_id;
-  const amount = Number(body?.amount ?? 0);
-  const baseUrl = body?.base_url || 'https://example.com';
-  const successUrl = body?.success_url || `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl = body?.cancel_url || `${baseUrl}/cancel`;
+  const body = await request.json().catch(() => ({}));
+  const dealId = String(body?.deal_id || '').trim();
+  const payerId = String(body?.payer_id || body?.buyer_id || body?.user_id || '').trim();
+  const requestedAmount = Number(body?.amount);
+  const metadata = body?.metadata && typeof body.metadata === 'object' && !Array.isArray(body.metadata)
+    ? body.metadata
+    : {};
+  const transactionType = String(body?.transaction_type || metadata.transaction_type || 'deal_activation').trim();
+  const amount = Number.isFinite(requestedAmount) && requestedAmount > 0 ? Math.round(requestedAmount) : 2000;
+  const productName = String(body?.description || (transactionType === 'deal_activation'
+    ? 'Greens ACC Deal Activation'
+    : 'Greens ACC Payment')).trim();
+  const requestOrigin = request.headers.get('origin') || '';
+  const baseUrl = String(body?.base_url || requestOrigin || 'https://greens-acc.com').replace(/\/$/, '');
+  const successUrl = body?.success_url || `${baseUrl}/success.html?session_id={CHECKOUT_SESSION_ID}&deal_id=${encodeURIComponent(dealId)}`;
+  const cancelUrl = body?.cancel_url || `${baseUrl}/cancel.html?deal_id=${encodeURIComponent(dealId)}`;
 
-  if (!dealId || !payerId) {
-    return new Response(JSON.stringify({ error: 'deal_id and payer_id are required' }), { status: 400 });
+  if (!dealId) {
+    return new Response(JSON.stringify({ error: 'deal_id is required' }), { status: 400 });
+  }
+
+  const stripeMetadata = {
+    ...Object.fromEntries(
+      Object.entries(metadata).map(([key, value]) => [key, String(value)])
+    ),
+    deal_id: dealId,
+    transaction_type: transactionType,
+  };
+
+  if (payerId) {
+    stripeMetadata.payer_id = payerId;
   }
 
   const stripePayload = {
@@ -27,25 +43,24 @@ export async function POST(request) {
     line_items: [{
       price_data: {
         currency: 'usd',
-        product_data: { name: 'Greens ACC Entry Fee' },
-        unit_amount: 2000
+        product_data: { name: productName },
+        unit_amount: amount
       },
       quantity: 1
     }],
     mode: 'payment',
     success_url: successUrl,
     cancel_url: cancelUrl,
-    metadata: {
-      deal_id: dealId,
-      payer_id: payerId,
-      entry_fee: '20.00'
+    metadata: stripeMetadata,
+    payment_intent_data: {
+      metadata: stripeMetadata
     }
   };
 
   const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${stripeKey}`,
+      Authorization: 'Bearer ' + stripeKey,
       'Content-Type': 'application/x-www-form-urlencoded'
     },
     body: new URLSearchParams(stripePayloadToForm(stripePayload))
@@ -56,25 +71,13 @@ export async function POST(request) {
     return new Response(JSON.stringify({ error: 'Stripe checkout creation failed', details: stripeData }), { status: 502 });
   }
 
-  const patchEndpoint = `${supabaseUrl}/rest/v1/green_acc_deals?id=eq.${encodeURIComponent(dealId)}`;
-  await fetch(patchEndpoint, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
-      Prefer: 'return=representation'
-    },
-    body: JSON.stringify({
-      buyer_id: payerId,
-      entry_fee_amount: 20.00,
-      entry_fee_status: 'paid',
-      last_updated: new Date().toISOString()
-    })
-  });
-
-  return new Response(JSON.stringify({ message: 'Stripe checkout session created', session_url: stripeData.url }), { status: 200 });
+  return new Response(JSON.stringify({
+    message: 'Stripe checkout session created',
+    session_id: stripeData.id,
+    session_url: stripeData.url,
+    checkout_url: stripeData.url,
+    url: stripeData.url,
+  }), { status: 200 });
 }
 
 function stripePayloadToForm(payload, prefix = '') {

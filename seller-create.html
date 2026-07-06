@@ -117,8 +117,8 @@
       </section>
 
       <section class="card p-6 hidden" data-step="3">
-        <div class="text-sm font-bold text-slate-900 mb-1">Step 3 — Payment review</div>
-        <div class="text-xs text-slate-500 mb-5">Submitting this form creates the deal in <strong>awaiting_payment</strong> status for the next activation step.</div>
+        <div class="text-sm font-bold text-slate-900 mb-1">Step 3 — Activation payment</div>
+        <div class="text-xs text-slate-500 mb-5">Submitting this form creates the deal in <strong>awaiting_payment</strong> status and redirects you to the Stripe activation checkout.</div>
         <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 space-y-2 text-sm text-slate-700">
           <div class="font-semibold text-emerald-800">Before you submit</div>
           <ul class="list-disc pl-5 space-y-1">
@@ -141,7 +141,7 @@
         <div class="flex items-center gap-3">
           <span id="step-label" class="text-sm text-slate-500">Step 1 of 3</span>
           <button type="button" id="next-btn" class="btn-primary">Next</button>
-          <button type="submit" id="submit-btn" class="btn-primary hidden">Create Deal</button>
+          <button type="submit" id="submit-btn" class="btn-primary hidden">Continue to payment</button>
         </div>
       </div>
     </form>
@@ -228,6 +228,7 @@
         }
 
         const submitBtn = byId('submit-btn');
+        let dealCreated = false;
         submitBtn.disabled = true;
         setMessage('Creating deal…', false);
 
@@ -254,11 +255,51 @@
             throw new Error(data.error || 'Deal creation failed.');
           }
 
-          setMessage(data.next_step || 'Deal created.', false);
-          byId('created-deal-id').textContent = data.deal && data.deal.id ? data.deal.id : 'Unavailable';
-          byId('created-deal-status').textContent = data.deal && data.deal.status ? data.deal.status : 'awaiting_payment';
-          byId('success-panel').classList.remove('hidden');
+          const dealId = data.deal && data.deal.id ? data.deal.id : '';
+          const dealStatus = data.deal && data.deal.status ? data.deal.status : 'awaiting_payment';
+          dealCreated = Boolean(dealId);
+          byId('created-deal-id').textContent = dealId || 'Unavailable';
+          byId('created-deal-status').textContent = dealStatus;
+
+          if (!dealId) {
+            throw new Error('Deal created without an ID. Please contact support.');
+          }
+
+          setMessage('Redirecting to secure Stripe activation payment…', false);
+
+          const checkoutResponse = await fetch('/supabase/functions/createStripeCheckout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify({
+              deal_id: dealId,
+              user_id: byId('user-id').value.trim() || null,
+              base_url: window.location.origin,
+              description: 'Greens ACC Deal Activation',
+              metadata: {
+                transaction_type: 'deal_activation',
+                activation_fee: '20.00'
+              }
+            })
+          });
+
+          const checkoutData = await checkoutResponse.json().catch(function () { return {}; });
+          if (!checkoutResponse.ok) {
+            throw new Error(checkoutData.error || 'Stripe checkout creation failed.');
+          }
+
+          const checkoutUrl = checkoutData.url || checkoutData.checkout_url || checkoutData.session_url;
+          if (!checkoutUrl) {
+            throw new Error('Stripe checkout URL missing from activation response.');
+          }
+
+          window.location.href = checkoutUrl;
         } catch (error) {
+          if (dealCreated) {
+            byId('success-panel').classList.remove('hidden');
+          }
           setMessage(error.message || 'Network error while creating deal.', true);
         } finally {
           submitBtn.disabled = false;
