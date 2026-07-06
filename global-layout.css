@@ -1,0 +1,181 @@
+:root {
+  color-scheme: light;
+  --gacc-shell-bg: rgba(255, 255, 255, 0.92);
+  --gacc-shell-border: rgba(148, 163, 184, 0.28);
+  --gacc-shell-text: #0f172a;
+  --gacc-shell-muted: #64748b;
+  --gacc-shell-chip: #f8fafc;
+  --gacc-shell-chip-border: #e2e8f0;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --gacc-shell-bg: rgba(2, 6, 23, 0.92);
+  --gacc-shell-border: rgba(148, 163, 184, 0.32);
+  --gacc-shell-text: #e2e8f0;
+  --gacc-shell-muted: #94a3b8;
+  --gacc-shell-chip: #0f172a;
+  --gacc-shell-chip-border: #334155;
+}
+
+body.gacc-shell-enabled {
+  padding-top: 66px;
+}
+
+#gacc-global-shell {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  backdrop-filter: blur(12px);
+  background: var(--gacc-shell-bg);
+  border-bottom: 1px solid var(--gacc-shell-border);
+}
+
+.gacc-shell-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gacc-shell-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--gacc-shell-text);
+  text-decoration: none;
+}
+
+.gacc-shell-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.gacc-shell-title {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.gacc-shell-subtitle {
+  font-size: 10px;
+  color: var(--gacc-shell-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.gacc-shell-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gacc-shell-link {
+  text-decoration: none;
+  color: var(--gacc-shell-muted);
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.gacc-shell-link:hover,
+.gacc-shell-link[aria-current='page'] {
+  color: var(--gacc-shell-text);
+  border-color: var(--gacc-shell-chip-border);
+  background: var(--gacc-shell-chip);
+}
+
+.gacc-shell-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gacc-shell-select,
+.gacc-shell-theme {
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--gacc-shell-chip-border);
+  background: var(--gacc-shell-chip);
+  color: var(--gacc-shell-text);
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.gacc-shell-theme {
+  cursor: pointer;
+}
+
+.gacc-shell-mobile {
+  display: none;
+}
+
+html[dir='rtl'] .gacc-shell-inner {
+  direction: rtl;
+}
+
+html[dir='rtl'] body {
+  text-align: right;
+}
+
+html[dir='rtl'] .gacc-shell-links,
+html[dir='rtl'] .gacc-shell-controls {
+  direction: rtl;
+}
+
+html[dir='rtl'] .gacc-shell-select {
+  text-align: right;
+}
+
+@media (max-width: 960px) {
+  .gacc-shell-inner {
+    flex-wrap: wrap;
+  }
+
+  .gacc-shell-links {
+    display: none;
+  }
+
+  .gacc-shell-mobile {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 640px) {
+  body.gacc-shell-enabled {
+    padding-top: 110px;
+  }
+
+  .gacc-shell-inner {
+    gap: 6px;
+  }
+
+  .gacc-shell-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .gacc-shell-select {
+    flex: 1;
+    min-width: 120px;
+  }
+}
