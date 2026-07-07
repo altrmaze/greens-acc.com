@@ -6,10 +6,11 @@ from typing import Optional
 import stripe
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, create_engine, or_
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
+
+from .security_command_center import router as security_router, verify_admin
 
 # ==========================================
 # 1. INITIALIZATION & DATABASE SETUP
@@ -22,7 +23,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 app = FastAPI(title="Greens ACC - Unified Command Matrix")
-security_jwt = HTTPBearer(auto_error=False)
 
 app.add_middleware(
     CORSMiddleware,
@@ -229,9 +229,7 @@ class MeetingCreate(BaseModel):
 # 4. RUNTIME OPERATIONS & BUSINESS LOGIC
 # ==========================================
 @app.get("/api/admin/system-state")
-def get_system_state(credentials: HTTPAuthorizationCredentials = Depends(security_jwt)):
-    if not credentials or credentials.credentials != "hassan123":
-        raise HTTPException(status_code=403, detail="Unauthorized Super Controller Identity")
+def get_system_state(credentials=Depends(verify_admin)):
     return {"status": "ONLINE", "active_viewers": 1}
 
 
@@ -634,5 +632,5 @@ def analyze_employee_behavior_and_blockages(employee_id: str, db: Session = Depe
         },
     }
 
-from .security_command_center import router as security_router
+
 app.include_router(security_router)
