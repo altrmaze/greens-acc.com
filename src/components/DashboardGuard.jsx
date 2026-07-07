@@ -95,7 +95,7 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
             .maybeSingle(),
           supabase
             .from('user_profiles')
-            .select('account_status')
+            .select('account_status, security_flags')
             .eq('id', user.id)
             .maybeSingle(),
         ]);
