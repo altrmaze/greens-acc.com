@@ -1,9 +1,10 @@
 name: AI Self-Healing Validation
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - test-self-healing
 
 permissions:
   contents: read
