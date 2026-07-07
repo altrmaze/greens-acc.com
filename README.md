@@ -27,6 +27,7 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - `npm test` — validate schema and edge function syntax
 - `streamlit run /home/runner/work/greens-acc.com/greens-acc.com/streamlit_app.py` — launch the operations dashboard UI
 - `python3 /home/runner/work/greens-acc.com/greens-acc.com/scripts/autonomous_execution_bridge.py` — run autonomous agent decision bridge (requires `CORE_AGENT_API_KEY`)
+- `python3 /home/runner/work/greens-acc.com/greens-acc.com/scripts/trigger_deploy_workflow.py '{"workflow":"deploy.yml","ref":"main"}'` — trigger a GitHub Actions workflow via `gh workflow run`
 
 ## Streamlit operations dashboard
 
