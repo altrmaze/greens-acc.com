@@ -25,6 +25,13 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - `npm run build` — build static site to `dist/`
 - `npm start` — build the site, start the Python integration server on port `5000`, and expose `/api/system-status`
 - `npm test` — validate schema and edge function syntax
+- `streamlit run /home/runner/work/greens-acc.com/greens-acc.com/streamlit_app.py` — launch the operations dashboard UI
+
+## Streamlit operations dashboard
+
+- File: `/home/runner/work/greens-acc.com/greens-acc.com/streamlit_app.py`
+- Purpose: enterprise UI for transaction evaluation, staged enforcement feedback, and session audit logs.
+- Backend target: `BACKEND_API_URL` env var (default: `http://localhost:5000/api/v1`), posting to `/transactions/evaluate`.
 
 ## Payment workflow
 
