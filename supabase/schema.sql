@@ -163,6 +163,89 @@ create table if not exists public.security_telemetry (
 create index if not exists idx_security_telemetry_created_at on public.security_telemetry (created_at desc);
 create index if not exists idx_security_telemetry_threat_level on public.security_telemetry (threat_level);
 
+-- Role hierarchy enum for dashboard authorization
+do $$
+begin
+  create type user_team_role as enum (
+    'admin',
+    'account_manager',
+    'financial_manager',
+    'accounting_staff',
+    'software_engineer',
+    'analyzer'
+  );
+exception when duplicate_object then null;
+end $$;
+
+-- Auth-linked profiles table consumed by DashboardGuard
+create table if not exists public.profiles (
+  id uuid primary key references auth.users on delete cascade,
+  username text unique not null,
+  role user_team_role not null default 'analyzer',
+  priority_level int not null default 6,
+  can_approve_deals boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create or replace function public.handle_profile_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_profiles_updated_at on public.profiles;
+create trigger trg_profiles_updated_at
+  before update on public.profiles
+  for each row execute function public.handle_profile_updated_at();
+
+alter table public.profiles enable row level security;
+
+drop policy if exists "profiles_select_own" on public.profiles;
+create policy "profiles_select_own"
+  on public.profiles for select
+  using (auth.uid() = id);
+
+drop policy if exists "profiles_hierarchy_visibility" on public.profiles;
+create policy "profiles_hierarchy_visibility"
+  on public.profiles for select
+  using (
+    exists (
+      select 1
+      from public.profiles p
+      where p.id = auth.uid()
+        and (
+          p.role = 'admin'
+          or p.priority_level <= profiles.priority_level
+        )
+    )
+  );
+
+drop policy if exists "profiles_update_own" on public.profiles;
+create policy "profiles_update_own"
+  on public.profiles for update
+  using (auth.uid() = id)
+  with check (
+    role = (select role from public.profiles where id = auth.uid()) and
+    priority_level = (select priority_level from public.profiles where id = auth.uid()) and
+    can_approve_deals = (select can_approve_deals from public.profiles where id = auth.uid())
+  );
+
+drop policy if exists "profiles_admin_full" on public.profiles;
+create policy "profiles_admin_full"
+  on public.profiles for all
+  using (
+    exists (
+      select 1 from public.profiles p
+      where p.id = auth.uid() and p.role = 'admin'
+    )
+  );
+
+create index if not exists idx_profiles_role on public.profiles (role);
+create index if not exists idx_profiles_priority on public.profiles (priority_level);
+
 -- ============================================================
 -- TRADING MONOLITH TABLES
 -- ============================================================
