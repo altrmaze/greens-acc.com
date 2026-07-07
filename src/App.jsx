@@ -3,6 +3,7 @@ import MarketFeeds    from './components/MarketFeeds';
 import DealsGrid      from './components/DealsGrid';
 import { DashboardGuard }   from './components/DashboardGuard';
 import { CodeSpaceConsole } from './components/CodeSpaceConsole';
+import { SecurityTelemetryPanel } from './components/SecurityTelemetryPanel';
 
 /**
  * Root application component — Greens ACC
@@ -23,6 +24,7 @@ export default function App() {
 
       {/* Super Admin — root configuration panel */}
       <DashboardGuard requiredRole="admin" allowAdmin={false}>
+        <SecurityTelemetryPanel />
         <AdminPanel />
       </DashboardGuard>
 

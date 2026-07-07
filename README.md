@@ -8,6 +8,8 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - `backend/server.py` — Python command-center server that serves `dist/`, proxies Supabase functions, and exposes `/api/system-status`
 - `package.json` — build, start, and test scripts
 - `supabase/schema.sql` — database schema for deals and payments
+- `src/components/DashboardGuard.jsx` — role/account-status credential gate using Supabase auth + profile tables
+- `src/components/SecurityTelemetryPanel.jsx` — live Supabase `security_telemetry` dashboard panel (General Bubbles)
 - `supabase/functions/processEntryFee.js` — edge function to process the flat $20 entry fee
 - `supabase/functions/processWithdrawal.js` — edge function to release escrow only after all 3 AI agents verify compliance
 

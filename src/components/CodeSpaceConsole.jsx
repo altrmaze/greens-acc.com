@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
-
 // Repository coordinates — the actual Greens ACC production repo
 const GITHUB_OWNER = 'altrmaze';
 const GITHUB_REPO  = 'greens-acc.com';
@@ -13,49 +10,10 @@ const CODESPACE_URL =
 /**
  * CodeSpaceConsole
  *
- * Renders an embedded GitHub Codespaces terminal iframe, gated behind
- * software_engineer or admin clearance.  The Supabase `profiles` table
- * is queried to verify the authenticated user's role before mounting the frame.
+ * Renders an embedded GitHub Codespaces terminal iframe.
+ * Access control is enforced by the parent DashboardGuard.
  */
 export function CodeSpaceConsole() {
-  const [hasClearance, setHasClearance] = useState(false);
-  const [loading, setLoading]           = useState(true);
-
-  useEffect(() => {
-    async function verifyDeveloperSession() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-
-        if (data?.role === 'software_engineer' || data?.role === 'admin') {
-          setHasClearance(true);
-        }
-      }
-      setLoading(false);
-    }
-    verifyDeveloperSession();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="p-6 text-gray-500 font-mono text-sm animate-pulse">
-        Booting Development Toolchains…
-      </div>
-    );
-  }
-
-  if (!hasClearance) {
-    return (
-      <div className="p-8 text-red-500 font-bold font-mono text-sm">
-        CRITICAL: SECURITY BOUNDARY ERROR — INSUFFICIENT PERMISSIONS
-      </div>
-    );
-  }
-
   return (
     <div
       className="w-full bg-[#181818] rounded-xl overflow-hidden border border-gray-800

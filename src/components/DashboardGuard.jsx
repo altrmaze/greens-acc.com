@@ -13,21 +13,65 @@ import { supabase } from '../supabaseClient';
  * @param {ReactNode} children     - The protected panel content.
  */
 export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
-  const [userRole, setUserRole] = useState(null);
+  const [context, setContext] = useState({
+    userId: null,
+    role: null,
+    accountStatus: 'active',
+    canApproveDeals: false,
+    priorityLevel: null,
+    error: null,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchUserContext() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        setUserRole(data?.role ?? null);
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          throw userError;
+        }
+
+        if (!user) {
+          setContext((prev) => ({ ...prev, error: 'Not authenticated' }));
+          return;
+        }
+
+        const [{ data: profileData, error: profileError }, { data: accountData, error: accountError }] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('role, priority_level, can_approve_deals')
+            .eq('id', user.id)
+            .maybeSingle(),
+          supabase
+            .from('user_profiles')
+            .select('account_status')
+            .eq('id', user.id)
+            .maybeSingle(),
+        ]);
+
+        if (profileError) {
+          throw profileError;
+        }
+        if (accountError) {
+          throw accountError;
+        }
+
+        setContext({
+          userId: user.id,
+          role: profileData?.role ?? user?.app_metadata?.role ?? null,
+          accountStatus: accountData?.account_status ?? 'active',
+          canApproveDeals: Boolean(profileData?.can_approve_deals),
+          priorityLevel: profileData?.priority_level ?? null,
+          error: null,
+        });
+      } catch (error) {
+        setContext((prev) => ({
+          ...prev,
+          error: error instanceof Error ? error.message : 'Unable to load security context',
+        }));
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
     fetchUserContext();
   }, []);
@@ -40,8 +84,10 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
     );
   }
 
+  const accountActive = ['active', 'premium'].includes((context.accountStatus || '').toLowerCase());
   const accessGranted =
-    userRole === requiredRole || (allowAdmin && userRole === 'admin');
+    accountActive &&
+    (context.role === requiredRole || (allowAdmin && context.role === 'admin'));
 
   if (!accessGranted) {
     return (
@@ -54,6 +100,15 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
           Your current credentials do not provide sufficient authorization parameters
           to mount this functional module.
         </p>
+        <p className="text-xs mt-3 text-red-300/80 font-mono">
+          role={context.role ?? 'none'} · account={context.accountStatus ?? 'unknown'} ·
+          approve={String(context.canApproveDeals)} · priority={context.priorityLevel ?? 'n/a'}
+        </p>
+        {context.error && (
+          <p className="text-xs mt-1 text-red-300/80 font-mono">
+            reason={context.error}
+          </p>
+        )}
       </div>
     );
   }
