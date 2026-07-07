@@ -3,6 +3,36 @@
 
 create extension if not exists "pgcrypto";
 
+do $$
+begin
+  if not exists (select 1 from pg_type where typname = 'rollout_mode') then
+    create type public.rollout_mode as enum ('shadow', 'assisted', 'enforcement');
+  end if;
+end $$;
+
+create table if not exists public.ai_monitoring_config (
+  id serial primary key,
+  current_mode public.rollout_mode not null default 'shadow',
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.ai_transaction_logs (
+  id uuid primary key default gen_random_uuid(),
+  transaction_id varchar(255) not null,
+  risk_score float not null,
+  action_taken varchar(50) not null,
+  is_false_positive boolean not null default false,
+  processing_time_ms int,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_ai_transaction_logs_transaction_id on public.ai_transaction_logs (transaction_id);
+create index if not exists idx_ai_transaction_logs_created_at on public.ai_transaction_logs (created_at);
+
+insert into public.ai_monitoring_config (current_mode)
+select 'shadow'
+where not exists (select 1 from public.ai_monitoring_config);
+
 create table if not exists public.green_acc_deals (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),

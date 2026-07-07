@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -66,6 +67,40 @@ def supabase_get(path: str, query: str) -> list[dict[str, Any]]:
         return json.loads(response.read().decode("utf-8"))
 
 
+def supabase_insert(path: str, payload: dict[str, Any]) -> None:
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        return
+    endpoint = f"{SUPABASE_URL}/rest/v1/{path}"
+    req = request.Request(
+        endpoint,
+        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal",
+            "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            "Authorization": "Bearer " + SUPABASE_SERVICE_ROLE_KEY,
+        },
+        method="POST",
+    )
+    with request.urlopen(req, timeout=10):
+        return
+
+
+def evaluate_risk(amount: float) -> float:
+    return 0.85 if amount > 100000 else 0.15
+
+
+def get_current_rollout_mode() -> str:
+    try:
+        rows = supabase_get("ai_monitoring_config", "select=current_mode&order=id.desc&limit=1")
+        if rows and rows[0].get("current_mode") in {"shadow", "assisted", "enforcement"}:
+            return rows[0]["current_mode"]
+    except Exception:  # noqa: BLE001
+        pass
+    return "shadow"
+
+
 def supabase_functions_target(base_url: str, function_path: str, query: str) -> str:
     base = base_url.rstrip("/")
     if not base and SUPABASE_URL:
@@ -105,6 +140,9 @@ class GreensHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         parsed = parse.urlparse(self.path)
+        if parsed.path == "/api/v1/transactions/evaluate":
+            self.handle_transaction_evaluate()
+            return
         if parsed.path == "/api/v1/memo/analyze":
             self.handle_memo_analyze()
             return
@@ -165,6 +203,89 @@ class GreensHandler(SimpleHTTPRequestHandler):
                 "summary": summary,
                 "risk_factors": risk_factors,
                 "compliance_status": compliance_status,
+            },
+        )
+
+    def handle_transaction_evaluate(self) -> None:
+        length = int(self.headers.get("Content-Length", "0") or "0")
+        try:
+            payload: dict[str, Any] = json.loads(self.rfile.read(length)) if length else {}
+        except (json.JSONDecodeError, ValueError):
+            self._write_json(HTTPStatus.BAD_REQUEST, {"detail": "Invalid JSON body."})
+            return
+
+        required = {"transaction_id", "amount", "buyer_id", "seller_id"}
+        missing = [key for key in required if key not in payload]
+        if missing:
+            self._write_json(HTTPStatus.BAD_REQUEST, {"detail": f"Missing required fields: {', '.join(sorted(missing))}."})
+            return
+
+        transaction_id = str(payload.get("transaction_id", "")).strip()
+        buyer_id = str(payload.get("buyer_id", "")).strip()
+        seller_id = str(payload.get("seller_id", "")).strip()
+        try:
+            amount = float(payload.get("amount"))
+        except (TypeError, ValueError):
+            self._write_json(HTTPStatus.BAD_REQUEST, {"detail": "amount must be numeric."})
+            return
+
+        if not transaction_id or not buyer_id or not seller_id:
+            self._write_json(
+                HTTPStatus.BAD_REQUEST,
+                {"detail": "transaction_id, buyer_id, and seller_id must be non-empty strings."},
+            )
+            return
+
+        start_time = time.time()
+        risk_score = evaluate_risk(amount)
+        current_mode = get_current_rollout_mode()
+
+        action_taken = "logged"
+        is_blocked = False
+        warning_message: str | None = None
+
+        if risk_score > 0.70:
+            if current_mode == "assisted":
+                action_taken = "warned"
+                warning_message = "Caution: This high-impact transaction has flags."
+            elif current_mode == "enforcement":
+                action_taken = "blocked"
+                is_blocked = True
+
+        duration_ms = int((time.time() - start_time) * 1000)
+
+        try:
+            supabase_insert(
+                "ai_transaction_logs",
+                {
+                    "transaction_id": transaction_id,
+                    "risk_score": risk_score,
+                    "action_taken": action_taken,
+                    "processing_time_ms": duration_ms,
+                },
+            )
+        except Exception as exc:  # noqa: BLE001
+            print(f"Metrics logging failed: {exc}")
+
+        if is_blocked:
+            self._write_json(
+                HTTPStatus.FORBIDDEN,
+                {"detail": "Transaction blocked by AI safety guardrails for verification."},
+            )
+            return
+
+        self._write_json(
+            HTTPStatus.OK,
+            {
+                "status": "success",
+                "action_mode": current_mode,
+                "warning": warning_message,
+                "payload": {
+                    "transaction_id": transaction_id,
+                    "amount": amount,
+                    "buyer_id": buyer_id,
+                    "seller_id": seller_id,
+                },
             },
         )
 
