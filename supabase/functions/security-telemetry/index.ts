@@ -80,7 +80,8 @@ serve(async (req) => {
       },
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }), {
+    console.error("security-telemetry failure", error);
+    return new Response(JSON.stringify({ error: "Failed to process security telemetry event" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,
     });
