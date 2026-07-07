@@ -3,6 +3,9 @@ name: Fix Schema and Deploy
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   fix-schema-and-deploy:
     runs-on: ubuntu-latest
