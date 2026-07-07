@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -13,20 +14,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: npm ci
 
       - name: Run Tests
-        run: |
-          pytest
+        run: npm test
 
       - name: Deploy to Live Server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -38,6 +36,6 @@ jobs:
           script: |
             cd /var/www/greens-acc.com/backend
             git pull origin main
-            source venv/bin/activate
-            pip install -r requirements.txt
+            if [ -f venv/bin/activate ]; then source venv/bin/activate; fi
+            if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
             sudo systemctl restart fastapi
