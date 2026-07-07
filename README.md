@@ -26,6 +26,7 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - `npm start` — build the site, start the Python integration server on port `5000`, and expose `/api/system-status`
 - `npm test` — validate schema and edge function syntax
 - `streamlit run /home/runner/work/greens-acc.com/greens-acc.com/streamlit_app.py` — launch the operations dashboard UI
+- `python3 /home/runner/work/greens-acc.com/greens-acc.com/scripts/autonomous_execution_bridge.py` — run autonomous agent decision bridge (requires `CORE_AGENT_API_KEY`)
 
 ## Streamlit operations dashboard
 
