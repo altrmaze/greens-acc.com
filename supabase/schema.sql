@@ -144,6 +144,25 @@ create index if not exists idx_compliance_logs_room on public.compliance_logs (r
 create index if not exists idx_compliance_logs_severity on public.compliance_logs (severity);
 create index if not exists idx_room_sessions_status on public.room_sessions (session_status);
 
+-- Security telemetry stream from edge threat-scoring engine
+create table if not exists public.security_telemetry (
+  id uuid primary key default gen_random_uuid(),
+  event_id text not null,
+  source_ip text,
+  behavior_score numeric(4,3) not null default 0,
+  signature_matched boolean not null default false,
+  payload_size_mb numeric(12,3) not null default 0,
+  threat_level text not null default 'YELLOW'
+    check (threat_level in ('YELLOW','PURPLE','ORANGE','RED')),
+  kill_switch_active boolean not null default false,
+  bubble_isolated boolean not null default false,
+  action_details text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_security_telemetry_created_at on public.security_telemetry (created_at desc);
+create index if not exists idx_security_telemetry_threat_level on public.security_telemetry (threat_level);
+
 -- ============================================================
 -- TRADING MONOLITH TABLES
 -- ============================================================

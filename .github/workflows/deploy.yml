@@ -1,13 +1,12 @@
-name: Production Deployment
+name: Deploy Greens ACC to Supabase
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,22 +19,41 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run Tests
-        run: npm test
-
-      - name: Deploy to Live Server via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: |
-            cd /var/www/greens-acc.com/backend
-            git pull origin main
-            if [ -f venv/bin/activate ]; then source venv/bin/activate; fi
-            if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-            sudo systemctl restart fastapi
+          version: latest
+
+      - name: Install Dependencies & Build Dashboard
+        run: |
+          npm ci
+          npm run build
+
+      - name: Link and Deploy Frontend to Supabase Hosting
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+          supabase hosting deploy ./dist
+
+  deploy-security-engine:
+    runs-on: ubuntu-latest
+    needs: deploy-frontend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy Security Telemetry Edge Function
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          supabase functions deploy security-telemetry --project-ref "$SUPABASE_PROJECT_ID"

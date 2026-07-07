@@ -19,6 +19,8 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 4. Set environment variables:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_ACCESS_TOKEN` (for CI deploy workflows)
+   - `SUPABASE_PROJECT_ID` (for CI deploy workflows)
 
 ## Usage
 
@@ -54,6 +56,7 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - For the Python integration server, also set:
    - `SUPABASE_FUNCTIONS_BASE_URL` — base URL used to proxy `/supabase/functions/*` (supports project URL, `.../functions/v1`, or `*.functions.supabase.co`)
    - `PORT` — optional override for the default `5000`
+- GitHub Actions `.github/workflows/deploy.yml` deploys `dist/` to Supabase Hosting and deploys the `security-telemetry` edge function on pushes to `main`.
 
 - Python server diagnostics:
    - `GET /api/system-status` — aggregated deal/supply/compliance snapshot
