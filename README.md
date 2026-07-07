@@ -16,9 +16,19 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 1. Create a Supabase project.
 2. Add the `green_acc_deals` table using `supabase/schema.sql`.
 3. Deploy edge functions from `supabase/functions/`.
-4. Set environment variables:
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
+4. Set environment variables (copy `.env.example` to `.env` and fill in real values):
+
+**Frontend (browser-safe):**
+- `VITE_SUPABASE_URL` — your project URL (e.g. `https://xyz.supabase.co`)
+- `VITE_SUPABASE_ANON_KEY` — public anon key
+
+**Edge Function Runtime (never expose to browser):**
+- `SUPABASE_URL` — same project URL
+- `SUPABASE_SERVICE_ROLE_KEY` — high-privilege service role key
+
+**CLI & GitHub Actions secrets:**
+- `SUPABASE_PROJECT_ID` — your project reference ID
+- `SUPABASE_ACCESS_TOKEN` — personal access token for the Supabase CLI
 
 ## Usage
 
