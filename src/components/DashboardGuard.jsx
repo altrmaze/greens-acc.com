@@ -1,6 +1,42 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 
+const OPTIONAL_RESOURCE_CODES = new Set(['42P01', 'PGRST205']);
+
+function isOptionalResourceError(error) {
+  if (!error) {
+    return false;
+  }
+  return OPTIONAL_RESOURCE_CODES.has(error.code) || /does not exist/i.test(error.message || '');
+}
+
+function resolveRole(user, profileData, securityFlags) {
+  return (
+    profileData?.role ??
+    securityFlags?.role ??
+    user?.user_metadata?.role ??
+    user?.app_metadata?.role ??
+    null
+  );
+}
+
+function parseSecurityFlags(rawFlags) {
+  if (!rawFlags) {
+    return null;
+  }
+  if (typeof rawFlags === 'object') {
+    return rawFlags;
+  }
+  if (typeof rawFlags === 'string') {
+    try {
+      return JSON.parse(rawFlags);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 /**
  * DashboardGuard
  *
@@ -24,6 +60,11 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      fetchUserContext();
+    });
+
     async function fetchUserContext() {
       try {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -32,7 +73,17 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
         }
 
         if (!user) {
-          setContext((prev) => ({ ...prev, error: 'Not authenticated' }));
+          if (mounted) {
+            setContext((prev) => ({
+              ...prev,
+              userId: null,
+              role: null,
+              accountStatus: 'inactive',
+              canApproveDeals: false,
+              priorityLevel: null,
+              error: 'Not authenticated',
+            }));
+          }
           return;
         }
 
@@ -50,30 +101,48 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
         ]);
 
         if (profileError) {
-          throw profileError;
+          if (!isOptionalResourceError(profileError)) {
+            throw profileError;
+          }
         }
         if (accountError) {
-          throw accountError;
+          if (!isOptionalResourceError(accountError)) {
+            throw accountError;
+          }
         }
 
-        setContext({
-          userId: user.id,
-          role: profileData?.role ?? user?.app_metadata?.role ?? null,
-          accountStatus: accountData?.account_status ?? 'active',
-          canApproveDeals: Boolean(profileData?.can_approve_deals),
-          priorityLevel: profileData?.priority_level ?? null,
-          error: null,
-        });
+        const securityFlags = parseSecurityFlags(accountData?.security_flags);
+        const accountStatus = accountData?.account_status ?? (securityFlags?.suspended ? 'suspended' : 'active');
+
+        if (mounted) {
+          setContext({
+            userId: user.id,
+            role: resolveRole(user, profileData, securityFlags),
+            accountStatus,
+            canApproveDeals: Boolean(profileData?.can_approve_deals ?? securityFlags?.can_approve_deals),
+            priorityLevel: profileData?.priority_level ?? securityFlags?.priority_level ?? null,
+            error: null,
+          });
+        }
       } catch (error) {
-        setContext((prev) => ({
-          ...prev,
-          error: error instanceof Error ? error.message : 'Unable to load security context',
-        }));
+        if (mounted) {
+          setContext((prev) => ({
+            ...prev,
+            error: error instanceof Error ? error.message : 'Unable to load security context',
+          }));
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     }
     fetchUserContext();
+
+    return () => {
+      mounted = false;
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
   if (loading) {

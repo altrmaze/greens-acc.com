@@ -12,6 +12,21 @@ function severityClass(level) {
   return LEVEL_STYLES[level] ?? 'bg-slate-50 text-slate-700 border-slate-200';
 }
 
+function normalizeEvent(event) {
+  if (!event) {
+    return event;
+  }
+  return {
+    ...event,
+    threat_level: (event.threat_level || 'YELLOW').toUpperCase(),
+  };
+}
+
+function upsertEvent(list, incoming) {
+  const next = [normalizeEvent(incoming), ...list.filter((event) => event.id !== incoming.id)];
+  return next.slice(0, 25);
+}
+
 export function SecurityTelemetryPanel() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +49,7 @@ export function SecurityTelemetryPanel() {
       if (fetchError) {
         setError(fetchError.message);
       } else {
-        setEvents(data ?? []);
+        setEvents((data ?? []).map(normalizeEvent));
       }
       setLoading(false);
     }
@@ -47,7 +62,14 @@ export function SecurityTelemetryPanel() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'security_telemetry' },
         (payload) => {
-          setEvents((prev) => [payload.new, ...prev].slice(0, 25));
+          setEvents((prev) => upsertEvent(prev, payload.new));
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'security_telemetry' },
+        (payload) => {
+          setEvents((prev) => upsertEvent(prev, payload.new));
         },
       )
       .subscribe((status) => {
