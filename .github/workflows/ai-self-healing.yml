@@ -1,4 +1,4 @@
-name: AI Self-Healing Validation
+name: AI Execution
 
 on:
   workflow_dispatch:
@@ -7,48 +7,27 @@ on:
       - test-self-healing
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
-  validate-and-heal:
+  ai_execution:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest supabase requests
-
-      - name: Run Validation Tests
-        id: validation
-        run: |
-          pytest
-
-      - name: Handle Validation Failure
-        if: failure()
-        run: |
-          echo "failed" > .status
-          echo "Validation failed. Created .status file."
-
-      - name: Conditional AI Self-Healing & Telemetry
-        if: failure()
+      - name: Run AI Agent Execution
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -f scripts/self_heal.py ]; then
-            echo "Executing AI self-healing script..."
-            python scripts/self_heal.py
-          else
-            echo "scripts/self_heal.py not found. Skipping execution."
-          fi
+          python -m agents.execute \
+            --auto-approve=true \
+            --skip-proposal-blockage=true \
+            --kickoff="runtime baseline PR"
