@@ -1,85 +1,53 @@
-name: AI Self-Healing Loop
+name: AI Self-Healing Validation
 
 on:
   push:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  ai_healing:
+  validate-and-heal:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Verification Tools
-        run: pip install flake8 pytest supabase requests
-
-      - name: Run System Validation
-        id: run_tests
+      - name: Install Dependencies
         run: |
-          echo "Checking codebase health..."
-          rm -f .status
+          python -m pip install --upgrade pip
+          pip install flake8 pytest supabase requests
 
-          if [ -d tests ]; then
-            pytest tests/ > test_log.txt 2>&1 || echo "failed" > .status
-          else
-            echo "No tests directory found." > test_log.txt
-          fi
+      - name: Run Validation Tests
+        id: validation
+        run: |
+          pytest
 
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics > lint_log.txt 2>&1 || echo "failed" > .status
+      - name: Handle Validation Failure
+        if: failure()
+        run: |
+          echo "failed" > .status
+          echo "Validation failed. Created .status file."
 
-      - name: Route Failure to AI Agents
-        if: hashFiles('.status') != ''
+      - name: Conditional AI Self-Healing & Telemetry
+        if: failure()
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          echo "🚨 Structural degradation detected. Bypassing human administrator."
-          python - <<'PY'
-          import os
-          import subprocess
-          import requests
-
-          def read_log(path):
-            if not os.path.exists(path):
-              return ""
-            with open(path, "r", encoding="utf-8", errors="replace") as f:
-              return f.read()
-
-          test_log = read_log("test_log.txt")
-          lint_log = read_log("lint_log.txt")
-          error_payload = (test_log + "\n" + lint_log).replace('"', "'")
-
-          url = f"{os.environ['SUPABASE_URL']}/rest/v1/agent_telemetry"
-          headers = {
-            "apikey": os.environ["SUPABASE_SERVICE_ROLE_KEY"],
-            "Authorization": "Bearer " + os.environ["SUPABASE_SERVICE_ROLE_KEY"],
-            "Content-Type": "application/json",
-            "Prefer": "return=minimal",
-          }
-          payload = {
-            "event_type": "SYSTEM_DEGRADATION",
-            "error_log": error_payload,
-            "status": "triggered_self_healing",
-          }
-
-          response = requests.post(url, json=payload, headers=headers, timeout=30)
-          print("Agent Orchestrator Notified:", response.status_code)
-
-          if os.path.exists("scripts/self_heal.py"):
-            print("Initiating agentic monolith consensus healing loop...")
-            subprocess.run(["python", "scripts/self_heal.py"], check=False)
-          else:
-            print("No scripts/self_heal.py found. Skipping self-heal script execution.")
-          PY
+          if [ -f scripts/self_heal.py ]; then
+            echo "Executing AI self-healing script..."
+            python scripts/self_heal.py
+          else
+            echo "scripts/self_heal.py not found. Skipping execution."
+          fi
