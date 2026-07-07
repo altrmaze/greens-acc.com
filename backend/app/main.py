@@ -633,3 +633,6 @@ def analyze_employee_behavior_and_blockages(employee_id: str, db: Session = Depe
             "predicted_operational_blockage": blockage_prediction,
         },
     }
+
+from .security_command_center import router as security_router
+app.include_router(security_router)
