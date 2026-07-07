@@ -1,4 +1,5 @@
 import json
+import shutil
 import subprocess
 import sys
 from typing import Any
@@ -24,9 +25,38 @@ def parse_payload(raw_payload: str) -> dict[str, Any]:
     return {}
 
 
+def run_preflight_checks(proposal_data: dict[str, Any]) -> bool:
+    print("🧪 Running preflight checks before workflow trigger...")
+
+    if shutil.which("gh") is None:
+        print("❌ GitHub CLI (gh) is not installed or not in PATH.")
+        return False
+
+    if not run_command(["gh", "auth", "status"]):
+        print("❌ GitHub CLI authentication check failed.")
+        return False
+
+    workflow_name = str(proposal_data.get("workflow", "deploy.yml"))
+    view_command = ["gh", "workflow", "view", workflow_name]
+
+    repo = proposal_data.get("repo")
+    if isinstance(repo, str) and repo.strip():
+        view_command.extend(["--repo", repo.strip()])
+
+    if not run_command(view_command):
+        print(f"❌ Workflow not accessible: {workflow_name}")
+        return False
+
+    print("✅ Preflight checks passed.")
+    return True
+
+
 def execute_autonomous_workflow(proposal_data: dict[str, Any]) -> int:
     print("🤖 Agent analyzing proposal data...")
     print("🚀 Triggering GitHub Actions workflow autonomously...")
+
+    if not run_preflight_checks(proposal_data):
+        return 1
 
     workflow_name = str(proposal_data.get("workflow", "deploy.yml"))
     command = ["gh", "workflow", "run", workflow_name]
