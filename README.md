@@ -52,7 +52,8 @@ Greens ACC is a static website with Supabase backend support for secure trade es
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `STRIPE_SECRET_KEY`
 - For the Python integration server, also set:
-   - `SUPABASE_FUNCTIONS_BASE_URL` — base URL used to proxy `/supabase/functions/*`
+   - `SUPABASE_FUNCTIONS_BASE_URL` — optional base URL for edge functions (e.g. `https://<project-ref>.supabase.co/functions/v1` or `https://<project-ref>.functions.supabase.co`)
+   - If `SUPABASE_FUNCTIONS_BASE_URL` is not set, the server falls back to `SUPABASE_URL/functions/v1`
    - `PORT` — optional override for the default `5000`
 
 ## Files added in this update

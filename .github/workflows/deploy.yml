@@ -1,12 +1,26 @@
 name: Secure Production Deployment Gate
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '*.html'
+      - 'backend/**'
+      - 'supabase/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy.yml'
   pull_request:
     branches:
       - main
     paths:
-      - 'apps/homepage/**'
+      - '*.html'
+      - 'backend/**'
       - 'supabase/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   validate-and-test:
@@ -69,4 +83,4 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
 
       - name: Deploy Frontend / Dashboard Sync
-        run: npm run deploy:prod
+        run: npm run build

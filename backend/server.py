@@ -66,6 +66,24 @@ def supabase_get(path: str, query: str) -> list[dict[str, Any]]:
         return json.loads(response.read().decode("utf-8"))
 
 
+def supabase_functions_target(base_url: str, function_path: str, query: str) -> str:
+    base = base_url.rstrip("/")
+    if not base and SUPABASE_URL:
+        base = f"{SUPABASE_URL}/functions/v1"
+    if not base:
+        return ""
+
+    parsed_base = parse.urlparse(base)
+    host = parsed_base.netloc.lower()
+    if host.endswith(".supabase.co") and ".functions.supabase.co" not in host and "/functions/" not in parsed_base.path:
+        base = f"{base}/functions/v1"
+
+    target = f"{base}/{function_path.lstrip('/')}"
+    if query:
+        target = f"{target}?{query}"
+    return target
+
+
 class GreensHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, directory=str(DIST_DIR), **kwargs)
@@ -296,19 +314,27 @@ class GreensHandler(SimpleHTTPRequestHandler):
             )
 
     def proxy_supabase_function(self, parsed: parse.ParseResult) -> None:
-        if not SUPABASE_FUNCTIONS_BASE_URL:
+        function_path = parsed.path.removeprefix("/supabase/functions/").lstrip("/")
+        if not function_path:
             self._write_json(
-                HTTPStatus.BAD_GATEWAY,
+                HTTPStatus.BAD_REQUEST,
                 {
-                    "error": "SUPABASE_FUNCTIONS_BASE_URL is not configured",
+                    "error": "Missing Supabase function name in request path",
                     "backend": "python",
                 },
             )
             return
 
-        target = f"{SUPABASE_FUNCTIONS_BASE_URL.rstrip('/')}{parsed.path}"
-        if parsed.query:
-            target = f"{target}?{parsed.query}"
+        target = supabase_functions_target(SUPABASE_FUNCTIONS_BASE_URL, function_path, parsed.query)
+        if not target:
+            self._write_json(
+                HTTPStatus.BAD_GATEWAY,
+                {
+                    "error": "SUPABASE_FUNCTIONS_BASE_URL or SUPABASE_URL is not configured",
+                    "backend": "python",
+                },
+            )
+            return
 
         length = int(self.headers.get("Content-Length", "0") or "0")
         body = self.rfile.read(length) if length else None
