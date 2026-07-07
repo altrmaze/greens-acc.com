@@ -1,3 +1,4 @@
+# Trigger marker for workflow path filter.
 name: Supabase Production Deployment
 
 on:
