@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy-frontend:
@@ -27,15 +28,17 @@ jobs:
       - name: Install Dependencies & Build Dashboard
         run: |
           npm ci
+          npm test
           npm run build
 
-      - name: Link and Deploy Frontend to Supabase Hosting
+      - name: Link, Push Schema, and Deploy Frontend to Supabase Hosting
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_ID" --password "$SUPABASE_DB_PASSWORD"
+          supabase db push
           supabase hosting deploy ./dist
 
   deploy-security-engine:

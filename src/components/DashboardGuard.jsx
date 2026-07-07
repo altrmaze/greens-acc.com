@@ -1,42 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 
-const OPTIONAL_RESOURCE_CODES = new Set(['42P01', 'PGRST205']);
-
-function isOptionalResourceError(error) {
-  if (!error) {
-    return false;
-  }
-  return OPTIONAL_RESOURCE_CODES.has(error.code) || /does not exist/i.test(error.message || '');
-}
-
-function resolveRole(user, profileData, securityFlags) {
-  return (
-    profileData?.role ??
-    securityFlags?.role ??
-    user?.user_metadata?.role ??
-    user?.app_metadata?.role ??
-    null
-  );
-}
-
-function parseSecurityFlags(rawFlags) {
-  if (!rawFlags) {
-    return null;
-  }
-  if (typeof rawFlags === 'object') {
-    return rawFlags;
-  }
-  if (typeof rawFlags === 'string') {
-    try {
-      return JSON.parse(rawFlags);
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
-
 /**
  * DashboardGuard
  *
@@ -87,40 +51,23 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
           return;
         }
 
-        const [{ data: profileData, error: profileError }, { data: accountData, error: accountError }] = await Promise.all([
-          supabase
-            .from('profiles')
-            .select('role, priority_level, can_approve_deals')
-            .eq('id', user.id)
-            .maybeSingle(),
-          supabase
-            .from('user_profiles')
-            .select('account_status, security_flags')
-            .eq('id', user.id)
-            .maybeSingle(),
-        ]);
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
 
         if (profileError) {
-          if (!isOptionalResourceError(profileError)) {
-            throw profileError;
-          }
+          throw profileError;
         }
-        if (accountError) {
-          if (!isOptionalResourceError(accountError)) {
-            throw accountError;
-          }
-        }
-
-        const securityFlags = parseSecurityFlags(accountData?.security_flags);
-        const accountStatus = accountData?.account_status ?? (securityFlags?.suspended ? 'suspended' : 'active');
 
         if (mounted) {
           setContext({
             userId: user.id,
-            role: resolveRole(user, profileData, securityFlags),
-            accountStatus,
-            canApproveDeals: Boolean(profileData?.can_approve_deals ?? securityFlags?.can_approve_deals),
-            priorityLevel: profileData?.priority_level ?? securityFlags?.priority_level ?? null,
+            role: profileData?.role ?? null,
+            accountStatus: 'active',
+            canApproveDeals: false,
+            priorityLevel: null,
             error: null,
           });
         }
