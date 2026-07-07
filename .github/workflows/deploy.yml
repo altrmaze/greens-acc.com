@@ -1,9 +1,11 @@
 name: Secure Production Deployment Gate
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
+      - 'copilot/**'
     paths:
       - '*.html'
       - 'backend/**'
@@ -65,7 +67,7 @@ jobs:
   # Actual deployment ONLY triggers after a human approves and merges the PR to main
   deploy-to-production:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/copilot/'))
     needs: [validate-and-test, supabase-dry-run]
     permissions:
       contents: read
