@@ -147,6 +147,8 @@ create index if not exists idx_room_sessions_status on public.room_sessions (ses
 -- Security telemetry stream from edge threat-scoring engine
 create table if not exists public.security_telemetry (
   id uuid primary key default gen_random_uuid(),
+  department_id uuid,
+  workspace_queue text not null default 'global-security-telemetry',
   event_id text not null,
   source_ip text,
   behavior_score numeric(4,3) not null default 0,
@@ -162,6 +164,26 @@ create table if not exists public.security_telemetry (
 
 create index if not exists idx_security_telemetry_created_at on public.security_telemetry (created_at desc);
 create index if not exists idx_security_telemetry_threat_level on public.security_telemetry (threat_level);
+create index if not exists idx_security_telemetry_department_id on public.security_telemetry (department_id);
+create index if not exists idx_security_telemetry_workspace_queue on public.security_telemetry (workspace_queue);
+
+-- Dynamic department registry for isolated workspaces
+create table if not exists public.departments (
+  id uuid primary key default gen_random_uuid(),
+  name text not null unique,
+  slug text not null unique,
+  created_at timestamptz not null default now()
+);
+
+-- Department-bound workspaces with sandboxed metadata + queue definitions
+create table if not exists public.workspaces (
+  id uuid primary key default gen_random_uuid(),
+  department_id uuid not null references public.departments(id) on delete cascade,
+  workspace_metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_workspaces_department_id on public.workspaces (department_id);
 
 -- Auth-linked profiles table consumed by DashboardGuard
 create table if not exists public.profiles (
@@ -169,7 +191,9 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now(),
   username text unique,
   full_name text,
-  role text not null default 'user'
+  role text not null default 'user',
+  department_id uuid references public.departments(id) on delete set null,
+  department_role text not null default 'staff'
 );
 
 create or replace function public.handle_profile_updated_at()
@@ -186,6 +210,8 @@ create trigger trg_profiles_updated_at
   for each row execute function public.handle_profile_updated_at();
 
 alter table public.profiles enable row level security;
+alter table public.departments enable row level security;
+alter table public.workspaces enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 drop policy if exists "profiles_hierarchy_visibility" on public.profiles;
@@ -194,21 +220,135 @@ drop policy if exists "profiles_admin_full" on public.profiles;
 drop policy if exists "Allow public read access to profiles" on public.profiles;
 drop policy if exists "Allow individuals to update their own profile" on public.profiles;
 drop policy if exists "Allow individuals to insert their own profile" on public.profiles;
+drop policy if exists "Department members can read profiles" on public.profiles;
+drop policy if exists "Department members can update their own profile" on public.profiles;
+drop policy if exists "Department members can insert their own profile" on public.profiles;
 
-create policy "Allow public read access to profiles"
+drop policy if exists "Department members can read departments" on public.departments;
+drop policy if exists "Department members can update departments" on public.departments;
+drop policy if exists "Department members can insert departments" on public.departments;
+
+drop policy if exists "Department members can read workspaces" on public.workspaces;
+drop policy if exists "Department members can update workspaces" on public.workspaces;
+drop policy if exists "Department members can insert workspaces" on public.workspaces;
+
+create policy "Department members can read profiles"
   on public.profiles for select
-  using (auth.uid() is not null);
+  using (
+    auth.uid() = id
+    or department_id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  );
 
-create policy "Allow individuals to update their own profile"
+create policy "Department members can update their own profile"
   on public.profiles for update
-  using (auth.uid() = id)
-  with check (auth.uid() = id);
+  using (
+    auth.uid() = id
+    and department_id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  )
+  with check (
+    auth.uid() = id
+    and department_id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+    and department_role in ('dept_lead', 'staff')
+    and lower(role) <> 'manager'
+  );
 
-create policy "Allow individuals to insert their own profile"
+create policy "Department members can insert their own profile"
   on public.profiles for insert
-  with check (auth.uid() = id);
+  with check (
+    auth.uid() = id
+    and department_role in ('dept_lead', 'staff')
+    and lower(role) <> 'manager'
+  );
+
+create policy "Department members can read departments"
+  on public.departments for select
+  using (
+    id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  );
+
+create policy "Department members can update departments"
+  on public.departments for update
+  using (
+    id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  )
+  with check (
+    id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  );
+
+create policy "Department members can insert departments"
+  on public.departments for insert
+  with check (
+    id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  );
+
+create policy "Department members can read workspaces"
+  on public.workspaces for select
+  using (
+    department_id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  );
+
+create policy "Department members can update workspaces"
+  on public.workspaces for update
+  using (
+    department_id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  )
+  with check (
+    department_id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  );
+
+create policy "Department members can insert workspaces"
+  on public.workspaces for insert
+  with check (
+    department_id = (
+      select p.department_id
+      from public.profiles p
+      where p.id = auth.uid()
+    )
+  );
 
 create index if not exists idx_profiles_role on public.profiles (role);
+create index if not exists idx_profiles_department_id on public.profiles (department_id);
+create index if not exists idx_profiles_department_role on public.profiles (department_role);
 
 -- ============================================================
 -- TRADING MONOLITH TABLES

@@ -24,6 +24,8 @@ serve(async (req) => {
     const behaviorScore = Number(payload?.behavior_score ?? 0);
     const payloadSizeMb = Number(payload?.payload_size_mb ?? 0);
     const signatureMatched = Boolean(payload?.signature_matched);
+    const departmentId = payload?.department_id ?? null;
+    const workspaceQueue = (payload?.workspace_queue || "global-security-telemetry").toString();
 
     let threatLevel = "YELLOW";
     let killSwitchActivated = false;
@@ -57,6 +59,8 @@ serve(async (req) => {
     const { error } = await supabase.from("security_telemetry").insert([
       {
         event_id: payload?.event_id ?? crypto.randomUUID(),
+        department_id: departmentId,
+        workspace_queue: workspaceQueue,
         source_ip: payload?.source_ip ?? null,
         behavior_score: behaviorScore,
         signature_matched: signatureMatched,

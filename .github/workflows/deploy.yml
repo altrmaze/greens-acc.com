@@ -54,9 +54,10 @@ jobs:
         with:
           version: latest
 
-      - name: Deploy Security Telemetry Edge Function
+      - name: Deploy Security + Department Provisioning Edge Functions
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
         run: |
           supabase functions deploy security-telemetry --project-ref "$SUPABASE_PROJECT_ID"
+          supabase functions deploy provisionDepartmentWorkspace --project-ref "$SUPABASE_PROJECT_ID"

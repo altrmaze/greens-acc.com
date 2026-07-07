@@ -16,6 +16,10 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
   const [context, setContext] = useState({
     userId: null,
     role: null,
+    departmentId: null,
+    departmentRole: null,
+    workspaceId: null,
+    workspaceQueue: null,
     accountStatus: 'active',
     canApproveDeals: false,
     priorityLevel: null,
@@ -42,6 +46,10 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
               ...prev,
               userId: null,
               role: null,
+              departmentId: null,
+              departmentRole: null,
+              workspaceId: null,
+              workspaceQueue: null,
               accountStatus: 'inactive',
               canApproveDeals: false,
               priorityLevel: null,
@@ -53,7 +61,7 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
 
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, department_id, department_role')
           .eq('id', user.id)
           .single();
 
@@ -61,10 +69,43 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
           throw profileError;
         }
 
+        let workspaceId = null;
+        let workspaceQueue = null;
+        if (profileData?.department_id) {
+          const { data: workspaceData, error: workspaceError } = await supabase
+            .from('workspaces')
+            .select('id, workspace_metadata')
+            .eq('department_id', profileData.department_id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (workspaceError) {
+            throw workspaceError;
+          }
+
+          workspaceId = workspaceData?.id ?? null;
+          workspaceQueue = workspaceData?.workspace_metadata?.queue_names?.telemetry ?? null;
+
+          if (workspaceId && typeof window !== 'undefined') {
+            const nextUrl = new URL(window.location.href);
+            nextUrl.searchParams.set('department_id', profileData.department_id);
+            nextUrl.searchParams.set('workspace_id', workspaceId);
+            if (workspaceQueue) {
+              nextUrl.searchParams.set('workspace_queue', workspaceQueue);
+            }
+            window.history.replaceState({}, '', nextUrl);
+          }
+        }
+
         if (mounted) {
           setContext({
             userId: user.id,
             role: profileData?.role ?? null,
+            departmentId: profileData?.department_id ?? null,
+            departmentRole: profileData?.department_role ?? null,
+            workspaceId,
+            workspaceQueue,
             accountStatus: 'active',
             canApproveDeals: false,
             priorityLevel: null,
@@ -101,9 +142,13 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
   }
 
   const accountActive = ['active', 'premium'].includes((context.accountStatus || '').toLowerCase());
+  const roleMatched =
+    context.role === requiredRole ||
+    context.departmentRole === requiredRole ||
+    (allowAdmin && context.role === 'admin');
   const accessGranted =
     accountActive &&
-    (context.role === requiredRole || (allowAdmin && context.role === 'admin'));
+    roleMatched;
 
   if (!accessGranted) {
     return (
@@ -118,6 +163,8 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
         </p>
         <p className="text-xs mt-3 text-red-300/80 font-mono">
           role={context.role ?? 'none'} · account={context.accountStatus ?? 'unknown'} ·
+          dept={context.departmentId ?? 'none'} · dept_role={context.departmentRole ?? 'none'} ·
+          workspace={context.workspaceId ?? 'none'} · queue={context.workspaceQueue ?? 'none'} ·
           approve={String(context.canApproveDeals)} · priority={context.priorityLevel ?? 'n/a'}
         </p>
         {context.error && (

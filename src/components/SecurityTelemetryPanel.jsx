@@ -27,18 +27,72 @@ function upsertEvent(list, incoming) {
   return next.slice(0, 25);
 }
 
+function resolveWorkspaceQueue(workspaceMetadata, departmentId) {
+  const queueFromMetadata = workspaceMetadata?.queue_names?.telemetry;
+  if (typeof queueFromMetadata === 'string' && queueFromMetadata.trim().length > 0) {
+    return queueFromMetadata.trim();
+  }
+  return `dept.${departmentId}.telemetry`;
+}
+
 export function SecurityTelemetryPanel() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [streamContext, setStreamContext] = useState({
+    departmentId: null,
+    workspaceQueue: null,
+  });
 
   useEffect(() => {
     let mounted = true;
+    let liveDepartmentId = null;
+    let liveWorkspaceQueue = null;
 
     async function loadInitial() {
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        throw authError;
+      }
+
+      const userId = authData?.user?.id;
+      if (!userId) {
+        throw new Error('User authentication is required for department telemetry');
+      }
+
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('department_id')
+        .eq('id', userId)
+        .single();
+
+      if (profileError) {
+        throw profileError;
+      }
+      if (!profileData?.department_id) {
+        throw new Error('No department workspace assigned to this profile');
+      }
+
+      const { data: workspaceData, error: workspaceError } = await supabase
+        .from('workspaces')
+        .select('workspace_metadata')
+        .eq('department_id', profileData.department_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (workspaceError) {
+        throw workspaceError;
+      }
+
+      liveDepartmentId = profileData.department_id;
+      liveWorkspaceQueue = resolveWorkspaceQueue(workspaceData?.workspace_metadata, liveDepartmentId);
+
       const { data, error: fetchError } = await supabase
         .from('security_telemetry')
-        .select('id, event_id, source_ip, threat_level, kill_switch_active, bubble_isolated, action_details, created_at')
+        .select('id, department_id, workspace_queue, event_id, source_ip, threat_level, kill_switch_active, bubble_isolated, action_details, created_at')
+        .eq('department_id', liveDepartmentId)
+        .eq('workspace_queue', liveWorkspaceQueue)
         .order('created_at', { ascending: false })
         .limit(25);
 
@@ -49,38 +103,61 @@ export function SecurityTelemetryPanel() {
       if (fetchError) {
         setError(fetchError.message);
       } else {
+        setStreamContext({
+          departmentId: liveDepartmentId,
+          workspaceQueue: liveWorkspaceQueue,
+        });
         setEvents((data ?? []).map(normalizeEvent));
       }
       setLoading(false);
     }
 
-    loadInitial();
+    let channel = null;
 
-    const channel = supabase
-      .channel('security-telemetry-live')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'security_telemetry' },
-        (payload) => {
-          setEvents((prev) => upsertEvent(prev, payload.new));
-        },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'security_telemetry' },
-        (payload) => {
-          setEvents((prev) => upsertEvent(prev, payload.new));
-        },
-      )
-      .subscribe((status) => {
-        if (status === 'CHANNEL_ERROR') {
-          setError('Realtime telemetry stream is unavailable');
+    loadInitial()
+      .then(() => {
+        if (!mounted || !liveDepartmentId || !liveWorkspaceQueue) {
+          return;
         }
+        channel = supabase
+          .channel(`security-telemetry-live-${liveDepartmentId}`)
+          .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'security_telemetry', filter: `department_id=eq.${liveDepartmentId}` },
+            (payload) => {
+              if (payload?.new?.workspace_queue === liveWorkspaceQueue) {
+                setEvents((prev) => upsertEvent(prev, payload.new));
+              }
+            },
+          )
+          .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'security_telemetry', filter: `department_id=eq.${liveDepartmentId}` },
+            (payload) => {
+              if (payload?.new?.workspace_queue === liveWorkspaceQueue) {
+                setEvents((prev) => upsertEvent(prev, payload.new));
+              }
+            },
+          )
+          .subscribe((status) => {
+            if (status === 'CHANNEL_ERROR') {
+              setError('Realtime telemetry stream is unavailable');
+            }
+          });
+      })
+      .catch((loadError) => {
+        if (!mounted) {
+          return;
+        }
+        setError(loadError instanceof Error ? loadError.message : 'Unable to load department telemetry stream');
+        setLoading(false);
       });
 
     return () => {
       mounted = false;
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, []);
 
@@ -99,7 +176,9 @@ export function SecurityTelemetryPanel() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-bold text-slate-900">General Bubbles Cybersecurity Telemetry</h3>
-            <p className="text-xs text-slate-500 mt-1">Live Supabase stream · severity levels: Yellow, Purple, Orange, Red</p>
+            <p className="text-xs text-slate-500 mt-1">
+              Live Supabase stream · dept={streamContext.departmentId || 'unassigned'} · queue={streamContext.workspaceQueue || 'unset'}
+            </p>
           </div>
           {latest?.threat_level && (
             <span className={`text-xs font-bold px-2.5 py-1 rounded-full border ${severityClass(latest.threat_level)}`}>
