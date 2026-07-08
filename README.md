@@ -62,6 +62,13 @@ Greens ACC is a static website with Supabase backend support for secure trade es
    - `SUPABASE_SECRET_KEY` (or `SUPABASE_SERVICE_ROLE_KEY`) — server-side key for REST access
    - `SUPABASE_FUNCTIONS_BASE_URL` — base URL used to proxy `/supabase/functions/*`
    - `PORT` — optional override for the default `5000`
+- GitHub Actions production release now uses:
+   - `.github/workflows/deploy.yml` to run `npm test`, apply `supabase/migrations/*` with `supabase db push`, and deploy Supabase edge functions
+   - `.github/workflows/pages-deploy.yml` to run `npm test`, build `dist/`, preserve `CNAME`, and publish the frontend to GitHub Pages
+- Configure these GitHub repository secrets before triggering the live release:
+   - `SUPABASE_ACCESS_TOKEN`
+   - `SUPABASE_PROJECT_REF`
+   - `PRODUCTION_DB_PASSWORD`
 
 ## Files added in this update
 
