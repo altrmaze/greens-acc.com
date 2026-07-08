@@ -48,6 +48,20 @@ jobs:
     needs: validate-and-test
     permissions:
       contents: read
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -58,9 +72,28 @@ jobs:
           version: latest
 
       - name: Verify Database Migrations (Dry Run)
-        run: supabase db lint
+        run: |
+          if [ -n "${SUPABASE_ACCESS_TOKEN:-}" ] && [ -n "${SUPABASE_PROJECT_REF:-}" ]; then
+            echo "Running supabase db lint against linked project..."
+            supabase db lint --linked --project-ref "$SUPABASE_PROJECT_REF"
+          else
+            echo "Supabase credentials not configured; linting migrations against local postgres..."
+            DB_URL="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}"
+            psql "$DB_URL" -v ON_ERROR_STOP=1 <<'ENDSQL'
+          CREATE SCHEMA IF NOT EXISTS auth;
+          CREATE TABLE IF NOT EXISTS auth.users (id UUID PRIMARY KEY);
+          CREATE OR REPLACE FUNCTION auth.uid() RETURNS UUID LANGUAGE SQL AS $$ SELECT '00000000-0000-0000-0000-000000000000'::UUID $$;
+          ENDSQL
+            supabase db lint --db-url "$DB_URL"
+          fi
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
 
   deploy-to-production:
     runs-on: ubuntu-latest
