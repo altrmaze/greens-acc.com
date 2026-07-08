@@ -27,6 +27,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_TEST_USER_EMAIL: ${{ secrets.SUPABASE_TEST_EMAIL }}
+      VITE_TEST_USER_PASSWORD: ${{ secrets.SUPABASE_TEST_PASSWORD }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
