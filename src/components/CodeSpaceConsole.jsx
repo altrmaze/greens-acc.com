@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
+import { handleDevLogin } from '../utils/devLogin';
 
 // Repository coordinates — the actual Greens ACC production repo
 const GITHUB_OWNER = 'altrmaze';
@@ -23,7 +24,13 @@ export function CodeSpaceConsole() {
 
   useEffect(() => {
     async function verifyDeveloperSession() {
-      const { data: { user } } = await supabase.auth.getUser();
+      let { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        await handleDevLogin();
+        ({ data: { user } } = await supabase.auth.getUser());
+      }
+
       if (user) {
         const { data } = await supabase
           .from('profiles')

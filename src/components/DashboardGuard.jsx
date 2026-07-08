@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
+import { handleDevLogin } from '../utils/devLogin';
 
 /**
  * DashboardGuard
@@ -18,7 +19,13 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
 
   useEffect(() => {
     async function fetchUserContext() {
-      const { data: { user } } = await supabase.auth.getUser();
+      let { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        await handleDevLogin();
+        ({ data: { user } } = await supabase.auth.getUser());
+      }
+
       if (user) {
         const { data } = await supabase
           .from('profiles')
