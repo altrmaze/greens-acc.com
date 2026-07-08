@@ -16,7 +16,18 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 1. Create a Supabase project.
 2. Add the `green_acc_deals` table using `supabase/schema.sql`.
 3. Deploy edge functions from `supabase/functions/`.
-4. Set environment variables:
+4. Install server-side Supabase helpers:
+   - `npm install @supabase/server`
+5. Set environment variables (copy from `.env.example`):
+   - `SUPABASE_URL`
+   - `SUPABASE_PUBLISHABLE_KEY`
+   - `SUPABASE_SECRET_KEY`
+   - `SUPABASE_JWKS_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_FUNCTIONS_BASE_URL`
+6. (Optional) Install Supabase Server skill for AI tools:
+   - `npx skills add supabase/server`
+7. Existing runtime variables also used in this project:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
 
@@ -50,6 +61,8 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 - After deploying functions, set these environment variables in the edge functions runtime:
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_SECRET_KEY`
+   - `SUPABASE_JWKS_URL`
    - `STRIPE_SECRET_KEY`
 - For the Python integration server, also set:
    - `SUPABASE_FUNCTIONS_BASE_URL` — base URL used to proxy `/supabase/functions/*`
