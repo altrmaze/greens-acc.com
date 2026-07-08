@@ -14,7 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DIST_DIR = ROOT_DIR / "dist"
 PORT = int(os.environ.get("PORT", "5000"))
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
-SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SECRET_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 SUPABASE_FUNCTIONS_BASE_URL = os.environ.get("SUPABASE_FUNCTIONS_BASE_URL", "").rstrip("/")
 
 
@@ -181,7 +181,7 @@ class GreensHandler(SimpleHTTPRequestHandler):
                     "available": False,
                     "backend": "python",
                     "timestamp": self.date_time_string(),
-                    "reason": "SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are not configured",
+                    "reason": "SUPABASE_URL and a Supabase server key are not configured",
                     "locale": {
                         "region": region,
                         "region_timezone": REGION_TIMEZONES.get(region, "UTC"),
