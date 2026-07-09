@@ -3,17 +3,23 @@ import MarketFeeds    from './components/MarketFeeds';
 import DealsGrid      from './components/DealsGrid';
 import { DashboardGuard }   from './components/DashboardGuard';
 import { CodeSpaceConsole } from './components/CodeSpaceConsole';
+import { DevGate }          from './components/DevGate';
 
 /**
  * Root application component — Greens ACC
  *
- * Renders the public trading HUD and the role-isolated staff dashboards.
- * Each protected panel is wrapped in a DashboardGuard that resolves the
- * authenticated user's role from Supabase before mounting its children.
+ * The entire application is wrapped in DevGate.  When the
+ * VITE_DEV_GATE_TOKEN environment variable is set the user must enter a
+ * matching token before any content mounts (useful for staging / preview
+ * environments).  When the variable is absent the gate is a no-op and
+ * the app renders normally.
+ *
+ * Each protected panel inside is also wrapped in a DashboardGuard that
+ * resolves the authenticated user's role from Supabase before mounting.
  */
 export default function App() {
   return (
-    <>
+    <DevGate>
       {/* ── Public Trading HUD ─────────────────────────────────── */}
       <MarketClocks />
       <MarketFeeds />
@@ -50,7 +56,7 @@ export default function App() {
       <DashboardGuard requiredRole="analyzer">
         <AnalyzerPanel />
       </DashboardGuard>
-    </>
+    </DevGate>
   );
 }
 
