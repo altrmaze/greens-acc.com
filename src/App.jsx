@@ -1,9 +1,11 @@
+import { Routes, Route } from 'react-router-dom';
 import MarketClocks   from './components/MarketClocks';
 import MarketFeeds    from './components/MarketFeeds';
 import DealsGrid      from './components/DealsGrid';
 import { DashboardGuard }   from './components/DashboardGuard';
 import { CodeSpaceConsole } from './components/CodeSpaceConsole';
 import { DevGate }          from './components/DevGate';
+import AdminPageRoute        from './AdminPageRoute';
 
 /**
  * Root application component — Greens ACC
@@ -19,44 +21,55 @@ import { DevGate }          from './components/DevGate';
  */
 export default function App() {
   return (
-    <DevGate>
-      {/* ── Public Trading HUD ─────────────────────────────────── */}
-      <MarketClocks />
-      <MarketFeeds />
-      <DealsGrid />
+    <Routes>
+      {/* ── /admin — developer access gate + role selector ─────── */}
+      <Route path="/admin" element={<AdminPageRoute />} />
 
-      {/* ── Role-Isolated Dashboards ───────────────────────────── */}
+      {/* ── Default — public trading HUD + role dashboards ─────── */}
+      <Route
+        path="*"
+        element={
+          <DevGate>
+            {/* ── Public Trading HUD ─────────────────────────────────── */}
+            <MarketClocks />
+            <MarketFeeds />
+            <DealsGrid />
 
-      {/* Super Admin — root configuration panel */}
-      <DashboardGuard requiredRole="admin" allowAdmin={false}>
-        <AdminPanel />
-      </DashboardGuard>
+            {/* ── Role-Isolated Dashboards ───────────────────────────── */}
 
-      {/* Account Manager — oversight analytics & approvals */}
-      <DashboardGuard requiredRole="account_manager">
-        <AccountManagerPanel />
-      </DashboardGuard>
+            {/* Super Admin — root configuration panel */}
+            <DashboardGuard requiredRole="admin" allowAdmin={false}>
+              <AdminPanel />
+            </DashboardGuard>
 
-      {/* Financial Manager — macro finance & FX */}
-      <DashboardGuard requiredRole="financial_manager">
-        <FinancialManagerPanel />
-      </DashboardGuard>
+            {/* Account Manager — oversight analytics & approvals */}
+            <DashboardGuard requiredRole="account_manager">
+              <AccountManagerPanel />
+            </DashboardGuard>
 
-      {/* Accounting Staff — data-entry only, no global summaries */}
-      <DashboardGuard requiredRole="accounting_staff">
-        <AccountingStaffPanel />
-      </DashboardGuard>
+            {/* Financial Manager — macro finance & FX */}
+            <DashboardGuard requiredRole="financial_manager">
+              <FinancialManagerPanel />
+            </DashboardGuard>
 
-      {/* Software Engineer — embedded Codespaces console */}
-      <DashboardGuard requiredRole="software_engineer">
-        <CodeSpaceConsole />
-      </DashboardGuard>
+            {/* Accounting Staff — data-entry only, no global summaries */}
+            <DashboardGuard requiredRole="accounting_staff">
+              <AccountingStaffPanel />
+            </DashboardGuard>
 
-      {/* Analyzer — read-only projections */}
-      <DashboardGuard requiredRole="analyzer">
-        <AnalyzerPanel />
-      </DashboardGuard>
-    </DevGate>
+            {/* Software Engineer — embedded Codespaces console */}
+            <DashboardGuard requiredRole="software_engineer">
+              <CodeSpaceConsole />
+            </DashboardGuard>
+
+            {/* Analyzer — read-only projections */}
+            <DashboardGuard requiredRole="analyzer">
+              <AnalyzerPanel />
+            </DashboardGuard>
+          </DevGate>
+        }
+      />
+    </Routes>
   );
 }
 
