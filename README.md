@@ -20,6 +20,17 @@ Greens ACC is a static website with Supabase backend support for secure trade es
    - `SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
 
+## Developer Setup
+
+Before making commits, install the pre-commit hooks to automatically scan for secrets via [Gitleaks](https://github.com/gitleaks/gitleaks):
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+After running `pre-commit install`, gitleaks will run on every `git commit` and block the commit if secrets are detected.
+
 ## Usage
 
 - `npm run build` — build static site to `dist/`
