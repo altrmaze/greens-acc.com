@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greens ACC — Secure Meeting Room</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <style>
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}.blink{animation:blink 2s ease-in-out infinite;}
+    @keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}.slide-in{animation:slideIn .25s ease-out;}
+    body{background:#06080c;}
+    .card-dark{background:#10141f;border:1px solid rgba(255,255,255,.07);border-radius:14px;}
+    .btn-action{background:#059669;color:#fff;border-radius:9px;font-weight:700;font-size:12px;border:none;cursor:pointer;padding:9px 18px;transition:background .15s;}
+    .btn-action:hover{background:#047857;}
+    .btn-action:disabled{opacity:.4;cursor:not-allowed;}
+    .btn-ghost{background:transparent;color:#94a3b8;border:1px solid rgba(255,255,255,.1);border-radius:9px;font-weight:600;font-size:12px;cursor:pointer;padding:9px 18px;transition:border-color .15s,color .15s;}
+    .btn-ghost:hover{border-color:#059669;color:#10b981;}
+    .field-dark{background:#06080c;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 12px;font-size:13px;color:#e2e8f0;outline:none;width:100%;transition:border-color .15s;}
+    .field-dark:focus{border-color:#059669;}
+    .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:700;letter-spacing:.05em;}
+    .badge-live{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);}
+    .badge-pending{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.3);}
+    .badge-clean{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3);}
+    .badge-quarantine{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);}
+    .memo-info{border-left:2px solid #3b82f6;}
+    .memo-warning{border-left:2px solid #f59e0b;}
+    .memo-critical{border-left:2px solid #ef4444;}
+    .upload-zone{border:2px dashed rgba(255,255,255,.1);border-radius:12px;transition:border-color .2s,background .2s;}
+    .upload-zone.drag-over{border-color:#059669;background:rgba(5,150,105,.05);}
+  </style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen antialiased">
+
+<!-- TICKER -->
+<div class="border-b border-white/5 text-slate-500 text-[10px] py-1.5 overflow-hidden font-mono">
+  <span class="inline-flex items-center gap-2 px-6">
+    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full blink"></span>
+    GREENS ACC — SECURE LIVE MEETING ROOM
+    <span class="text-slate-700 mx-2">|</span>
+    SANDBOX BUBBLE ACTIVE
+    <span class="text-slate-700 mx-2">|</span>
+    FUEL &amp; PETROLEUM DOCUMENTS <span class="text-red-500 ml-1">PROHIBITED</span>
+  </span>
+</div>
+
+<!-- HEADER -->
+<header class="border-b border-white/5 px-6 py-4 sticky top-0 z-40" style="background:#06080c">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="h-9 w-9 bg-emerald-600 rounded-xl flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.361a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+      </div>
+      <div>
+        <div class="font-bold text-white text-sm">Secure Live Meeting Room</div>
+        <div class="text-[11px] text-slate-500">Deal <span id="hdr-deal-ref" class="text-emerald-400 font-mono">—</span></div>
+      </div>
+    </div>
+    <div class="flex gap-2 items-center">
+      <span class="badge badge-live blink">🔴 LIVE</span>
+      <button id="btn-analyze" class="btn-ghost text-xs">AI Contract Analysis</button>
+      <a id="back-link" href="deal-room.html" class="btn-ghost text-xs">← Waiting Room</a>
+    </div>
+  </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+  <div class="grid lg:grid-cols-3 gap-5">
+
+    <!-- LEFT: Meeting Frame + Document Vault -->
+    <div class="lg:col-span-2 space-y-5">
+
+      <!-- MEETING EMBED AREA -->
+      <div class="card-dark overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-white/5">
+          <span class="font-bold text-white text-sm">Live Negotiation Frame</span>
+          <span class="badge badge-live text-[10px]">ENCRYPTED CHANNEL</span>
+        </div>
+        <div id="meet-frame-container" class="bg-slate-950 aspect-video flex items-center justify-center text-slate-600 text-xs font-mono">
+          <div class="text-center space-y-2">
+            <div class="text-3xl">📡</div>
+            <div>Meeting room connection pending</div>
+            <div class="text-[10px] text-slate-700">Video session managed by your operator</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENT VAULT -->
+      <div class="card-dark p-5">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="font-bold text-white text-sm">📎 Secure Document Vault</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">Share PDFs, images, and trade specs during the live session. Max 20 MB per file.</div>
+          </div>
+          <span class="badge badge-pending text-[10px]">MIME VALIDATED</span>
+        </div>
+
+        <!-- Drop zone -->
+        <div id="upload-zone" class="upload-zone p-8 text-center mb-4 cursor-pointer" onclick="document.getElementById('file-input').click()">
+          <div class="text-2xl mb-2">📂</div>
+          <div class="text-xs text-slate-400 font-mono">Drop file here or click to browse</div>
+          <div class="text-[10px] text-slate-600 mt-1">PNG · JPEG · WEBP · PDF · DOCX · XLSX · Max 20 MB</div>
+          <input id="file-input" type="file" class="hidden" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.ms-excel">
+        </div>
+        <div id="upload-progress" class="hidden mb-3">
+          <div class="flex items-center gap-2 text-xs text-slate-400 font-mono">
+            <div class="w-3 h-3 border border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
+            <span id="upload-status-text">Uploading…</span>
+          </div>
+        </div>
+        <div id="upload-error" class="hidden mb-3 text-xs text-red-400 font-mono"></div>
+
+        <!-- Uploaded docs list -->
+        <div class="space-y-2" id="docs-list">
+          <div class="text-[11px] text-slate-600 font-mono italic">No documents shared yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: AI Secretary Memo Panel + Compliance -->
+    <div class="space-y-5">
+
+      <!-- AI SECRETARY MEMO PANEL -->
+      <div class="card-dark p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="font-bold text-white text-sm">🤖 AI Secretary — Contract Alerts</div>
+            <div class="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Private clause-level analysis of uploaded contract documents. Alerts are generated from document text only.</div>
+          </div>
+          <button id="btn-mark-read" class="btn-ghost text-[10px] px-2 py-1">Mark read</button>
+        </div>
+        <div id="memos-list" class="space-y-2 max-h-72 overflow-y-auto">
+          <div class="text-[11px] text-slate-600 font-mono italic" id="memos-empty">No alerts. Upload a contract document and run AI analysis.</div>
+        </div>
+      </div>
+
+      <!-- CONTRACT ANALYSIS INPUT -->
+      <div class="card-dark p-5">
+        <div class="font-bold text-white text-sm mb-3">📄 Paste Contract Text for AI Review</div>
+        <textarea id="contract-input" class="field-dark text-xs resize-none h-28" placeholder="Paste the contract or clause text here for the AI Secretary to review…"></textarea>
+        <button id="btn-analyze-submit" class="btn-action w-full mt-3 text-xs">Analyse Contract Clauses</button>
+        <div id="analyze-msg" class="text-xs text-slate-500 font-mono mt-2 hidden"></div>
+      </div>
+
+      <!-- COMPLIANCE REMINDER -->
+      <div class="card-dark p-4 border-amber-800/30">
+        <div class="text-xs font-bold text-amber-400 mb-2">⚠️ Active Compliance Rules</div>
+        <ul class="space-y-1.5 text-[11px] text-slate-400">
+          <li>• All documents uploaded become part of the deal audit trail</li>
+          <li>• Fuel, diesel, and petroleum documents are prohibited and will be rejected</li>
+          <li>• NCNDA remains in force throughout the live session</li>
+          <li>• Upload forgeries or fraudulent docs → account suspension + legal referral</li>
+        </ul>
+      </div>
+
+      <!-- LINKS -->
+      <div class="card-dark p-4">
+        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Session Links</div>
+        <div class="space-y-2">
+          <a id="link-fulfillment" href="#" class="flex items-center justify-between text-xs text-slate-400 hover:text-emerald-400 transition-colors">
+            <span>Fulfillment Tracker</span>
+            <span>→</span>
+          </a>
+          <a id="link-marketplace" href="marketplace.html" class="flex items-center justify-between text-xs text-slate-400 hover:text-emerald-400 transition-colors">
+            <span>Secondary Marketplace</span>
+            <span>→</span>
+          </a>
+          <a href="/" class="flex items-center justify-between text-xs text-slate-400 hover:text-emerald-400 transition-colors">
+            <span>Dashboard</span>
+            <span>→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const ALLOWED_MIME = [
+    'image/png','image/jpeg','image/webp','image/gif',
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/msword','application/vnd.ms-excel',
+  ];
+  const MAX_BYTES = 20 * 1024 * 1024;
+  const RESTRICTED = ['fuel','diesel','petrol','crude oil','petroleum','gasoline'];
+
+  const params = new URLSearchParams(window.location.search);
+  const DEAL_ID  = params.get('dealId')  || '';
+  const USER_ID  = params.get('userId')  || '';
+  const COMMODITY = params.get('commodity') || 'general';
+
+  function el(id) { return document.getElementById(id); }
+  function show(id) { el(id) && el(id).classList.remove('hidden'); }
+  function hide(id) { el(id) && el(id).classList.add('hidden'); }
+  function setText(id, v) { const e = el(id); if (e) e.textContent = v; }
+  function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ── Init page ──────────────────────────────────────────────────────
+  setText('hdr-deal-ref', DEAL_ID || '(no deal ID)');
+  const backLink = el('back-link');
+  if (backLink && DEAL_ID) backLink.href = 'deal-room.html?dealId=' + encodeURIComponent(DEAL_ID) + '&userId=' + encodeURIComponent(USER_ID) + '&commodity=' + encodeURIComponent(COMMODITY);
+  const fulLink = el('link-fulfillment');
+  if (fulLink && DEAL_ID) fulLink.href = 'fulfillment.html?dealId=' + encodeURIComponent(DEAL_ID) + '&userId=' + encodeURIComponent(USER_ID);
+
+  async function callAPI(fn, payload) {
+    try {
+      const r = await fetch('/supabase/functions/' + fn, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      return { ok: r.ok, data: await r.json().catch(() => ({})) };
+    } catch(e) { return { ok: false, data: { error: e.message } }; }
+  }
+
+  // ── Supabase for realtime + storage ───────────────────────────────
+  const supabaseUrl = (window.__ENV__ && window.__ENV__.SUPABASE_URL) || '';
+  const supabaseKey = (window.__ENV__ && window.__ENV__.SUPABASE_ANON_KEY) || '';
+  let _supabase = null;
+  if (supabaseUrl && supabaseKey) {
+    _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  }
+
+  // ── LOAD EXISTING DOCUMENTS ───────────────────────────────────────
+  async function loadDocs() {
+    if (!DEAL_ID) return;
+    const { ok, data } = await callAPI('meetingRoom', { action: 'get_documents', deal_id: DEAL_ID });
+    if (ok && Array.isArray(data.documents) && data.documents.length) {
+      renderDocs(data.documents);
+    }
+  }
+
+  function renderDocs(docs) {
+    const list = el('docs-list');
+    if (!list) return;
+    list.innerHTML = '';
+    docs.forEach(doc => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between bg-slate-900 rounded-lg px-3 py-2 text-xs';
+      const scanBadge = doc.scan_status === 'CLEAN' ? 'badge-clean' : doc.scan_status === 'QUARANTINED' ? 'badge-quarantine' : 'badge-pending';
+      div.innerHTML = `
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="text-slate-400">📄</span>
+          <span class="text-slate-300 truncate">${escapeHtml(doc.file_name)}</span>
+        </div>
+        <span class="badge ${scanBadge} ml-2 shrink-0">${escapeHtml(doc.scan_status)}</span>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // ── FILE UPLOAD HANDLER ───────────────────────────────────────────
+  async function handleFileUpload(file) {
+    if (!file) return;
+
+    // MIME type validation
+    if (!ALLOWED_MIME.includes(file.type)) {
+      const errEl = el('upload-error');
+      if (errEl) { errEl.textContent = 'File type not permitted: ' + file.type; }
+      show('upload-error');
+      return;
+    }
+
+    // Size check
+    if (file.size > MAX_BYTES) {
+      const errEl = el('upload-error');
+      if (errEl) errEl.textContent = 'File exceeds 20 MB limit.';
+      show('upload-error');
+      return;
+    }
+
+    hide('upload-error');
+    show('upload-progress');
+    setText('upload-status-text', 'Uploading ' + file.name + '…');
+
+    if (_supabase) {
+      const ext = file.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g,'');
+      const fileName = crypto.randomUUID() + '.' + ext;
+      const filePath = 'meeting-vault/' + (DEAL_ID || 'unknown') + '/' + fileName;
+
+      const { error: uploadErr } = await _supabase.storage
+        .from('deal-documents')
+        .upload(filePath, file, { contentType: file.type, upsert: false });
+
+      if (uploadErr) {
+        hide('upload-progress');
+        const errEl = el('upload-error');
+        if (errEl) errEl.textContent = 'Upload failed: ' + uploadErr.message;
+        show('upload-error');
+        return;
+      }
+
+      // Register with edge function
+      setText('upload-status-text', 'Registering document…');
+      await callAPI('meetingRoom', {
+        action: 'register_upload',
+        deal_id: DEAL_ID,
+        uploader_id: USER_ID,
+        file_name: file.name,
+        file_path: filePath,
+        mime_type: file.type,
+        file_size_bytes: file.size,
+      });
+    }
+
+    hide('upload-progress');
+    await loadDocs();
+  }
+
+  // ── LOAD MEMOS ────────────────────────────────────────────────────
+  async function loadMemos() {
+    if (!DEAL_ID || !USER_ID) return;
+    const { ok, data } = await callAPI('meetingRoom', { action: 'get_memos', deal_id: DEAL_ID, receiver_id: USER_ID });
+    if (ok && Array.isArray(data.memos)) {
+      renderMemos(data.memos);
+    }
+  }
+
+  function renderMemos(memos) {
+    const list = el('memos-list');
+    if (!list) return;
+    const empty = el('memos-empty');
+    if (!memos.length) {
+      if (empty) empty.classList.remove('hidden');
+      return;
+    }
+    if (empty) empty.classList.add('hidden');
+    list.innerHTML = '';
+    memos.forEach(memo => {
+      const div = document.createElement('div');
+      const severityClass = memo.severity === 'CRITICAL' ? 'memo-critical' : memo.severity === 'WARNING' ? 'memo-warning' : 'memo-info';
+      const severityColor = memo.severity === 'CRITICAL' ? 'text-red-400' : memo.severity === 'WARNING' ? 'text-amber-400' : 'text-blue-400';
+      div.className = 'bg-slate-900 rounded-r-lg p-2.5 slide-in ' + severityClass;
+      div.innerHTML = `
+        <div class="flex items-center gap-1.5 mb-1">
+          <span class="text-[10px] font-bold font-mono ${severityColor}">[${escapeHtml(memo.severity)}]</span>
+          ${memo.source_clause ? `<span class="text-[10px] text-slate-500 font-mono">${escapeHtml(memo.source_clause)}</span>` : ''}
+          ${!memo.is_read ? '<span class="w-1.5 h-1.5 bg-blue-400 rounded-full ml-auto"></span>' : ''}
+        </div>
+        <div class="text-[11px] text-slate-300 leading-relaxed">${escapeHtml(memo.content_message)}</div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // ── CONTRACT ANALYSIS ─────────────────────────────────────────────
+  async function analyzeContract() {
+    const text = (el('contract-input') || {}).value?.trim();
+    if (!text) {
+      const msgEl = el('analyze-msg');
+      if (msgEl) { msgEl.textContent = 'Please paste contract text first.'; msgEl.className = 'text-xs text-amber-400 font-mono mt-2'; }
+      show('analyze-msg');
+      return;
+    }
+
+    const btn = el('btn-analyze-submit');
+    if (btn) { btn.disabled = true; btn.textContent = 'Analysing…'; }
+
+    const msgEl = el('analyze-msg');
+    if (msgEl) { msgEl.textContent = 'AI Secretary is reviewing contract clauses…'; msgEl.className = 'text-xs text-slate-500 font-mono mt-2'; }
+    show('analyze-msg');
+
+    const { ok, data } = await callAPI('meetingRoom', {
+      action: 'analyze_contract',
+      deal_id: DEAL_ID,
+      receiver_id: USER_ID,
+      contract_text: text,
+      commodity_type: COMMODITY,
+    });
+
+    if (btn) { btn.disabled = false; btn.textContent = 'Analyse Contract Clauses'; }
+
+    if (ok && data.success) {
+      if (msgEl) { msgEl.textContent = `✓ ${data.flags_analysed} clause(s) analysed. ${data.memos_created} memo(s) generated.`; msgEl.className = 'text-xs text-emerald-400 font-mono mt-2'; }
+      await loadMemos();
+    } else {
+      if (msgEl) { msgEl.textContent = data.error || 'Analysis failed. Please retry.'; msgEl.className = 'text-xs text-red-400 font-mono mt-2'; }
+    }
+  }
+
+  // ── MARK MEMOS READ ───────────────────────────────────────────────
+  async function markMemosRead() {
+    if (!DEAL_ID || !USER_ID) return;
+    await callAPI('meetingRoom', { action: 'mark_memos_read', deal_id: DEAL_ID, receiver_id: USER_ID });
+    await loadMemos();
+  }
+
+  // ── REALTIME MEMO SUBSCRIPTION ────────────────────────────────────
+  function subscribeToMemos() {
+    if (!_supabase || !DEAL_ID || !USER_ID) return;
+    _supabase
+      .channel('meeting_memos:' + DEAL_ID)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'meeting_memos' }, payload => {
+        if (payload.new && payload.new.receiver_id === USER_ID) {
+          loadMemos();
+        }
+      })
+      .subscribe();
+  }
+
+  // ── DRAG-AND-DROP ─────────────────────────────────────────────────
+  const zone = el('upload-zone');
+  if (zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) handleFileUpload(file);
+    });
+  }
+
+  const fileInput = el('file-input');
+  if (fileInput) fileInput.addEventListener('change', e => handleFileUpload(e.target.files?.[0]));
+
+  // ── BIND EVENTS ───────────────────────────────────────────────────
+  el('btn-analyze') && el('btn-analyze').addEventListener('click', () => {
+    el('contract-input') && el('contract-input').focus();
+  });
+  el('btn-analyze-submit') && el('btn-analyze-submit').addEventListener('click', analyzeContract);
+  el('btn-mark-read') && el('btn-mark-read').addEventListener('click', markMemosRead);
+
+  // ── INIT ──────────────────────────────────────────────────────────
+  loadDocs();
+  loadMemos();
+  subscribeToMemos();
+})();
+</script>
+</body>
+</html>

@@ -26,7 +26,7 @@ export async function POST(request) {
     is_encrypted: true,
     encryption_algorithm: 'AES-256-GCM',
     streaming: true,
-    server_stored: false // Important: file NOT stored on GreenACC servers
+    server_stored: false // Important: file NOT stored on Greens ACC servers
   };
 
   const docPayload = {
@@ -64,6 +64,6 @@ export async function POST(request) {
     document: doc,
     stream_endpoint: `/supabase/functions/documentStream?doc_id=${doc.id}&room_id=${room_id}`,
     encryption_ready: true,
-    note: 'File is streamed on-demand. Not stored on GreenACC servers. Access requires room session token.'
+    note: 'File is streamed on-demand. Not stored on Greens ACC servers. Access requires room session token.'
   }), { status: 200 });
 }

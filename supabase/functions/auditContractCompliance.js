@@ -74,7 +74,7 @@ export async function POST(request) {
     headers: {
       'Content-Type': 'application/json',
       apikey: serviceRoleKey,
-      Authorization: `******
+      Authorization: `******`,
       Prefer: 'return=representation'
     },
     body: JSON.stringify(logPayload)
@@ -90,4 +90,8 @@ export async function POST(request) {
     audit_log: auditLog,
     timestamp: new Date().toISOString()
   }), { status: 200 });
+}
+
+export async function GET(_request) {
+  return new Response(JSON.stringify({ standby: true, message: "hi Ayman" }), { status: 200 });
 }

@@ -13,3 +13,7 @@ export async function POST(request) {
 
   return new Response(JSON.stringify({ room, insights }), { status: 200 });
 }
+
+export async function GET(_request) {
+  return new Response(JSON.stringify({ standby: true, message: "hi Ayman" }), { status: 200 });
+}

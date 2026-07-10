@@ -35,7 +35,7 @@ export async function POST(request) {
         headers: {
           'Content-Type': 'application/json',
           apikey: serviceRoleKey,
-          Authorization: `******
+          Authorization: `******`,
         },
         body: JSON.stringify({
           account_status: 'suspended_compliance',
@@ -67,7 +67,7 @@ export async function POST(request) {
       headers: {
         'Content-Type': 'application/json',
         apikey: serviceRoleKey,
-        Authorization: `******
+        Authorization: `******`,
         Prefer: 'return=representation'
       },
       body: JSON.stringify(payload)
@@ -104,7 +104,7 @@ export async function POST(request) {
         headers: {
           'Content-Type': 'application/json',
           apikey: serviceRoleKey,
-          Authorization: `******
+          Authorization: `******`,
           Prefer: 'return=representation'
         },
         body: JSON.stringify({ is_verified: true, status: 'active_global' })
@@ -121,4 +121,8 @@ export async function POST(request) {
   }
 
   return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), { status: 400 });
+}
+
+export async function GET(_request) {
+  return new Response(JSON.stringify({ standby: true, message: "hi Ayman" }), { status: 200 });
 }

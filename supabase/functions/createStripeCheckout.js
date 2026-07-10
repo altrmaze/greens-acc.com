@@ -27,7 +27,7 @@ export async function POST(request) {
     line_items: [{
       price_data: {
         currency: 'usd',
-        product_data: { name: 'GreenACC Entry Fee' },
+        product_data: { name: 'Greens ACC Entry Fee' },
         unit_amount: 2000
       },
       quantity: 1

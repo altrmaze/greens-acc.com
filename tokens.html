@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tokens — Greens ACC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; }
+        .btn-primary { background:#059669; color:#fff; border-radius:10px; font-weight:600; font-size:13px; letter-spacing:.03em; border:none; cursor:pointer; transition:background .15s; padding:9px 18px; }
+        .btn-primary:hover { background:#047857; }
+        .btn-primary:disabled { opacity:.45; cursor:not-allowed; }
+        .btn-danger { background:#fff; color:#dc2626; border:1px solid #fca5a5; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer; transition:background .15s; padding:5px 12px; }
+        .btn-danger:hover { background:#fef2f2; }
+        .btn-secondary { background:#fff; color:#0f172a; border:1px solid #cbd5e1; border-radius:10px; font-weight:600; font-size:13px; cursor:pointer; transition:border-color .15s; padding:9px 18px; }
+        .btn-secondary:hover { border-color:#059669; background:#f0fdf4; }
+        input.field, select.field { border:1px solid #cbd5e1; border-radius:9px; padding:8px 12px; font-size:13px; background:#fff; outline:none; width:100%; transition:border-color .15s; }
+        input.field:focus, select.field:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.08); }
+        label.lbl { font-size:12px; font-weight:600; color:#374151; display:block; margin-bottom:4px; }
+        .token-row { border-bottom:1px solid #f1f5f9; padding:14px 0; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+        .token-row:last-child { border-bottom:none; }
+        .badge-active { background:#ecfdf5; color:#059669; border:1px solid #6ee7b7; display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:9999px; font-size:11px; font-weight:700; letter-spacing:.05em; }
+        .badge-revoked { background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; display:inline-flex; align-items:center; gap:4px; padding:2px 9px; border-radius:9999px; font-size:11px; font-weight:700; letter-spacing:.05em; }
+        .scope-tag { display:inline-block; padding:1px 7px; border-radius:5px; font-size:10px; font-weight:700; background:#eff6ff; border:1px solid #bfdbfe; color:#2563eb; margin-right:3px; }
+        .mono { font-family: 'Courier New', monospace; }
+        .nav-link { font-size:13px; font-weight:600; color:#475569; text-decoration:none; transition:color .15s; }
+        .nav-link:hover { color:#059669; }
+        .overlay { position:fixed; inset:0; background:rgba(15,23,42,.55); backdrop-filter:blur(4px); z-index:100; display:none; align-items:center; justify-content:center; }
+        .overlay.show { display:flex; }
+        .modal { background:#fff; border-radius:16px; padding:32px; max-width:540px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.18); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased">
+
+<!-- NAV -->
+<nav class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+    <div class="flex items-center gap-3">
+        <div class="h-10 w-10 bg-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3L4 7v10l8 4 8-4V7L12 3z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M4 7l8 4 8-4" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M12 11v10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            </svg>
+        </div>
+        <div>
+            <div class="font-bold text-slate-900 text-[15px] leading-none tracking-tight">Greens ACC</div>
+            <div class="text-[10px] text-slate-400 font-medium tracking-widest uppercase leading-tight mt-0.5">Global Trade Platform</div>
+        </div>
+    </div>
+    <div class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="nav-link">Dashboard</a>
+        <a href="meeting.html" class="nav-link">Meeting Room</a>
+        <a href="marketplace.html" class="nav-link">Marketplace</a>
+        <a href="tokens.html" class="nav-link text-emerald-700 font-bold">API Tokens</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="max-w-4xl mx-auto px-4 py-10">
+    <div class="mb-8">
+        <div class="flex items-center gap-3 mb-1">
+            <div class="h-9 w-9 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center">
+                <svg viewBox="0 0 20 20" fill="none" class="w-5 h-5 text-emerald-600" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="3" y="3" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">API Tokens</h1>
+        </div>
+        <p class="text-sm text-slate-500 ml-12">Generate bearer tokens for programmatic access to the Greens ACC platform APIs.</p>
+    </div>
+
+    <!-- USER ID INPUT -->
+    <div class="card p-5 mb-6">
+        <label class="lbl" for="user-id-input">Your User ID</label>
+        <div class="flex gap-3">
+            <input id="user-id-input" class="field" type="text" placeholder="Enter your Supabase user UUID" autocomplete="off"/>
+            <button class="btn-primary whitespace-nowrap" id="load-btn" onclick="loadTokens()">Load Tokens</button>
+        </div>
+        <p class="text-xs text-slate-400 mt-2">Tokens are scoped to your user account. Paste your Supabase Auth user UUID above.</p>
+    </div>
+
+    <!-- CREATE TOKEN BUTTON -->
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-slate-800">Active Tokens</h2>
+        <button class="btn-primary" onclick="openCreateModal()" id="create-btn" disabled>
+            + New Token
+        </button>
+    </div>
+
+    <!-- TOKEN LIST -->
+    <div class="card p-5 mb-6" id="token-list-card">
+        <div class="text-sm text-slate-400 text-center py-6" id="token-list-empty">
+            Enter your User ID and click <strong>Load Tokens</strong> to view your API tokens.
+        </div>
+        <div id="token-list"></div>
+    </div>
+
+    <!-- DOCS SECTION -->
+    <div class="card p-5">
+        <h3 class="text-sm font-bold text-slate-800 mb-3">Using your API token</h3>
+        <p class="text-xs text-slate-500 mb-3">Pass your token in the <code class="bg-slate-100 px-1 rounded">Authorization</code> header on every API request:</p>
+        <div class="bg-slate-950 rounded-lg px-4 py-3 mono text-xs text-emerald-300 mb-3">
+            curl -X POST https://your-project.supabase.co/functions/v1/manageApiTokens \<br>
+            &nbsp;&nbsp;-H "Authorization: ******" \<br>
+            &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
+            &nbsp;&nbsp;-d '{"action":"list","user_id":"&lt;your-uuid&gt;"}'
+        </div>
+        <p class="text-xs text-slate-500 mb-2 font-semibold">Available scopes:</p>
+        <div class="flex flex-wrap gap-1.5">
+            <span class="scope-tag">read:deals</span>
+            <span class="scope-tag">write:deals</span>
+            <span class="scope-tag">read:shipments</span>
+            <span class="scope-tag">write:shipments</span>
+            <span class="scope-tag">read:compliance</span>
+            <span class="scope-tag">read:marketplace</span>
+            <span class="scope-tag">write:marketplace</span>
+            <span class="scope-tag">admin</span>
+        </div>
+    </div>
+</div>
+
+<!-- CREATE TOKEN MODAL -->
+<div class="overlay" id="create-overlay">
+    <div class="modal">
+        <h3 class="text-lg font-bold text-slate-900 mb-1">Create New API Token</h3>
+        <p class="text-sm text-slate-500 mb-5">The token will be shown <strong>once</strong> after creation. Store it securely.</p>
+
+        <div class="mb-4">
+            <label class="lbl" for="token-name">Token Name</label>
+            <input id="token-name" class="field" type="text" placeholder="e.g. CI Pipeline, Logistics Bot" maxlength="64"/>
+        </div>
+
+        <div class="mb-4">
+            <label class="lbl">Scopes</label>
+            <div class="flex flex-wrap gap-2 mt-1" id="scope-checkboxes">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <label class="lbl" for="expires-select">Expiry</label>
+            <select id="expires-select" class="field">
+                <option value="">Never expires</option>
+                <option value="30">30 days</option>
+                <option value="90">90 days</option>
+                <option value="180">180 days</option>
+                <option value="365">1 year</option>
+            </select>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+            <button class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
+            <button class="btn-primary" id="confirm-create-btn" onclick="createToken()">Generate Token</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOKEN REVEAL MODAL -->
+<div class="overlay" id="reveal-overlay">
+    <div class="modal">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="h-9 w-9 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                <svg viewBox="0 0 20 20" fill="none" class="w-5 h-5 text-emerald-600"><path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm3.5 6.5l-4 4-2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-900">Token Created</h3>
+                <p class="text-xs text-slate-500">Copy and store this token now — it won't be shown again.</p>
+            </div>
+        </div>
+        <div class="bg-slate-950 rounded-lg px-4 py-3 flex items-center justify-between gap-3 mb-4">
+            <code class="mono text-emerald-300 text-xs break-all" id="reveal-token-text"></code>
+            <button onclick="copyToken()" class="flex-shrink-0 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded px-2 py-1 cursor-pointer" title="Copy">Copy</button>
+        </div>
+        <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-5">
+            ⚠ This is the only time this token will be displayed. If you lose it, generate a new one.
+        </p>
+        <div class="flex justify-end">
+            <button class="btn-primary" onclick="closeRevealModal()">Done</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const SUPABASE_FUNCTIONS_BASE_URL = window.SUPABASE_CONFIG?.url
+  ? window.SUPABASE_CONFIG.url + '/functions/v1'
+  : '';
+
+const ALL_SCOPES = [
+  'read:deals', 'write:deals', 'read:shipments', 'write:shipments',
+  'read:compliance', 'read:marketplace', 'write:marketplace', 'admin'
+];
+
+let currentUserId = null;
+let revealedToken = null;
+
+// Populate scope checkboxes
+(function buildScopeCheckboxes() {
+  const container = document.getElementById('scope-checkboxes');
+  ALL_SCOPES.forEach(function(scope) {
+    const label = document.createElement('label');
+    label.className = 'flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = scope;
+    cb.className = 'scope-cb accent-emerald-600';
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(scope));
+    container.appendChild(label);
+  });
+})();
+
+async function callAPI(action, payload) {
+  const base = SUPABASE_FUNCTIONS_BASE_URL || '';
+  const url = base + '/manageApiTokens';
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ action }, payload))
+    });
+    const data = await resp.json();
+    return { ok: resp.ok, status: resp.status, data };
+  } catch (err) {
+    return { ok: false, status: 0, data: { error: err.message } };
+  }
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = String(str || '');
+  return d.innerHTML;
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }); }
+  catch { return iso; }
+}
+
+function renderTokenList(tokens) {
+  const list = document.getElementById('token-list');
+  const empty = document.getElementById('token-list-empty');
+  list.innerHTML = '';
+
+  if (!tokens || tokens.length === 0) {
+    empty.style.display = 'block';
+    empty.textContent = 'No tokens found. Click "+ New Token" to create one.';
+    return;
+  }
+
+  empty.style.display = 'none';
+
+  tokens.forEach(function(t) {
+    const row = document.createElement('div');
+    row.className = 'token-row';
+
+    const scopeHtml = (t.scopes || []).map(function(s) {
+      return '<span class="scope-tag">' + escapeHtml(s) + '</span>';
+    }).join('');
+
+    const badge = t.is_active && !t.revoked_at
+      ? '<span class="badge-active"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>Active</span>'
+      : '<span class="badge-revoked">Revoked</span>';
+
+    const revokeBtn = t.is_active && !t.revoked_at
+      ? '<button class="btn-danger" onclick="revokeToken('' + escapeHtml(t.id) + '', '' + escapeHtml(t.name) + '')">Revoke</button>'
+      : '';
+
+    row.innerHTML =
+      '<div class="flex-1 min-w-0">' +
+        '<div class="flex items-center gap-2 mb-0.5">' +
+          '<span class="text-sm font-semibold text-slate-900">' + escapeHtml(t.name) + '</span>' +
+          badge +
+        '</div>' +
+        '<div class="mono text-xs text-slate-400 mb-1">' + escapeHtml(t.token_prefix) + '••••••••••••••••••••••••••••</div>' +
+        '<div class="flex flex-wrap gap-1 mb-1">' + scopeHtml + '</div>' +
+        '<div class="text-xs text-slate-400">' +
+          'Created ' + formatDate(t.created_at) +
+          (t.expires_at ? ' · Expires ' + formatDate(t.expires_at) : ' · Never expires') +
+          (t.last_used_at ? ' · Last used ' + formatDate(t.last_used_at) : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="flex-shrink-0">' + revokeBtn + '</div>';
+
+    list.appendChild(row);
+  });
+}
+
+async function loadTokens() {
+  const userId = document.getElementById('user-id-input').value.trim();
+  if (!userId) { alert('Please enter your User ID'); return; }
+
+  currentUserId = userId;
+  document.getElementById('load-btn').disabled = true;
+  document.getElementById('load-btn').textContent = 'Loading…';
+
+  const { ok, data } = await callAPI('list', { user_id: userId });
+
+  document.getElementById('load-btn').disabled = false;
+  document.getElementById('load-btn').textContent = 'Load Tokens';
+  document.getElementById('create-btn').disabled = false;
+
+  if (!ok) {
+    document.getElementById('token-list-empty').style.display = 'block';
+    document.getElementById('token-list-empty').textContent = 'Error: ' + (data.error || 'Failed to load tokens');
+    return;
+  }
+
+  renderTokenList(data.tokens);
+}
+
+function openCreateModal() {
+  if (!currentUserId) { alert('Load your tokens first.'); return; }
+  document.getElementById('token-name').value = '';
+  document.querySelectorAll('.scope-cb').forEach(function(cb) { cb.checked = false; });
+  document.getElementById('expires-select').value = '';
+  document.getElementById('create-overlay').classList.add('show');
+}
+
+function closeCreateModal() {
+  document.getElementById('create-overlay').classList.remove('show');
+}
+
+async function createToken() {
+  const name = document.getElementById('token-name').value.trim();
+  if (!name) { alert('Please enter a token name'); return; }
+
+  const scopes = Array.from(document.querySelectorAll('.scope-cb:checked')).map(function(cb) { return cb.value; });
+  const expiresIn = document.getElementById('expires-select').value;
+
+  document.getElementById('confirm-create-btn').disabled = true;
+  document.getElementById('confirm-create-btn').textContent = 'Creating…';
+
+  const payload = { user_id: currentUserId, name, scopes };
+  if (expiresIn) payload.expires_in_days = parseInt(expiresIn, 10);
+
+  const { ok, data } = await callAPI('create', payload);
+
+  document.getElementById('confirm-create-btn').disabled = false;
+  document.getElementById('confirm-create-btn').textContent = 'Generate Token';
+
+  if (!ok) {
+    alert('Error: ' + (data.error || 'Failed to create token'));
+    return;
+  }
+
+  closeCreateModal();
+  revealedToken = data.token;
+  document.getElementById('reveal-token-text').textContent = data.token;
+  document.getElementById('reveal-overlay').classList.add('show');
+
+  // Refresh the list
+  loadTokens();
+}
+
+function copyToken() {
+  if (!revealedToken) return;
+  navigator.clipboard.writeText(revealedToken).then(function() {
+    const btn = document.querySelector('#reveal-overlay button[onclick="copyToken()"]');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(function() { btn.textContent = 'Copy'; }, 1500); }
+  }).catch(function() {
+    const text = document.getElementById('reveal-token-text');
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  });
+}
+
+function closeRevealModal() {
+  document.getElementById('reveal-overlay').classList.remove('show');
+  revealedToken = null;
+}
+
+async function revokeToken(id, name) {
+  if (!confirm('Revoke token "' + name + '"? This cannot be undone.')) return;
+
+  const { ok, data } = await callAPI('revoke', { id, user_id: currentUserId });
+  if (!ok) {
+    alert('Error: ' + (data.error || 'Failed to revoke token'));
+    return;
+  }
+
+  loadTokens();
+}
+
+// Close modals on overlay click
+document.getElementById('create-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeCreateModal();
+});
+document.getElementById('reveal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeRevealModal();
+});
+</script>
+</body>
+</html>
