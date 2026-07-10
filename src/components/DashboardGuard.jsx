@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { handleDevLogin } from '../utils/devLogin';
+import { AdminPassGate } from './AdminPassGate';
+import {
+  hasUnlockedAdminAccess,
+  isAdminAccessConfigured,
+} from '../utils/adminAccess';
 
 /**
  * DashboardGuard
@@ -16,6 +21,7 @@ import { handleDevLogin } from '../utils/devLogin';
 export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [adminAccessUnlocked, setAdminAccessUnlocked] = useState(() => hasUnlockedAdminAccess());
 
   useEffect(() => {
     async function fetchUserContext() {
@@ -49,6 +55,7 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
 
   const accessGranted =
     userRole === requiredRole || (allowAdmin && userRole === 'admin');
+  const requiresAdminAccessGate = userRole === 'admin' && accessGranted;
 
   if (!accessGranted) {
     return (
@@ -63,6 +70,16 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
         </p>
       </div>
     );
+  }
+
+  if (requiresAdminAccessGate) {
+    if (!isAdminAccessConfigured()) {
+      return <AdminPassGate configured={false} />;
+    }
+
+    if (!adminAccessUnlocked) {
+      return <AdminPassGate onUnlock={() => setAdminAccessUnlocked(true)} />;
+    }
   }
 
   return <>{children}</>;
