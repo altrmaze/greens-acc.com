@@ -362,3 +362,29 @@ create table if not exists public.meeting_memos (
 create index if not exists idx_meeting_memos_deal on public.meeting_memos (deal_id);
 create index if not exists idx_meeting_memos_receiver on public.meeting_memos (receiver_id);
 create index if not exists idx_meeting_memos_read on public.meeting_memos (is_read);
+
+-- ============================================================
+-- API TOKEN MANAGEMENT
+-- ============================================================
+
+-- API access tokens for programmatic platform access
+-- The full token is shown to the user once on creation only.
+-- token_hash stores a SHA-256 hex digest so the plaintext is never persisted.
+create table if not exists public.api_tokens (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  name text not null,
+  token_prefix text not null,        -- first 12 chars of the token (safe to display)
+  token_hash text not null unique,   -- SHA-256 hex of the full token
+  scopes text[] not null default '{}', -- e.g. '{read:deals,write:deals,read:shipments}'
+  is_active boolean not null default true,
+  last_used_at timestamptz,
+  expires_at timestamptz,            -- null = never expires
+  revoked_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_api_tokens_user on public.api_tokens (user_id);
+create index if not exists idx_api_tokens_prefix on public.api_tokens (token_prefix);
+create index if not exists idx_api_tokens_hash on public.api_tokens (token_hash);
+create index if not exists idx_api_tokens_active on public.api_tokens (is_active);
