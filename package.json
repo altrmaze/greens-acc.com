@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "mkdir -p dist && cp index.html dist/ && cp announce.html dist/ && cp meeting.html dist/ && cp meeting.js dist/ && cp meeting.css dist/ && cp success.html dist/ && cp cancel.html dist/ && cp deal-room.html dist/ && cp fulfillment.html dist/ && cp marketplace.html dist/ && cp meeting-room.html dist/ && vite build",
+    "build": "mkdir -p dist && cp index.html dist/ && cp announce.html dist/ && cp meeting.html dist/ && cp meeting.js dist/ && cp meeting.css dist/ && cp success.html dist/ && cp cancel.html dist/ && cp deal-room.html dist/ && cp fulfillment.html dist/ && cp marketplace.html dist/ && cp meeting-room.html dist/ && cp tokens.html dist/ && vite build",
     "dev": "vite",
     "start": "npm run build && python3 backend/server.py",
     "deploy:prod": "curl -X POST \"https://api.render.com/deploy/srv-$RENDER_SERVICE_ID?key=$RENDER_API_KEY\"",
