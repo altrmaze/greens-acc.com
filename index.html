@@ -1,363 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greens ACC — Global Trade Command Centre</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        .animate-marquee { animation: marquee 48s linear infinite; white-space: nowrap; display: inline-block; }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-        .blink { animation: blink 2s ease-in-out infinite; }
-        @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
-        .slide-down { animation: slideDown 0.18s ease forwards; }
-        .card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; }
-        .card-accent { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:14px; }
-        .pillar { background:#fff; border:1px solid #e2e8f0; border-top:3px solid #059669; border-radius:14px; transition:box-shadow .2s,border-color .2s; }
-        .pillar:hover { box-shadow:0 6px 28px rgba(5,150,105,.10); border-color:#6ee7b7; }
-        .step-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; position:relative; }
-        .step-card.active-step { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.08); }
-        .step-card.done-step { border-color:#a7f3d0; background:#f0fdf4; }
-        .btn-primary { background:#059669; color:#fff; border-radius:10px; font-weight:600; font-size:13px; letter-spacing:.03em; border:none; cursor:pointer; transition:background .15s,opacity .15s; padding:10px 20px; }
-        .btn-primary:hover { background:#047857; }
-        .btn-primary:disabled { opacity:.45; cursor:not-allowed; }
-        .btn-secondary { background:#fff; color:#0f172a; border:1px solid #cbd5e1; border-radius:10px; font-weight:600; font-size:13px; letter-spacing:.03em; cursor:pointer; transition:border-color .15s,background .15s; padding:10px 20px; }
-        .btn-secondary:hover { border-color:#059669; background:#f0fdf4; }
-        .btn-secondary:disabled { opacity:.45; cursor:not-allowed; }
-        .btn-danger { background:#fff; color:#dc2626; border:1px solid #fca5a5; border-radius:10px; font-weight:600; font-size:13px; cursor:pointer; transition:background .15s; padding:10px 20px; }
-        .btn-danger:hover { background:#fef2f2; }
-        .btn-danger:disabled { opacity:.45; cursor:not-allowed; }
-        .status-badge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; }
-        .badge-pending { background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1; }
-        .badge-active { background:#ecfdf5; color:#059669; border:1px solid #6ee7b7; }
-        .badge-warning { background:#fffbeb; color:#b45309; border:1px solid #fcd34d; }
-        .badge-error { background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; }
-        .badge-info { background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; }
-        .rule { height:1px; background:linear-gradient(to right,transparent,#e2e8f0 20%,#e2e8f0 80%,transparent); }
-        .log-row { border-bottom:1px solid #f1f5f9; padding:8px 12px; font-size:12px; display:flex; gap:8px; align-items:flex-start; }
-        .log-row:last-child { border-bottom:none; }
-        input.field, select.field, textarea.field {
-            border:1px solid #cbd5e1; border-radius:9px; padding:8px 12px; font-size:13px;
-            background:#fff; color:#0f172a; outline:none; width:100%; transition:border-color .15s;
-        }
-        input.field:focus, select.field:focus, textarea.field:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.08); }
-        label.lbl { font-size:12px; font-weight:600; color:#374151; display:block; margin-bottom:4px; letter-spacing:.02em; }
-        .section-header { font-size:18px; font-weight:700; color:#0f172a; letter-spacing:-.01em; }
-        .section-sub { font-size:13px; color:#64748b; margin-top:2px; }
-        .tag { display:inline-block; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; background:#f8fafc; border:1px solid #e2e8f0; color:#64748b; }
-        .tag-green { background:#ecfdf5; border-color:#a7f3d0; color:#059669; }
-        .tag-amber { background:#fffbeb; border-color:#fcd34d; color:#b45309; }
-        .locale-select { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:5px 8px; font-size:12px; font-weight:600; color:#374151; cursor:pointer; }
-        .nav-link { font-size:13px; font-weight:600; color:#475569; text-decoration:none; transition:color .15s; }
-        .nav-link:hover { color:#059669; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Greens ACC — Global B2B Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes marquee {
+      0%   { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    .animate-marquee {
+      display: inline-block;
+      padding-left: 100%;
+      animation: marquee 32s linear infinite;
+      white-space: nowrap;
+    }
+    .animate-marquee:hover { animation-play-state: paused; }
+
+    .pillar-card {
+      border-left: 3px solid;
+      transition: box-shadow 0.15s ease, border-left-color 0.15s ease;
+    }
+    .pillar-card:hover { box-shadow: 0 4px 16px 0 rgba(16,185,129,0.10); }
+
+    .stroke-separator {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .log-entry-info    { color: #475569; }
+    .log-entry-success { color: #059669; }
+    .log-entry-warning { color: #d97706; }
+    .log-entry-alert   { color: #dc2626; }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #059669 !important;
+      box-shadow: 0 0 0 2px rgba(5,150,105,0.08);
+    }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased">
 
-<!-- ═══════════════════════════════════════════════════
-     TICKER BAR
-═══════════════════════════════════════════════════ -->
-<div class="bg-slate-950 text-slate-400 text-[11px] py-2 px-0 overflow-hidden border-b border-slate-800 font-mono" aria-hidden="true">
-    <div class="animate-marquee" id="ticker-bar">
-        <span class="inline-flex items-center mx-6"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2 blink"></span>GREENS ACC PLATFORM — LIVE <span class="text-emerald-400 ml-2">OPERATIONAL</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">AGRI-COMMODITIES PLATFORM <span class="text-emerald-400 ml-2">ACTIVE</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">GLOBAL TRADE COMPLIANCE ENGINE <span class="text-emerald-400 ml-2">ONLINE</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">B2B MEETING SUITE <span class="text-emerald-400 ml-2">READY</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">SUPPLY CHAIN COORDINATOR <span class="text-emerald-400 ml-2">ACTIVE</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">AI COMPLIANCE MONITOR <span class="text-emerald-400 ml-2">RUNNING</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">SECURE ESCROW GATEWAY <span class="text-emerald-400 ml-2">OPERATIONAL</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <!-- duplicate for seamless loop -->
-        <span class="inline-flex items-center mx-6"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full mr-2 blink"></span>GREENS ACC PLATFORM — LIVE <span class="text-emerald-400 ml-2">OPERATIONAL</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">AGRI-COMMODITIES PLATFORM <span class="text-emerald-400 ml-2">ACTIVE</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">GLOBAL TRADE COMPLIANCE ENGINE <span class="text-emerald-400 ml-2">ONLINE</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">B2B MEETING SUITE <span class="text-emerald-400 ml-2">READY</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">SUPPLY CHAIN COORDINATOR <span class="text-emerald-400 ml-2">ACTIVE</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">AI COMPLIANCE MONITOR <span class="text-emerald-400 ml-2">RUNNING</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
-        <span class="inline-flex items-center mx-6">SECURE ESCROW GATEWAY <span class="text-emerald-400 ml-2">OPERATIONAL</span></span>
-        <span class="inline-flex items-center mx-6 text-slate-600">|</span>
+  <!-- ═══════════════════════ TOP MARKET TICKER ═══════════════════════ -->
+  <div class="bg-slate-900 text-slate-400 text-xs py-1.5 px-4 overflow-hidden whitespace-nowrap border-b border-slate-800 font-mono select-none">
+    <div class="animate-marquee space-x-10">
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>GREENS ACC INDEX (AGRI/USD) $14.20 <span class="text-emerald-400">+1.4%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>FREIGHT INDEX (GLOBAL) $3,450 <span class="text-emerald-400">+0.8%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / EGP 47.85 <span class="text-emerald-400">+2.1%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / AED 3.67 <span class="text-slate-400">0.0%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-rose-400"></span>USD / TRY 32.45 <span class="text-rose-400">-0.5%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / MNT 3,420 <span class="text-emerald-400">+0.2%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / INR 83.20 <span class="text-emerald-400">+0.3%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / PLN 3.98 <span class="text-emerald-400">+0.1%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / CNY 7.24 <span class="text-slate-400">0.0%</span></span>
+      <!-- duplicate band for seamless loop -->
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>GREENS ACC INDEX (AGRI/USD) $14.20 <span class="text-emerald-400">+1.4%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>FREIGHT INDEX (GLOBAL) $3,450 <span class="text-emerald-400">+0.8%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / EGP 47.85 <span class="text-emerald-400">+2.1%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / AED 3.67 <span class="text-slate-400">0.0%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-rose-400"></span>USD / TRY 32.45 <span class="text-rose-400">-0.5%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / MNT 3,420 <span class="text-emerald-400">+0.2%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / INR 83.20 <span class="text-emerald-400">+0.3%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-emerald-400"></span>USD / PLN 3.98 <span class="text-emerald-400">+0.1%</span></span>
+      <span class="inline-flex items-center gap-2"><span class="status-dot bg-slate-500"></span>USD / CNY 7.24 <span class="text-slate-400">0.0%</span></span>
     </div>
-</div>
+  </div>
 
-<!-- ═══════════════════════════════════════════════════
-     NAVIGATION
-═══════════════════════════════════════════════════ -->
-<nav class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
-    <div class="flex items-center gap-3">
-        <div class="h-10 w-10 bg-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg viewBox="0 0 24 24" fill="none" class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 3L4 7v10l8 4 8-4V7L12 3z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                <path d="M4 7l8 4 8-4" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                <path d="M12 11v10" stroke="currentColor" stroke-width="1.5" fill="none"/>
-            </svg>
+  <!-- ═══════════════════════ NAVIGATION ═══════════════════════ -->
+  <nav class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
+
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-5 h-5">
+            <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-1.5V9a3 3 0 00-3-3h-3V4.5a3 3 0 00-3-3H4.5a3 3 0 00-3 3V9a3 3 0 003 3H6v1.5a3 3 0 003 3h3V18a3 3 0 003 3h4.5zM6 10.5H4.5a1.5 1.5 0 01-1.5-1.5V4.5a1.5 1.5 0 011.5-1.5H9a1.5 1.5 0 011.5 1.5V6H9a3 3 0 00-3 3v1.5z" />
+          </svg>
         </div>
         <div>
-            <div class="font-bold text-slate-900 text-[15px] leading-none tracking-tight">Greens ACC</div>
-            <div class="text-[10px] text-slate-400 font-medium tracking-widest uppercase leading-tight mt-0.5">Global Trade Platform</div>
+          <p class="text-lg font-black tracking-tight text-slate-900 leading-none">Greens ACC</p>
+          <p class="text-[10px] text-emerald-600 font-bold tracking-widest uppercase font-mono leading-none mt-0.5">Secure Access &amp; Compliance Command</p>
         </div>
-    </div>
-    <div class="hidden md:flex items-center gap-6">
-        <a href="#meeting-room" class="nav-link">Meeting Room</a>
-        <a href="#supply-chain" class="nav-link">Supply Chain</a>
-        <a href="#compliance" class="nav-link">Compliance</a>
-        <a href="#deal-flow" class="nav-link">Deal Flow</a>
-        <a href="marketplace.html" class="nav-link">Marketplace</a>
-        <a href="deal-room.html" class="nav-link text-emerald-700">Deal Room ↗</a>
-    </div>
-    <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2">
-            <select id="locale-lang" class="locale-select" aria-label="Select language">
-                <option value="en">🌐 EN</option>
-                <option value="fr">FR</option>
-                <option value="es">ES</option>
-                <option value="ar">AR</option>
-                <option value="zh">ZH</option>
-            </select>
-            <select id="locale-region" class="locale-select" aria-label="Select region">
-                <option value="US">US</option>
-                <option value="GB">GB</option>
-                <option value="AE">AE</option>
-                <option value="SG">SG</option>
-                <option value="DE">DE</option>
-                <option value="FR">FR</option>
-                <option value="JP">JP</option>
-                <option value="IN">IN</option>
-                <option value="CN">CN</option>
-                <option value="ZA">ZA</option>
-                <option value="NG">NG</option>
-                <option value="BR">BR</option>
-            </select>
-        </div>
-        <div class="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
-            <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full blink"></span>
-            <span id="nav-time">--:--</span>
-            <span id="nav-timezone" class="text-slate-400"></span>
-        </div>
-    </div>
-</nav>
+      </div>
 
-<!-- ═══════════════════════════════════════════════════
-     MAIN CONTENT
-═══════════════════════════════════════════════════ -->
-<main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-10">
+      <!-- Platform nav links -->
+      <div class="hidden sm:flex items-center gap-4">
+        <a href="marketplace.html" class="text-xs font-semibold text-slate-600 hover:text-emerald-600 transition-colors">Marketplace</a>
+        <a href="deal-room.html" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition-colors">Deal Room ↗</a>
+      </div>
 
-    <!-- ── HERO ── -->
-    <section>
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div>
-                <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-none">
-                    Trade Command<br class="hidden sm:block"> <span class="text-emerald-600">Centre</span>
-                </h1>
-                <p class="mt-3 text-slate-500 text-[14px] max-w-lg leading-relaxed">
-                    Greens ACC connects global trade parties through a secure B2B meeting suite, AI-monitored compliance engine, and end-to-end supply chain coordination — all under one verified deal lifecycle.
-                </p>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <span class="tag tag-green">Global B2B</span>
-                    <span class="tag tag-green">AI Compliance</span>
-                    <span class="tag tag-green">Supply Chain</span>
-                    <span class="tag">CISG-Aligned</span>
-                    <span class="tag">Escrow Protected</span>
-                    <span class="tag">KYC / AML</span>
-                </div>
-            </div>
-            <div class="card p-4 min-w-[220px] flex-shrink-0">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">System Status</div>
-                <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Platform</span>
-                        <span class="status-badge badge-active"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full blink"></span>Live</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Compliance Engine</span>
-                        <span class="status-badge badge-active">Active</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Escrow Gateway</span>
-                        <span class="status-badge badge-active">Operational</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs text-slate-500">Meeting Suite</span>
-                        <span class="status-badge badge-active">Ready</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── DEAL IDENTITY ── -->
-    <section>
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <div class="section-header">Deal Identity</div>
-                <div class="section-sub">Identify your active deal to track status and perform lifecycle actions.</div>
-            </div>
-        </div>
-        <div class="card p-5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                    <label class="lbl" for="deal-id-input">Deal ID</label>
-                    <input type="text" id="deal-id-input" class="field" placeholder="UUID or reference code" autocomplete="off" spellcheck="false">
-                </div>
-                <div>
-                    <label class="lbl" for="payer-id-input">Buyer / Payer ID</label>
-                    <input type="text" id="payer-id-input" class="field" placeholder="User or entity ID" autocomplete="off" spellcheck="false">
-                </div>
-                <div>
-                    <label class="lbl" for="deal-amount-input">Deal Amount (USD)</label>
-                    <input type="number" id="deal-amount-input" class="field" placeholder="0.00" min="0" step="0.01">
-                </div>
-                <div>
-                    <label class="lbl" for="lc-reference-input">L/C Reference</label>
-                    <input type="text" id="lc-reference-input" class="field" placeholder="Letter of credit ref." autocomplete="off">
-                </div>
-            </div>
-            <div class="mt-4 flex flex-wrap items-center gap-3">
-                <div class="text-xs text-slate-400">Deal value: <span id="deal-amount-display" class="font-bold text-slate-700">$0.00</span></div>
-                <div class="text-xs text-slate-400">Commission (2%): <span id="commission-amount-display" class="font-bold text-slate-700">$0.00</span></div>
-                <div class="text-xs text-slate-400">Entry fee: <span class="font-bold text-emerald-700">$20.00 flat</span></div>
-            </div>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── DEAL STATUS COMMAND ── -->
-    <section>
-        <div class="mb-4">
-            <div class="section-header">Deal Status</div>
-            <div class="section-sub">Live status of your active deal across all verification checkpoints.</div>
-        </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <!-- Entry Fee -->
-            <div class="card p-4">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Entry Fee</span>
-                </div>
-                <div id="status-entry-fee" class="status-badge badge-pending mb-1">Pending</div>
-                <div class="text-[10px] text-slate-400 mt-1">$20.00 activation charge</div>
-            </div>
-            <!-- Handshake -->
-            <div class="card p-4">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/></svg>
-                    </div>
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Handshake</span>
-                </div>
-                <div id="status-handshake" class="status-badge badge-pending mb-1">Pending</div>
-                <div class="text-[10px] text-slate-400 mt-1">L/C session confirmation</div>
-            </div>
-            <!-- Compliance -->
-            <div class="card p-4">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-                    </div>
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Compliance</span>
-                </div>
-                <div id="status-compliance" class="status-badge badge-pending mb-1">Pending</div>
-                <div class="text-[10px] text-slate-400 mt-1">KYC / AML review</div>
-            </div>
-            <!-- Escrow -->
-            <div class="card p-4">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="w-8 h-8 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-                    </div>
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Escrow</span>
-                </div>
-                <div id="status-escrow" class="status-badge badge-pending mb-1">Locked</div>
-                <div class="text-[10px] text-slate-400 mt-1">Fund release state</div>
-            </div>
-        </div>
-        <!-- AI Agent Status -->
-        <div class="mt-3 card p-4">
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">AI Verification Agents</div>
-            <div class="flex flex-wrap gap-3">
-                <div class="flex items-center gap-2 text-xs">
-                    <span class="text-slate-500">Agent 1 — KYC</span>
-                    <span id="status-agent1" class="status-badge badge-pending">Pending</span>
-                </div>
-                <div class="flex items-center gap-2 text-xs">
-                    <span class="text-slate-500">Agent 2 — Compliance</span>
-                    <span id="status-agent2" class="status-badge badge-pending">Pending</span>
-                </div>
-                <div class="flex items-center gap-2 text-xs">
-                    <span class="text-slate-500">Agent 3 — Legal</span>
-                    <span id="status-agent3" class="status-badge badge-pending">Pending</span>
-                </div>
-                <div class="flex items-center gap-2 text-xs ml-auto">
-                    <span class="text-slate-400">Progress:</span>
-                    <span id="deal-progress-display" class="font-bold text-slate-700">0 / 4 steps</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── THREE PILLARS ── -->
-    <section>
-        <div class="mb-5">
-            <div class="section-header">Platform Pillars</div>
-            <div class="section-sub">Three integrated modules powering every Greens ACC transaction.</div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <a href="#meeting-room" class="pillar p-5 block no-underline group cursor-pointer">
-                <div class="w-10 h-10 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center mb-4">
-                    <svg class="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
-                </div>
-                <div class="font-bold text-slate-900 text-[15px] mb-1">Global B2B Meeting Room</div>
-                <div class="text-xs text-slate-500 leading-relaxed">Encrypted instant rooms for buyer-seller negotiations with AI secretary, multilingual support, and document exchange.</div>
-                <div class="mt-3 text-xs font-semibold text-emerald-700 group-hover:text-emerald-800">Open module →</div>
-            </a>
-            <a href="#supply-chain" class="pillar p-5 block no-underline group cursor-pointer">
-                <div class="w-10 h-10 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center mb-4">
-                    <svg class="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
-                </div>
-                <div class="font-bold text-slate-900 text-[15px] mb-1">Supply Chain Engine</div>
-                <div class="text-xs text-slate-500 leading-relaxed">Initiate and track commodity shipments through structured milestones — from manifest creation to final delivery confirmation.</div>
-                <div class="mt-3 text-xs font-semibold text-emerald-700 group-hover:text-emerald-800">Open module →</div>
-            </a>
-            <a href="#compliance" class="pillar p-5 block no-underline group cursor-pointer">
-                <div class="w-10 h-10 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center mb-4">
-                    <svg class="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.97zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.97z"/></svg>
-                </div>
-                <div class="font-bold text-slate-900 text-[15px] mb-1">AI Legal Compliance Monitor</div>
-                <div class="text-xs text-slate-500 leading-relaxed">Automated OFAC, AML, CISG, and Incoterms 2020 contract review — with kill-switch enforcement for sanctioned parties.</div>
-                <div class="mt-3 text-xs font-semibold text-emerald-700 group-hover:text-emerald-800">Open module →</div>
-            </a>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── DEAL FLOW (Payment Lifecycle) ── -->
-    <section id="deal-flow">
-        <div class="mb-5">
-            <div class="section-header">Deal Lifecycle</div>
-            <div class="section-sub">Four-step verified deal execution — $20 activation gate through escrow release.</div>
+      <!-- Unified locale controls -->
+      <div class="flex flex-wrap items-end gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Region</label>
+          <select id="region-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
+            <option value="global">🌍 Global</option>
+            <option value="us">🇺🇸 United States</option>
+            <option value="ae">🇦🇪 UAE</option>
+            <option value="eg">🇪🇬 Egypt</option>
+            <option value="in">🇮🇳 India</option>
+            <option value="pl">🇵🇱 Poland</option>
+            <option value="fr">🇫🇷 France</option>
+            <option value="cn">🇨🇳 China</option>
+            <option value="mn">🇲🇳 Mongolia</option>
+          </select>
         </div>
         <div class="flex flex-col gap-1">
-          <label id="interface-language-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Interface Language</label>
+          <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Interface Language</label>
           <select id="language-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
             <option value="en">🇬🇧 English</option>
             <option value="ar">🇦🇪 العربية</option>
@@ -368,7 +126,7 @@
           </select>
         </div>
         <div class="flex flex-col gap-1">
-          <label id="counterparty-language-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Counterparty Language</label>
+          <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Counterparty Language</label>
           <select id="counterparty-language-select" class="bg-white border border-slate-200 rounded-lg text-xs font-semibold px-3 py-1.5 text-slate-700 cursor-pointer">
             <option value="en">🇬🇧 English</option>
             <option value="ar">🇦🇪 العربية</option>
@@ -379,1981 +137,938 @@
           </select>
         </div>
         <div id="system-time-badge" class="flex flex-col gap-1">
-          <label id="local-time-label" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Local Time</label>
+          <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Local Time</label>
           <span id="local-time" class="text-xs font-mono text-slate-600 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg">—</span>
         </div>
       </div>
 
-        <!-- Step Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <!-- Step 1: Entry Fee -->
-            <div class="step-card p-4" id="step1-card">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-xs font-bold text-slate-500" id="step1-icon">1</div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Entry Fee</span>
-                    </div>
-                    <span id="step1-badge" class="status-badge badge-pending">Pending</span>
-                </div>
-                <div class="text-xl font-bold text-slate-900 mb-1">$20.00</div>
-                <div class="text-[11px] text-slate-400 mb-3">Flat activation charge. Required to unlock all deal functions.</div>
-                <button class="btn-primary w-full" id="btn-entry-fee">Process Entry Fee</button>
-                <div id="step1-msg" class="text-[11px] mt-2 text-slate-500 min-h-[16px]"></div>
-            </div>
-
-            <!-- Step 2: Handshake -->
-            <div class="step-card p-4" id="step2-card">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-xs font-bold text-slate-500" id="step2-icon">2</div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Handshake</span>
-                    </div>
-                    <span id="step2-badge" class="status-badge badge-pending">Pending</span>
-                </div>
-                <div class="text-[11px] text-slate-700 font-semibold mb-1">Confirm deal terms &amp; L/C</div>
-                <div class="text-[11px] text-slate-400 mb-3">Locks deal amount, confirms letter of credit, sets 2% commission.</div>
-                <button class="btn-primary w-full" id="btn-handshake" disabled>Confirm Handshake</button>
-                <div id="step2-msg" class="text-[11px] mt-2 text-slate-500 min-h-[16px]"></div>
-            </div>
-
-            <!-- Step 3: Compliance Verified -->
-            <div class="step-card p-4" id="step3-card">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-xs font-bold text-slate-500" id="step3-icon">3</div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Compliance</span>
-                    </div>
-                    <span id="step3-badge" class="status-badge badge-pending">Pending</span>
-                </div>
-                <div class="text-[11px] text-slate-700 font-semibold mb-1">KYC / AML / OFAC verified</div>
-                <div class="text-[11px] text-slate-400 mb-3">Set automatically after handshake confirmation. All 3 AI agents must pass.</div>
-                <div class="text-[11px] text-slate-400 bg-slate-50 rounded-lg p-2 border border-slate-200">Auto-verified on handshake confirmation</div>
-                <div id="step3-msg" class="text-[11px] mt-2 text-slate-500 min-h-[16px]"></div>
-            </div>
-
-            <!-- Step 4: Release Escrow -->
-            <div class="step-card p-4" id="step4-card">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 rounded-full border-2 border-slate-300 bg-white flex items-center justify-center text-xs font-bold text-slate-500" id="step4-icon">4</div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Escrow Release</span>
-                    </div>
-                    <span id="step4-badge" class="status-badge badge-pending">Locked</span>
-                </div>
-                <div class="text-[11px] text-slate-700 font-semibold mb-1">Release verified funds</div>
-                <div class="text-[11px] text-slate-400 mb-3">Available after all agents verified &amp; compliance passed. Triggers payout.</div>
-                <button class="btn-danger w-full" id="btn-withdrawal" disabled>Release Escrow</button>
-                <div id="step4-msg" class="text-[11px] mt-2 text-slate-500 min-h-[16px]"></div>
-            </div>
-        </div>
-
-        <!-- Payout Summary -->
-        <div class="card-accent p-4 flex flex-wrap items-center gap-4">
-            <div class="text-xs text-emerald-700 font-bold uppercase tracking-wider">Payout Summary</div>
-            <div class="flex items-center gap-6 flex-wrap">
-                <div><span class="text-xs text-slate-500">Total deal value: </span><span id="summary-deal-amount" class="text-sm font-bold text-slate-900">$0.00</span></div>
-                <div><span class="text-xs text-slate-500">Commission (2%): </span><span id="summary-commission" class="text-sm font-bold text-slate-700">$0.00</span></div>
-                <div><span class="text-xs text-slate-500">Payout amount: </span><span id="summary-payout" class="text-sm font-bold text-emerald-700">$0.00</span></div>
-            </div>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── MEETING ROOM MODULE ── -->
-    <section id="meeting-room">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-9 h-9 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
-            </div>
-            <div>
-                <div class="section-header">Global B2B Meeting Room</div>
-                <div class="section-sub">Generate an encrypted instant room for secure bilateral negotiations.</div>
-            </div>
-            <a href="meeting-room.html" class="btn-primary ml-auto hidden sm:inline-flex items-center gap-2">
-                Open Live Meeting Room
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>
-            </a>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="card p-5">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Create Instant Room</div>
-                <div class="space-y-3">
-                    <div>
-                        <label class="lbl" for="room-creator-company">Your Company Name</label>
-                        <input type="text" id="room-creator-company" class="field" placeholder="Company or entity name" autocomplete="off">
-                    </div>
-                    <div>
-                        <label class="lbl" for="room-participant-email">Participant Email (optional)</label>
-                        <input type="email" id="room-participant-email" class="field" placeholder="counterpart@company.com" autocomplete="off">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="lbl" for="room-buyer-lang">Buyer Language</label>
-                            <select id="room-buyer-lang" class="field">
-                                <option value="en">English</option>
-                                <option value="fr">French</option>
-                                <option value="es">Spanish</option>
-                                <option value="ar">Arabic</option>
-                                <option value="zh">Mandarin</option>
-                                <option value="de">German</option>
-                                <option value="pt">Portuguese</option>
-                                <option value="ja">Japanese</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="lbl" for="room-seller-lang">Seller Language</label>
-                            <select id="room-seller-lang" class="field">
-                                <option value="en">English</option>
-                                <option value="fr">French</option>
-                                <option value="es">Spanish</option>
-                                <option value="ar">Arabic</option>
-                                <option value="zh">Mandarin</option>
-                                <option value="de">German</option>
-                                <option value="pt">Portuguese</option>
-                                <option value="ja">Japanese</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn-primary w-full" id="btn-create-room">Generate Encrypted Room</button>
-                </div>
-                <div id="room-result" class="mt-4 hidden card-accent p-3">
-                    <div class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider mb-2">Room Created</div>
-                    <div class="text-xs text-slate-600 space-y-1">
-                        <div>Token: <span id="room-token-display" class="font-mono font-bold text-slate-900"></span></div>
-                        <div>Name: <span id="room-name-display" class="font-semibold text-slate-900"></span></div>
-                        <div>Expires: <span id="room-expires-display" class="text-slate-500"></span></div>
-                    </div>
-                    <a id="room-join-link" href="meeting-room.html" class="btn-primary inline-block mt-3 text-center text-xs">Open Meeting Room</a>
-                </div>
-            </div>
-            <div class="card p-5">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Meeting Room Features</div>
-                <ul class="space-y-3">
-                    <li class="flex items-start gap-3 text-xs text-slate-600">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                        <span>End-to-end encrypted room with secure token. Room expires after 24 hours.</span>
-                    </li>
-                    <li class="flex items-start gap-3 text-xs text-slate-600">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                        <span>Multilingual AI secretary translates and facilitates real-time negotiation between parties.</span>
-                    </li>
-                    <li class="flex items-start gap-3 text-xs text-slate-600">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                        <span>Secure document exchange: contracts, invoices, shipping manifests — linked but not stored.</span>
-                    </li>
-                    <li class="flex items-start gap-3 text-xs text-slate-600">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                        <span>AI compliance monitor runs continuously during session — kill-switch on sanction violations.</span>
-                    </li>
-                    <li class="flex items-start gap-3 text-xs text-slate-600">
-                        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                        <span>Session linked to deal ID and escrow lifecycle for complete traceability.</span>
-                    </li>
-                </ul>
-                <div class="mt-4 pt-4 border-t border-slate-100">
-                    <a href="meeting-room.html" class="btn-secondary w-full text-center block">Open Full Meeting Suite</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── SUPPLY CHAIN MODULE ── -->
-    <section id="supply-chain">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-9 h-9 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
-            </div>
-            <div>
-                <div class="section-header">Supply Chain Engine</div>
-                <div class="section-sub">Initiate and advance commodity shipments through verified logistics milestones.</div>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="card p-5">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Initiate Shipment</div>
-                <div class="space-y-3">
-                    <div>
-                        <label class="lbl" for="sc-order-id">Order ID</label>
-                        <input type="text" id="sc-order-id" class="field" placeholder="e.g. ORD-2025-001" autocomplete="off">
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="lbl" for="sc-origin">Origin Point</label>
-                            <input type="text" id="sc-origin" class="field" placeholder="City / Port, Country" autocomplete="off">
-                        </div>
-                        <div>
-                            <label class="lbl" for="sc-destination">Destination</label>
-                            <input type="text" id="sc-destination" class="field" placeholder="City / Port, Country" autocomplete="off">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="lbl" for="sc-carrier">Carrier / Logistics Agent</label>
-                        <input type="text" id="sc-carrier" class="field" placeholder="Carrier name or ID (optional)" autocomplete="off">
-                    </div>
-                    <button class="btn-primary w-full" id="btn-init-shipment">Initialize Shipment</button>
-                    <div id="sc-init-msg" class="text-[11px] text-slate-500 min-h-[16px]"></div>
-                </div>
-                <div id="sc-result" class="mt-4 hidden card-accent p-3">
-                    <div class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider mb-2">Shipment Initialized</div>
-                    <div class="text-xs text-slate-600 space-y-1">
-                        <div>Tracking ID: <span id="sc-tracking-id" class="font-mono font-bold text-slate-900"></span></div>
-                        <div>Milestone: <span id="sc-milestone" class="font-semibold text-slate-700"></span></div>
-                        <div>Status: <span id="sc-transit-status" class="font-semibold text-emerald-700"></span></div>
-                    </div>
-                </div>
-            </div>
-            <div class="card p-5">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Advance Milestone</div>
-                <div class="space-y-3">
-                    <div>
-                        <label class="lbl" for="sc-adv-tracking-id">Tracking ID</label>
-                        <input type="text" id="sc-adv-tracking-id" class="field" placeholder="UUID from initialized shipment" autocomplete="off">
-                    </div>
-                    <div>
-                        <label class="lbl" for="sc-adv-milestone">Next Milestone</label>
-                        <select id="sc-adv-milestone" class="field">
-                            <option value="customs_cleared">Customs Cleared</option>
-                            <option value="in_transit">In Transit</option>
-                            <option value="arrived_port">Arrived at Destination Port</option>
-                            <option value="final_delivery">Final Delivery Confirmed</option>
-                            <option value="inspection_passed">Inspection Passed</option>
-                            <option value="payment_released">Payment Released</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="lbl" for="sc-adv-summary">Update Summary</label>
-                        <input type="text" id="sc-adv-summary" class="field" placeholder="Brief status update note" autocomplete="off">
-                    </div>
-                    <button class="btn-secondary w-full" id="btn-advance-milestone">Advance Milestone</button>
-                    <div id="sc-adv-msg" class="text-[11px] text-slate-500 min-h-[16px]"></div>
-                </div>
-            </div>
-        </div>
-        <!-- Milestone map -->
-        <div class="mt-4 card p-4">
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Standard Milestone Sequence</div>
-            <div class="flex flex-wrap gap-2">
-                <span class="tag tag-green">Manifest Created</span>
-                <span class="text-slate-300">→</span>
-                <span class="tag">Customs Cleared</span>
-                <span class="text-slate-300">→</span>
-                <span class="tag">In Transit</span>
-                <span class="text-slate-300">→</span>
-                <span class="tag">Arrived at Port</span>
-                <span class="text-slate-300">→</span>
-                <span class="tag">Inspection Passed</span>
-                <span class="text-slate-300">→</span>
-                <span class="tag">Final Delivery</span>
-                <span class="text-slate-300">→</span>
-                <span class="tag tag-green">Payment Released</span>
-            </div>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── AI COMPLIANCE MODULE ── -->
-    <section id="compliance">
-        <div class="flex items-center gap-3 mb-5">
-            <div class="w-9 h-9 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center flex-shrink-0">
-                <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.97zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.97z"/></svg>
-            </div>
-            <div>
-                <div class="section-header">AI Legal Compliance Monitor</div>
-                <div class="section-sub">Automated contract review against CISG, INCOTERMS 2020, OFAC, AML, and export control regulations.</div>
-            </div>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="card p-5">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Contract Compliance Audit</div>
-                <div class="space-y-3">
-                    <div>
-                        <label class="lbl" for="compliance-contract-id">Contract Reference ID (optional)</label>
-                        <input type="text" id="compliance-contract-id" class="field" placeholder="Contract or document ID" autocomplete="off">
-                    </div>
-                    <div>
-                        <label class="lbl" for="compliance-room-id">Room ID (optional)</label>
-                        <input type="text" id="compliance-room-id" class="field" placeholder="Meeting room ID for linked audit" autocomplete="off">
-                    </div>
-                    <div>
-                        <label class="lbl" for="compliance-text">Contract Text / Terms</label>
-                        <textarea id="compliance-text" class="field" rows="5" placeholder="Paste contract text or key terms here for AI review…"></textarea>
-                    </div>
-                    <button class="btn-primary w-full" id="btn-compliance-audit">Run Compliance Audit</button>
-                    <div id="compliance-msg" class="text-[11px] text-slate-500 min-h-[16px]"></div>
-                </div>
-            </div>
-            <div class="card p-5">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Audit Result</div>
-                <div id="compliance-result-empty" class="text-xs text-slate-400 py-6 text-center border border-dashed border-slate-200 rounded-xl">
-                    Submit contract text to receive an AI compliance audit report.
-                </div>
-                <div id="compliance-result" class="hidden space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-slate-600 font-semibold">Compliance Status</span>
-                        <span id="compliance-verdict" class="status-badge badge-pending">Pending</span>
-                    </div>
-                    <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Discrepancies Found</div>
-                        <ul id="compliance-discrepancies" class="space-y-1 text-xs text-slate-600"></ul>
-                    </div>
-                    <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Recommended Clauses</div>
-                        <ul id="compliance-recommendations" class="space-y-1 text-xs text-slate-600"></ul>
-                    </div>
-                    <div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Applied Frameworks</div>
-                        <div id="compliance-frameworks" class="text-[11px] text-slate-400"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Compliance scope note -->
-        <div class="mt-4 card p-4">
-            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Monitored Compliance Frameworks</div>
-            <div class="flex flex-wrap gap-2">
-                <span class="tag">CISG</span>
-                <span class="tag">INCOTERMS 2020</span>
-                <span class="tag">OFAC SDN</span>
-                <span class="tag">AML / KYC</span>
-                <span class="tag">UNIDROIT</span>
-                <span class="tag">Export Controls</span>
-                <span class="tag">Arms Trade Treaty</span>
-                <span class="tag">EU Sanctions Reg.</span>
-            </div>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── ACTIVITY LOG ── -->
-    <section>
-        <div class="flex items-center justify-between mb-4">
-            <div>
-                <div class="section-header">Activity Log</div>
-                <div class="section-sub">Live record of system events, actions, and compliance signals.</div>
-            </div>
-            <button class="btn-secondary text-xs py-1.5 px-3" id="btn-clear-log">Clear Log</button>
-        </div>
-        <div class="card overflow-hidden">
-            <div id="activity-log" class="divide-y divide-slate-50 max-h-64 overflow-y-auto font-mono text-[11px]">
-                <!-- log entries injected by JS -->
-            </div>
-        </div>
-    </section>
-
-    <div class="rule"></div>
-
-    <!-- ── LOCALE / COUNTERPARTY ── -->
-    <section>
-        <div class="mb-4">
-            <div class="section-header">Locale & Counterparty Settings</div>
-            <div class="section-sub">Configure session language, time zone, and counterparty preferences for meeting and deal metadata.</div>
-        </div>
-        <div class="card p-5">
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div>
-                    <label class="lbl" for="locale-user-lang">Your Language</label>
-                    <select id="locale-user-lang" class="field">
-                        <option value="en">English</option>
-                        <option value="fr">French</option>
-                        <option value="es">Spanish</option>
-                        <option value="ar">Arabic</option>
-                        <option value="zh">Mandarin</option>
-                        <option value="de">German</option>
-                        <option value="pt">Portuguese</option>
-                        <option value="ja">Japanese</option>
-                        <option value="ko">Korean</option>
-                        <option value="ru">Russian</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="lbl" for="locale-counterparty-lang">Counterparty Language</label>
-                    <select id="locale-counterparty-lang" class="field">
-                        <option value="en">English</option>
-                        <option value="fr">French</option>
-                        <option value="es">Spanish</option>
-                        <option value="ar">Arabic</option>
-                        <option value="zh">Mandarin</option>
-                        <option value="de">German</option>
-                        <option value="pt">Portuguese</option>
-                        <option value="ja">Japanese</option>
-                        <option value="ko">Korean</option>
-                        <option value="ru">Russian</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="lbl" for="locale-currency">Deal Currency</label>
-                    <select id="locale-currency" class="field">
-                        <option value="USD">USD — US Dollar</option>
-                        <option value="EUR">EUR — Euro</option>
-                        <option value="GBP">GBP — British Pound</option>
-                        <option value="AED">AED — UAE Dirham</option>
-                        <option value="SGD">SGD — Singapore Dollar</option>
-                        <option value="CNY">CNY — Chinese Yuan</option>
-                        <option value="JPY">JPY — Japanese Yen</option>
-                        <option value="INR">INR — Indian Rupee</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="lbl" for="locale-deal-country">Deal Country</label>
-                    <select id="locale-deal-country" class="field">
-                        <option value="US">United States</option>
-                        <option value="GB">United Kingdom</option>
-                        <option value="AE">UAE</option>
-                        <option value="SG">Singapore</option>
-                        <option value="DE">Germany</option>
-                        <option value="FR">France</option>
-                        <option value="NL">Netherlands</option>
-                        <option value="JP">Japan</option>
-                        <option value="IN">India</option>
-                        <option value="CN">China</option>
-                        <option value="ZA">South Africa</option>
-                        <option value="NG">Nigeria</option>
-                        <option value="BR">Brazil</option>
-                        <option value="AU">Australia</option>
-                        <option value="CA">Canada</option>
-                        <option value="MX">Mexico</option>
-                        <option value="KE">Kenya</option>
-                        <option value="GH">Ghana</option>
-                        <option value="TR">Turkey</option>
-                        <option value="SA">Saudi Arabia</option>
-                    </select>
-                </div>
-            </div>
-            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center gap-4 text-xs text-slate-500">
-                <span>Local time: <span id="locale-time-display" class="font-bold text-slate-700">--:--</span></span>
-                <span>Region: <span id="locale-region-display" class="font-bold text-slate-700">--</span></span>
-                <span>Language: <span id="locale-lang-display" class="font-bold text-slate-700">--</span></span>
-                <span>Counterparty: <span id="locale-cp-display" class="font-bold text-slate-700">--</span></span>
-            </div>
-        </div>
-    </section>
-
-</main>
-
-<!-- ═══════════════════════════════════════════════════
-     MARKET CLOCKS — World Trading Centers
-═══════════════════════════════════════════════════ -->
-<section id="market-clocks" class="bg-slate-950 py-10 border-t border-slate-800">
-  <div class="max-w-5xl mx-auto px-6">
-    <div class="flex items-center gap-2 mb-6">
-      <div class="w-2 h-2 rounded-full bg-emerald-400 blink"></div>
-      <span class="text-slate-400 text-xs font-mono uppercase tracking-widest">Live Trading Clocks</span>
     </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="clocks-grid">
-      <!-- Populated by JS -->
-    </div>
-  </div>
-</section>
+  </nav>
 
-<!-- ═══════════════════════════════════════════════════
-     MARKET FEEDS — Intelligence & News Grid
-═══════════════════════════════════════════════════ -->
-<section id="market-feeds" class="bg-white py-10 border-t border-slate-100">
-  <div class="max-w-5xl mx-auto px-6">
-    <div class="section-header mb-1">Market Intelligence</div>
-    <div class="section-sub mb-5">Real-time trade news and financial market data</div>
-    <!-- Tab bar -->
-    <div class="flex gap-1 mb-5 border-b border-slate-100" id="feeds-tabbar">
-      <button class="feeds-tab px-4 py-2 text-xs font-bold rounded-t-lg border-b-2 border-emerald-600 text-emerald-700 bg-emerald-50" data-tab="trade">Trade News</button>
-      <button class="feeds-tab px-4 py-2 text-xs font-bold rounded-t-lg border-b-2 border-transparent text-slate-500 hover:text-emerald-700" data-tab="markets">Financial Markets</button>
-    </div>
-    <!-- Trade News panel -->
-    <div id="feeds-trade" class="feeds-panel">
-      <div class="grid sm:grid-cols-2 gap-3" id="trade-feed-list"></div>
-    </div>
-    <!-- Financial Markets panel -->
-    <div id="feeds-markets" class="feeds-panel hidden">
-      <div class="grid sm:grid-cols-3 gap-3" id="market-ticker-list"></div>
-    </div>
-  </div>
-</section>
+  <!-- ═══════════════════════ MAIN CONTENT ═══════════════════════ -->
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-8">
 
-<!-- ═══════════════════════════════════════════════════
-     VIDEO ONBOARDING GUIDE
-═══════════════════════════════════════════════════ -->
-<section id="video-guide" class="bg-white py-10 border-t border-slate-200">
-  <div class="max-w-4xl mx-auto px-6">
-    <div class="text-center mb-6">
-      <div class="section-header mb-1">Platform Walkthrough</div>
-      <div class="section-sub">Watch the step-by-step onboarding sequence — asset sourcing, compliance waiting rooms, and deal clearance</div>
-    </div>
-    <div class="relative aspect-video w-full bg-slate-900 rounded-2xl border border-slate-200 overflow-hidden shadow-lg" id="video-container">
-      <!-- Play overlay (shown before video plays) -->
-      <div id="video-overlay" class="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-slate-950/80 cursor-pointer group" onclick="playVideoGuide()">
-        <div class="w-16 h-16 bg-blue-600 group-hover:bg-blue-500 rounded-full flex items-center justify-center transition-transform group-hover:scale-105 shadow-xl">
-          <svg class="w-6 h-6 fill-white ml-1" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-        <p class="text-xs font-mono text-slate-400">Click to play — Greens ACC Complete Platform Walkthrough</p>
-      </div>
-      <!-- YouTube iframe (injected on play) -->
-      <div id="video-frame" class="hidden w-full h-full"></div>
-      <div class="absolute bottom-2 left-2 bg-slate-950/80 border border-slate-700 px-2.5 py-1 rounded-md text-[10px] font-mono text-slate-400 pointer-events-none">
-        GREENS ACC — SECURE PLAYER
-      </div>
-    </div>
-    <div class="flex items-center justify-center gap-6 mt-4 text-xs text-slate-400">
-      <span>🔒 No tracking pixels</span>
-      <span>📋 5-minute overview</span>
-      <span>🌐 Available in 5 languages</span>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════
-     DEALS GRID — Locked B2B International Matrix
-═══════════════════════════════════════════════════ -->
-<section id="deals-grid" class="bg-slate-50 py-10 border-t border-slate-200">
-  <div class="max-w-5xl mx-auto px-6">
-    <div class="flex items-center justify-between mb-5">
+    <!-- Platform Header -->
+    <header class="bg-white border border-slate-200 rounded-2xl px-7 py-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-5 shadow-sm">
       <div>
-        <div class="section-header mb-1">International Trade Ledger</div>
-        <div class="section-sub">Active wholesale deals, manifests &amp; container allocations</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="status-dot bg-emerald-500"></span>
+          <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest font-mono">All Systems Active</span>
+        </div>
+        <h1 class="text-2xl font-black text-slate-900 tracking-tight">Global B2B Command Center</h1>
+        <p class="text-sm text-slate-500 mt-1 max-w-xl">Authorized corporate access. AI-driven compliance monitoring. Secure escrow lifecycle. Multilingual global trade orchestration.</p>
       </div>
-      <span class="status-badge badge-warning">🔒 Restricted Access</span>
-    </div>
-    <div class="grid sm:grid-cols-3 gap-4" id="deals-locked-grid"></div>
-  </div>
-</section>
-
-<!-- Paywall Modal -->
-<div id="deals-paywall-modal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-  <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
-    <div class="flex items-center gap-3 mb-5">
-      <div class="h-10 w-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-        <svg class="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      <div class="flex flex-wrap gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-semibold border border-emerald-200">
+          <span class="status-dot bg-emerald-500"></span>Supabase Connected
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold border border-slate-200 font-mono">
+          AI Fee: 2% Brokerage
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold border border-slate-200 font-mono">
+          Entry: $20.00 flat
+        </span>
       </div>
-      <div>
-        <div class="font-bold text-slate-900 text-sm">Access Restricted</div>
-        <div class="text-xs text-slate-500">Corporate verified account required</div>
+    </header>
+
+    <!-- ─── THREE CORE PILLARS ─── -->
+    <section>
+      <div class="mb-4 flex items-center gap-3">
+        <hr class="flex-1 stroke-separator" />
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Core Platform Pillars</span>
+        <hr class="flex-1 stroke-separator" />
       </div>
-    </div>
-    <p class="text-sm text-slate-700 leading-relaxed mb-6">To review the specifications of this international trade ledger, please register a corporate verified account and fulfill the one-time <strong>$20 compliance and activation onboarding fee</strong>.</p>
-    <div class="flex gap-3">
-      <button onclick="document.getElementById('deals-paywall-modal').classList.add('hidden')" class="btn-secondary flex-1">Close</button>
-      <button onclick="document.getElementById('deals-paywall-modal').classList.add('hidden'); document.getElementById('btn-pay-entry')?.click();" class="btn-primary flex-1">Activate Account — $20</button>
-    </div>
-  </div>
-</div>
+      <div class="grid gap-5 lg:grid-cols-3">
 
-<!-- ═══════════════════════════════════════════════════
-     STAFF PORTAL — RBAC Login & Role-Isolated Dashboards
-═══════════════════════════════════════════════════ -->
-<section id="staff-portal" class="bg-slate-900 py-12 border-t border-slate-700">
-  <div class="max-w-5xl mx-auto px-6">
-
-    <div class="flex items-center gap-2 mb-8">
-      <div class="w-2 h-2 rounded-full bg-emerald-400 blink"></div>
-      <span class="text-slate-400 text-xs font-mono uppercase tracking-widest">Greens ACC — Staff Portal</span>
-    </div>
-
-    <!-- Login form (shown when logged out) -->
-    <div id="sp-login" class="max-w-sm mx-auto">
-      <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700">
-        <div class="text-center mb-6">
-          <div class="inline-flex items-center justify-center w-12 h-12 bg-emerald-900 rounded-xl mb-3">
-            <svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-          </div>
-          <div class="text-white font-bold text-sm">Staff Access</div>
-          <div class="text-slate-400 text-xs mt-1">Sign in with your corporate account</div>
-        </div>
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Email</label>
-          <input id="sp-email" type="email" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" placeholder="you@greens-acc.com" autocomplete="username">
-        </div>
-        <div class="mb-5">
-          <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
-          <input id="sp-password" type="password" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <button id="sp-login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-lg py-2.5 transition-colors">Sign In</button>
-        <div id="sp-login-msg" class="mt-3 text-xs text-center text-red-400 hidden"></div>
-      </div>
-    </div>
-
-    <!-- Dashboard (shown when logged in) -->
-    <div id="sp-dashboard" class="hidden">
-
-      <!-- Top bar -->
-      <div class="flex items-center justify-between mb-8 bg-slate-800 rounded-xl px-5 py-3 border border-slate-700">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 bg-emerald-700 rounded-full flex items-center justify-center text-white text-xs font-bold" id="sp-avatar">?</div>
-          <div>
-            <div class="text-white text-sm font-semibold" id="sp-username-display">Loading...</div>
-            <div class="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-700 border border-slate-600 inline-block mt-0.5" id="sp-role-badge">—</div>
-          </div>
-        </div>
-        <button id="sp-logout-btn" class="text-xs text-slate-400 hover:text-red-400 transition-colors font-semibold">Sign Out</button>
-      </div>
-
-      <!-- ── Super Admin Panel (clearance: admin) ── -->
-      <div id="sp-panel-admin" class="sp-panel hidden">
-        <div class="mb-5">
-          <div class="text-white font-bold text-base flex items-center gap-2">🔑 Super Admin — Root Control Centre</div>
-          <div class="text-slate-400 text-xs mt-1">Total platform authority, systemic toggle control, override rights.</div>
-        </div>
-        <div class="grid sm:grid-cols-3 gap-3">
-          <div class="sp-module-card">Platform Toggle Controls</div>
-          <div class="sp-module-card">User Management</div>
-          <div class="sp-module-card">Global Audit Logs</div>
-          <div class="sp-module-card">System Overrides</div>
-          <div class="sp-module-card"><a href="tokens.html" class="text-emerald-400 hover:text-emerald-300">API Token Management ↗</a></div>
-          <div class="sp-module-card">Billing Root Access</div>
-        </div>
-      </div>
-
-      <!-- ── Account Manager Panel (clearance: account_manager) ── -->
-      <div id="sp-panel-account_manager" class="sp-panel hidden">
-        <div class="mb-5">
-          <div class="text-white font-bold text-base flex items-center gap-2">📊 Account Manager — Oversight &amp; Approvals</div>
-          <div class="text-slate-400 text-xs mt-1">Executive analytics, cross-border contract authorizations, management logs &amp; manifest approval panels.</div>
-        </div>
-        <div class="grid sm:grid-cols-3 gap-3">
-          <div class="sp-module-card">Corporate Balance Sheet</div>
-          <div class="sp-module-card">Ledger Creation Tools</div>
-          <div class="sp-module-card">Trade Manifest Approvals</div>
-          <div class="sp-module-card">Accounting Audit Logs</div>
-          <div class="sp-module-card">International Trade Contracts</div>
-          <div class="sp-module-card">Client Analytics Dashboard</div>
-        </div>
-      </div>
-
-      <!-- ── Financial Manager Panel (clearance: financial_manager) ── -->
-      <div id="sp-panel-financial_manager" class="sp-panel hidden">
-        <div class="mb-5">
-          <div class="text-white font-bold text-base flex items-center gap-2">💹 Financial Manager — Macro Finance</div>
-          <div class="text-slate-400 text-xs mt-1">Master macro-financial reporting, cross-border tax configuration &amp; currency fluctuation dashboards.</div>
-        </div>
-        <div class="grid sm:grid-cols-3 gap-3">
-          <div class="sp-module-card">Macro Financial Summary</div>
-          <div class="sp-module-card">Cross-Border Tax Config</div>
-          <div class="sp-module-card">Currency Fluctuation Dashboard</div>
-          <div class="sp-module-card">Operational Cost Reports</div>
-          <div class="sp-module-card">FX Risk Metrics</div>
-          <div class="sp-module-card">Budget Projections</div>
-        </div>
-      </div>
-
-      <!-- ── Accounting Staff Panel (clearance: accounting_staff) — RESTRICTED ── -->
-      <div id="sp-panel-accounting_staff" class="sp-panel hidden">
-        <div class="mb-5">
-          <div class="text-white font-bold text-base flex items-center gap-2">📋 Accounting — Data Entry Workspace</div>
-          <div class="text-slate-400 text-xs mt-1">Individual ledger inputs, invoice processing &amp; billing records.</div>
-        </div>
-        <div class="bg-amber-900/30 border border-amber-700 rounded-xl px-4 py-3 mb-5 text-xs text-amber-300">
-          ⚠ Restricted access: global financial summaries, contract approval buttons, and management reports are not available at this clearance level.
-        </div>
-        <div class="grid sm:grid-cols-2 gap-3">
-          <div class="sp-module-card">New Invoice Entry</div>
-          <div class="sp-module-card">Individual Billing Log</div>
-          <div class="sp-module-card">Manual Ledger Input</div>
-          <div class="sp-module-card">My Submitted Records</div>
-        </div>
-      </div>
-
-      <!-- ── Software Engineer Panel (clearance: software_engineer) ── -->
-      <div id="sp-panel-software_engineer" class="sp-panel hidden">
-        <div class="mb-5">
-          <div class="text-white font-bold text-base flex items-center gap-2">⚡ Engineering Console</div>
-          <div class="text-slate-400 text-xs mt-1">Development console access, live application monitors, server telemetry, and terminal integrations.</div>
-        </div>
-        <!-- Embedded Codespaces iframe -->
-        <div class="w-full rounded-xl overflow-hidden border border-gray-700 flex flex-col" style="height:calc(100vh - 200px); min-height:480px;">
-          <div class="bg-[#202020] px-4 py-2 text-xs text-gray-400 flex justify-between items-center border-b border-gray-800 font-mono">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-green-500 blink"></span>
-              <span class="font-semibold text-gray-300">EMBEDDED CODESPACE HUB: greens-acc.com</span>
+        <!-- Pillar 1: Global B2B Meeting Room -->
+        <div class="pillar-card bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" style="border-left-color: #059669;">
+          <div class="flex items-start justify-between mb-4">
+            <div class="h-10 w-10 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#059669" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              </svg>
             </div>
-            <span class="text-gray-500 text-[10px]">BRANCH: main</span>
+            <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full font-mono">Pillar I</span>
           </div>
-          <iframe
-            src="https://github.com/codespaces/embed/altrmaze/greens-acc.com?hide_repo_header=true&theme=dark"
-            title="Integrated Development Terminal Frame"
-            class="w-full flex-grow bg-[#1e1e1e]"
-            allow="clipboard-read; clipboard-write; encrypted-media;"
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads">
-          </iframe>
+          <h2 class="text-base font-bold text-slate-900 mb-2">Global B2B Meeting Room</h2>
+          <p class="text-xs text-slate-500 leading-relaxed mb-5">Encrypted, secure video and document rooms for international B2B trade sessions. WebRTC end-to-end. Kill-switch on compliance breach.</p>
+          <hr class="stroke-separator mb-4" />
+          <div class="space-y-2 mb-5">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Your Company</label>
+              <input id="room-company-input" type="text" placeholder="e.g. Acme Trading Ltd." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+            </div>
+          </div>
+          <button id="create-meeting-room" class="w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition">
+            Launch Secure Room
+          </button>
+          <p id="room-status" class="mt-2.5 text-[10px] text-slate-400 font-mono text-center min-h-[16px]"></p>
         </div>
+
+        <!-- Pillar 2: Supply Chain Engine -->
+        <div class="pillar-card bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" style="border-left-color: #0891b2;">
+          <div class="flex items-start justify-between mb-4">
+            <div class="h-10 w-10 bg-cyan-50 border border-cyan-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#0891b2" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+              </svg>
+            </div>
+            <span class="text-[9px] font-bold text-cyan-600 uppercase tracking-widest bg-cyan-50 border border-cyan-100 px-2 py-1 rounded-full font-mono">Pillar II</span>
+          </div>
+          <h2 class="text-base font-bold text-slate-900 mb-2">Supply Chain Engine</h2>
+          <p class="text-xs text-slate-500 leading-relaxed mb-5">End-to-end shipment tracking for international commodities. Carrier assignment, milestone progression, and real-time logistics audit trail.</p>
+          <hr class="stroke-separator mb-4" />
+          <div class="space-y-2 mb-5">
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Order ID</label>
+                <input id="sc-order-id" type="text" placeholder="ORD-0001" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Carrier</label>
+                <input id="sc-carrier-id" type="text" placeholder="Optional" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Origin</label>
+                <input id="sc-origin" type="text" placeholder="e.g. Cairo, EG" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Destination</label>
+                <input id="sc-destination" type="text" placeholder="e.g. Dubai, AE" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+              </div>
+            </div>
+          </div>
+          <button id="init-shipment" class="w-full px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition">
+            Initialize Shipment
+          </button>
+          <p id="sc-status" class="mt-2.5 text-[10px] text-slate-400 font-mono text-center min-h-[16px]"></p>
+        </div>
+
+        <!-- Pillar 3: AI Legal Compliance Monitor -->
+        <div class="pillar-card bg-white border border-slate-200 rounded-2xl p-6 shadow-sm" style="border-left-color: #7c3aed;">
+          <div class="flex items-start justify-between mb-4">
+            <div class="h-10 w-10 bg-violet-50 border border-violet-200 rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#7c3aed" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.97zm-16.5 0c-.99.143-1.99.317-2.999.52m2.999-.52L5.13 15.696c-.122.499.106 1.028.589 1.202a5.989 5.989 0 002.031.352 5.989 5.989 0 002.031-.352c.483-.174.711-.703.59-1.202L5.25 4.97z" />
+              </svg>
+            </div>
+            <span class="text-[9px] font-bold text-violet-600 uppercase tracking-widest bg-violet-50 border border-violet-100 px-2 py-1 rounded-full font-mono">Pillar III</span>
+          </div>
+          <h2 class="text-base font-bold text-slate-900 mb-2">AI Legal Compliance Monitor</h2>
+          <p class="text-xs text-slate-500 leading-relaxed mb-5">OFAC, AML, KYC, and CISG-aligned contract scanning. Detects sanction violations and illegal commodities. Includes automated kill-switch and audit logging.</p>
+          <hr class="stroke-separator mb-4" />
+          <div class="space-y-2 mb-5">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Contract Text or Trade Note</label>
+              <textarea id="compliance-text-input" rows="3" placeholder="Paste contract clause, trade note, or conversation excerpt for AI compliance review..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 resize-none"></textarea>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Room / Contract ID (optional)</label>
+              <input id="compliance-room-id" type="text" placeholder="Room or Contract UUID" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800" />
+            </div>
+          </div>
+          <button id="run-compliance" class="w-full px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold uppercase tracking-widest rounded-xl transition">
+            Run AI Compliance Scan
+          </button>
+          <p id="compliance-scan-status" class="mt-2.5 text-[10px] text-slate-400 font-mono text-center min-h-[16px]"></p>
+        </div>
+
       </div>
+    </section>
 
-      <!-- ── Analyzer Panel (clearance: analyzer) ── -->
-      <div id="sp-panel-analyzer" class="sp-panel hidden">
-        <div class="mb-5">
-          <div class="text-white font-bold text-base flex items-center gap-2">🔬 Analyzing Team — Read-Only Views</div>
-          <div class="text-slate-400 text-xs mt-1">Market projection tables, predictive model histories, and general system views.</div>
-        </div>
-        <div class="grid sm:grid-cols-3 gap-3">
-          <div class="sp-module-card">Market Projection Tables</div>
-          <div class="sp-module-card">Predictive Model History</div>
-          <div class="sp-module-card">System View</div>
-          <div class="sp-module-card">Trade Analytics</div>
-          <div class="sp-module-card">Risk Dashboard</div>
-          <div class="sp-module-card">Report Archive</div>
-        </div>
-      </div>
+    <!-- ─── DEAL ACTIVATION & ESCROW LIFECYCLE ─── -->
+    <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
-      <!-- Fallback for unknown role -->
-      <div id="sp-panel-unknown" class="sp-panel hidden">
-        <div class="p-6 bg-red-900/40 border border-red-700 rounded-xl text-red-300 text-sm">
-          ⚠ Your account role is not recognized. Please contact your system administrator.
-        </div>
-      </div>
-
-    </div><!-- /sp-dashboard -->
-  </div>
-</section>
-
-<style>
-  .sp-module-card {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 12px;
-    padding: 14px 18px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #cbd5e1;
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
-  }
-  .sp-module-card:hover {
-    border-color: #10b981;
-    color: #ffffff;
-  }
-</style>
-
-<!-- ═══════════════════════════════════════════════════
-     FOOTER
-═══════════════════════════════════════════════════ -->
-<footer class="border-t border-slate-200 bg-white mt-16">
-    <div class="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div class="px-7 py-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-            <div class="flex items-center gap-2 mb-1">
-                <div class="h-7 w-7 bg-emerald-600 rounded-lg flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L4 7v10l8 4 8-4V7L12 3z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M4 7l8 4 8-4" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M12 11v10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
-                </div>
-                <span class="font-bold text-slate-900 text-sm">Greens ACC</span>
-            </div>
-            <p class="text-[11px] text-slate-400 max-w-xs">Secure global commodities trading platform. CISG-aligned, OFAC-monitored, escrow-protected.</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1">Verification Gate</p>
+          <h2 class="text-lg font-black text-slate-900">Deal Activation &amp; Escrow Lifecycle</h2>
+          <p class="text-xs text-slate-500 mt-0.5">Flat $20.00 access activation · 2% L/C brokerage commission · AI-verified safe withdrawal</p>
         </div>
-        <div class="flex flex-wrap gap-6 text-[11px] text-slate-500">
-            <div>
-                <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Platform</div>
-                <div class="space-y-1">
-                    <div><a href="#meeting-room" class="hover:text-emerald-600 transition-colors">Meeting Room</a></div>
-                    <div><a href="#supply-chain" class="hover:text-emerald-600 transition-colors">Supply Chain</a></div>
-                    <div><a href="#compliance" class="hover:text-emerald-600 transition-colors">Compliance</a></div>
-                </div>
-            </div>
-            <div>
-                <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Tools</div>
-                <div class="space-y-1">
-                    <div><a href="deal-room.html" class="hover:text-emerald-600 transition-colors">Deal Room</a></div>
-                    <div><a href="marketplace.html" class="hover:text-emerald-600 transition-colors">Marketplace</a></div>
-                    <div><a href="fulfillment.html" class="hover:text-emerald-600 transition-colors">Fulfillment</a></div>
-                    <div><a href="tokens.html" class="hover:text-emerald-600 transition-colors">API Tokens</a></div>
-                </div>
-            </div>
-            <div>
-                <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Policy</div>
-                <div class="space-y-1">
-                    <div class="text-slate-400">No sanctions violations</div>
-                    <div class="text-slate-400">OFAC / AML enforced</div>
-                    <div class="text-slate-400">No illegal commodities</div>
-                </div>
-            </div>
-            <div>
-                <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Compliance</div>
-                <div class="space-y-1">
-                    <div class="text-slate-400">CISG-Aligned</div>
-                    <div class="text-slate-400">INCOTERMS 2020</div>
-                    <div class="text-slate-400">KYC / AML Verified</div>
-                </div>
-            </div>
+        <div id="deal-lifecycle-badge" class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-semibold rounded-full border border-slate-200">
+          <span class="status-dot bg-slate-400"></span>
+          <span id="lifecycle-stage-text">Awaiting inputs</span>
         </div>
-    </div>
-    <div class="border-t border-slate-100 py-3 px-6 text-center text-[10px] text-slate-400">
-        © <span id="footer-year"></span> Greens ACC. All rights reserved. Secure enterprise trade platform.
-    </div>
-</footer>
+      </div>
 
-<!-- ═══════════════════════════════════════════════════
-     APPLICATION SCRIPT
-═══════════════════════════════════════════════════ -->
-<script>
-(function () {
+      <div class="p-7 grid gap-6 lg:grid-cols-2">
+
+        <!-- Left: Deal inputs -->
+        <div class="space-y-4">
+          <div class="rounded-xl bg-emerald-50 border border-emerald-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-[9px] font-bold text-emerald-700 uppercase tracking-widest font-mono">Entry Access Fee</p>
+                <p class="text-xl font-black text-slate-900 mt-0.5">$20.00 USD</p>
+                <p class="text-[10px] text-emerald-800 mt-0.5">One-time flat activation · separate from deal amount · non-refundable</p>
+              </div>
+              <span class="text-[9px] font-bold bg-white border border-emerald-200 text-emerald-700 px-2 py-1 rounded-full font-mono uppercase">Required first</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Deal ID *</label>
+              <input id="deal-id-input" type="text" placeholder="UUID" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 font-mono" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Buyer ID *</label>
+              <input id="buyer-id-input" type="text" placeholder="UUID" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 font-mono" />
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">Deal Amount (USD) *</label>
+              <input id="deal-amount-input" type="number" step="0.01" value="1000.00" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">L/C Reference</label>
+              <input id="lc-reference-input" type="text" placeholder="LCR-0001" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 font-mono" />
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="grid grid-cols-3 gap-2 pt-1">
+            <button id="process-entry-fee" class="px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition">Pay $20 Access</button>
+            <button id="process-handshake" class="px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition">Lock L/C + 2%</button>
+            <button id="trigger-withdrawal" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold uppercase tracking-widest rounded-xl border border-slate-200 transition">Safe Withdrawal</button>
+          </div>
+          <p class="text-[10px] text-slate-400 leading-relaxed">Withdrawal requires: entry fee paid · handshake confirmed · all 3 AI agents verified · compliance cleared.</p>
+        </div>
+
+        <!-- Right: Status grid (single canonical set) -->
+        <div class="flex flex-col gap-3">
+
+          <!-- Four status tiles -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Entry Fee</p>
+              <p id="entry-fee-status" class="text-base font-black text-slate-900">pending</p>
+              <p class="text-[10px] text-slate-400 mt-1">$20.00 flat access</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Handshake</p>
+              <p id="handshake-status" class="text-base font-black text-slate-900">pending</p>
+              <p class="text-[10px] text-slate-400 mt-1">L/C session</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Compliance</p>
+              <p id="compliance-status" class="text-base font-black text-slate-900">pending</p>
+              <p class="text-[10px] text-slate-400 mt-1">KYC / AML / OFAC</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Escrow</p>
+              <p id="escrow-status" class="text-base font-black text-slate-900">locked</p>
+              <p class="text-[10px] text-slate-400 mt-1">Fund custody</p>
+            </div>
+          </div>
+
+          <!-- AI Agents + Commission + Amount -->
+          <div class="grid grid-cols-3 gap-2">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2">AI Agents</p>
+              <div class="flex flex-col gap-1">
+                <span id="agent1-status" class="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">1 pending</span>
+                <span id="agent2-status" class="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">2 pending</span>
+                <span id="agent3-status" class="rounded-full bg-slate-100 border border-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600">3 pending</span>
+              </div>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Commission</p>
+              <p id="commission-amount" class="text-base font-black text-slate-900">$0.00</p>
+              <p class="text-[10px] text-slate-400 mt-1">2% brokerage</p>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-1.5">Deal Amount</p>
+              <p id="deal-amount-display" class="text-base font-black text-slate-900">—</p>
+              <p class="text-[10px] text-slate-400 mt-1">From input</p>
+            </div>
+          </div>
+
+          <!-- Secure trade policy -->
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2">Secure Trade Policy</p>
+            <ul class="space-y-1.5 text-[10px] text-slate-500">
+              <li class="flex items-start gap-2"><span class="status-dot bg-emerald-500 mt-0.5 flex-shrink-0"></span>All deals require KYC, AML, and compliance verification before payment.</li>
+              <li class="flex items-start gap-2"><span class="status-dot bg-emerald-500 mt-0.5 flex-shrink-0"></span>No sanctioned entities, illegal goods, or illicit financing permitted.</li>
+              <li class="flex items-start gap-2"><span class="status-dot bg-emerald-500 mt-0.5 flex-shrink-0"></span>AI monitors conversations, behavior, and handshake risk continuously.</li>
+              <li class="flex items-start gap-2"><span class="status-dot bg-emerald-500 mt-0.5 flex-shrink-0"></span>Suspicious activity is blocked, reported, and escalated for analyst review.</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── NEGOTIATION SUPPORT + AI ACTIVITY LOG ─── -->
+    <section class="grid gap-6 lg:grid-cols-2">
+
+      <!-- Secure Negotiation -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-0.5">Multilingual Negotiation Support</p>
+          <h3 class="text-base font-bold text-slate-900">Secure Negotiation Channel</h3>
+        </div>
+        <div class="p-6 space-y-4">
+          <p class="text-xs text-slate-500">AI-assisted multilingual negotiation. Each party communicates in their preferred language. Logs kept for compliance review.</p>
+          <div id="conversation-log" class="min-h-[180px] max-h-[240px] overflow-y-auto rounded-xl bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700 space-y-2">
+            <p class="text-xs text-slate-400 italic">Negotiation exchange will appear here when started.</p>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <button id="start-conversation" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition">Start Negotiation</button>
+            <button id="analyze-trade" class="px-4 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl transition">AI Trade Analysis</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-0.5">AI Monitoring</p>
+            <h3 class="text-base font-bold text-slate-900">System Activity Log</h3>
+          </div>
+          <span id="system-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full font-mono uppercase">
+            <span class="status-dot bg-emerald-500"></span>Active
+          </span>
+        </div>
+        <div class="p-6">
+          <div id="activity-log" class="min-h-[220px] max-h-[280px] overflow-y-auto rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-2 text-xs">
+            <p class="text-slate-400 italic">System activity will be logged here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── CORPORATE VERIFICATION GATE ─── -->
+    <section class="bg-white border border-amber-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="px-7 py-5 border-b border-amber-100 bg-amber-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 bg-amber-100 border border-amber-300 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#d97706" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-[9px] font-bold text-amber-700 uppercase tracking-widest font-mono">Corporate Access Required</p>
+            <h3 class="text-base font-bold text-slate-900">Protected Corporate Information Vault</h3>
+          </div>
+        </div>
+        <span class="text-[9px] font-bold bg-amber-100 border border-amber-300 text-amber-800 px-3 py-1.5 rounded-full font-mono uppercase">24-Hour KYB Review</span>
+      </div>
+      <div class="p-7 grid gap-6 sm:grid-cols-2">
+        <div>
+          <p class="text-sm text-slate-600 leading-relaxed mb-4">To unlock global trade logistics data, AI-negotiated bids, and direct bi-directional client conversations, register your corporate entity and submit documentation for a banking-grade compliance audit.</p>
+          <div class="space-y-2">
+            <div class="flex items-start gap-2 text-xs text-slate-600">
+              <span class="status-dot bg-emerald-500 mt-1 flex-shrink-0"></span>
+              <span><strong>$20.00 USD</strong> access activation fee · one-time · non-refundable</span>
+            </div>
+            <div class="flex items-start gap-2 text-xs text-slate-600">
+              <span class="status-dot bg-emerald-500 mt-1 flex-shrink-0"></span>
+              <span>Official trade registry &amp; company name submission</span>
+            </div>
+            <div class="flex items-start gap-2 text-xs text-slate-600">
+              <span class="status-dot bg-amber-400 mt-1 flex-shrink-0"></span>
+              <span><strong>24-hour mandatory period</strong> · background documentation verification</span>
+            </div>
+            <div class="flex items-start gap-2 text-xs text-slate-600">
+              <span class="status-dot bg-emerald-500 mt-1 flex-shrink-0"></span>
+              <span>AI-monitored compliance scan before corporate account activation</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col justify-between gap-4">
+          <div class="rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-600 space-y-1.5">
+            <p class="font-bold text-slate-800 mb-2">What you unlock</p>
+            <p class="flex items-center gap-2"><span class="status-dot bg-cyan-500 flex-shrink-0"></span>Live global B2B meeting rooms with document sharing</p>
+            <p class="flex items-center gap-2"><span class="status-dot bg-violet-500 flex-shrink-0"></span>Direct AI-assisted multilingual negotiation streams</p>
+            <p class="flex items-center gap-2"><span class="status-dot bg-emerald-500 flex-shrink-0"></span>Full supply chain visibility and carrier assignment</p>
+            <p class="flex items-center gap-2"><span class="status-dot bg-amber-500 flex-shrink-0"></span>Real-time AI legal compliance monitor on every trade</p>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <button class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded-xl border border-slate-200 uppercase tracking-widest transition">Register Company</button>
+            <button id="vault-pay-unlock" class="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold rounded-xl uppercase tracking-widest transition">Pay $20 &amp; Begin</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+  <footer class="border-t border-slate-200 bg-white mt-12">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <p class="text-xs text-slate-400 font-mono">Greens ACC · Secure Access &amp; Compliance Command · All trade activity monitored.</p>
+      <div class="flex items-center gap-6">
+        <div class="flex flex-col gap-1">
+          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Tools</p>
+          <div class="flex items-center gap-3">
+            <a href="deal-room.html" class="text-xs text-slate-400 hover:text-emerald-600 transition-colors">Deal Room</a>
+            <a href="marketplace.html" class="text-xs text-slate-400 hover:text-emerald-600 transition-colors">Marketplace</a>
+            <a href="fulfillment.html" class="text-xs text-slate-400 hover:text-emerald-600 transition-colors">Fulfillment</a>
+            <a href="tokens.html" class="text-xs text-slate-400 hover:text-emerald-600 transition-colors">API Tokens</a>
+          </div>
+        </div>
+      </div>
+      <p class="text-xs text-slate-400">CISG · INCOTERMS 2020 · OFAC / AML / KYC compliant infrastructure</p>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+  <script>
     'use strict';
 
-    // ── Configuration ──────────────────────────────────────────────────
-    const FUNCTION_HOST = '/supabase/functions';
-    const ENTRY_FEE_AMOUNT = 20.00;
-    const HANDSHAKE_COMMISSION_RATE = 0.02;
+    // ─── DOM REFERENCES ───────────────────────────────────────────────────────
+    const regionSelect               = document.getElementById('region-select');
+    const languageSelect             = document.getElementById('language-select');
+    const counterpartyLanguageSelect = document.getElementById('counterparty-language-select');
+    const localTimeEl                = document.getElementById('local-time');
+    const conversationLog            = document.getElementById('conversation-log');
+    const activityLog                = document.getElementById('activity-log');
+    const systemStatusBadge          = document.getElementById('system-status-badge');
+    const lifecycleStageTxt          = document.getElementById('lifecycle-stage-text');
 
-    // ── Shared portal context (read by deals grid script) ─────────────
-    window.__gaccPortal = { activated: false, dealId: '', payerId: '' };
+    // Deal inputs
+    const dealIdInput       = document.getElementById('deal-id-input');
+    const buyerIdInput      = document.getElementById('buyer-id-input');
+    const dealAmountInput   = document.getElementById('deal-amount-input');
+    const lcReferenceInput  = document.getElementById('lc-reference-input');
 
-    // ── State ──────────────────────────────────────────────────────────
-    const state = {
-        deal: {
-            entry_fee_status: 'pending',
-            handshake_status: 'pending',
-            compliance_status: 'pending',
-            escrow_status: 'locked',
-            ai_agent_status: { agent1: 'pending', agent2: 'pending', agent3: 'pending' },
-            amount_total: 0,
-            handshake_commission_amount: 0,
-            lc_reference_number: null,
-            safe_withdrawal_ready: false,
-            withdrawal_triggered: false,
-        },
-        locale: {
-            lang: 'en',
-            region: 'US',
-            userLang: 'en',
-            counterpartyLang: 'en',
-            currency: 'USD',
-            country: 'US',
-        }
+    // Action buttons
+    const btnEntryFee    = document.getElementById('process-entry-fee');
+    const btnHandshake   = document.getElementById('process-handshake');
+    const btnWithdrawal  = document.getElementById('trigger-withdrawal');
+    const btnConversation= document.getElementById('start-conversation');
+    const btnAnalyzeTrade= document.getElementById('analyze-trade');
+
+    // Pillar buttons
+    const btnCreateRoom  = document.getElementById('create-meeting-room');
+    const btnInitShipment= document.getElementById('init-shipment');
+    const btnCompliance  = document.getElementById('run-compliance');
+    const btnVaultPay    = document.getElementById('vault-pay-unlock');
+
+    // Status fields (single canonical set)
+    const entryFeeStatusEl  = document.getElementById('entry-fee-status');
+    const handshakeStatusEl = document.getElementById('handshake-status');
+    const complianceStatusEl= document.getElementById('compliance-status');
+    const escrowStatusEl    = document.getElementById('escrow-status');
+    const agent1StatusEl    = document.getElementById('agent1-status');
+    const agent2StatusEl    = document.getElementById('agent2-status');
+    const agent3StatusEl    = document.getElementById('agent3-status');
+    const commissionAmountEl= document.getElementById('commission-amount');
+    const dealAmountDisplayEl= document.getElementById('deal-amount-display');
+
+    // Pillar status messages
+    const roomStatusEl          = document.getElementById('room-status');
+    const scStatusEl            = document.getElementById('sc-status');
+    const complianceScanStatusEl= document.getElementById('compliance-scan-status');
+
+    // ─── CONSTANTS ───────────────────────────────────────────────────────────
+    const FUNCTION_HOST   = '/supabase/functions';
+    const ENTRY_FEE_AMOUNT= 20;
+
+    // ─── LOCAL STATE (updated from backend responses) ─────────────────────────
+    const dealState = {
+      entry_fee_status : 'pending',
+      handshake_status : 'pending',
+      compliance_status: 'pending',
+      escrow_status    : 'locked',
+      funds_locked     : true,
+      ai_agent_status  : { agent1: 'pending', agent2: 'pending', agent3: 'pending' }
     };
 
-    // ── Safe DOM helpers ───────────────────────────────────────────────
-    function el(id) { return document.getElementById(id); }
-    function setText(id, text) { const e = el(id); if (e) e.textContent = String(text ?? ''); }
-    function setMsg(id, text, isError) {
-        const e = el(id);
-        if (!e) return;
-        e.textContent = String(text ?? '');
-        e.style.color = isError ? '#dc2626' : '#059669';
-    }
-    function show(id) { const e = el(id); if (e) e.classList.remove('hidden'); }
-    function hide(id) { const e = el(id); if (e) e.classList.add('hidden'); }
-    function disableBtn(id) { const e = el(id); if (e) e.disabled = true; }
-    function enableBtn(id) { const e = el(id); if (e) e.disabled = false; }
+    // ─── LOCALE / LANGUAGE ───────────────────────────────────────────────────
+    const LOCALE_MAP = {
+      en: 'en-US', ar: 'ar-SA', hi: 'hi-IN',
+      pl: 'pl-PL', fr: 'fr-FR', zh: 'zh-CN'
+    };
 
-    // ── Formatting ─────────────────────────────────────────────────────
-    function formatUsd(val) {
-        const n = Number(val ?? 0);
-        return '$' + (isNaN(n) ? '0.00' : n.toFixed(2)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    }
+    const NEGOTIATION_PHRASES = {
+      en: {
+        hello    : 'Hello — the offer is ready for secure review.',
+        reply    : 'Terms confirmed. Awaiting safe closing handshake.',
+        handshake: 'Handshake acknowledged. Final decision with analyst.'
+      },
+      ar: {
+        hello    : 'مرحباً — العرض جاهز للمراجعة الآمنة.',
+        reply    : 'تم تأكيد الشروط. في انتظار المصافحة الختامية.',
+        handshake: 'تمت المصافحة. القرار النهائي مع المحلل.'
+      },
+      hi: {
+        hello    : 'नमस्ते — प्रस्ताव सुरक्षित समीक्षा के लिए तैयार है।',
+        reply    : 'शर्तें स्वीकृत। सुरक्षित समझौते की प्रतीक्षा।',
+        handshake: 'हस्तमिलाप पूर्ण। अंतिम निर्णय विश्लेषक के पास।'
+      },
+      pl: {
+        hello    : 'Cześć — oferta gotowa do bezpiecznego przeglądu.',
+        reply    : 'Warunki potwierdzone. Czekam na finalne zamknięcie.',
+        handshake: 'Uścisk dłoni zakończony. Decyzja u analityka.'
+      },
+      fr: {
+        hello    : 'Bonjour — l'offre est prête pour la révision sécurisée.',
+        reply    : 'Conditions confirmées. En attente de la clôture.',
+        handshake: 'Poignée de main terminée. Décision finale chez l'analyste.'
+      },
+      zh: {
+        hello    : '您好 — 报价已准备好供安全审核。',
+        reply    : '条款已确认。等待安全成交握手。',
+        handshake: '握手完成。最终决定现由分析师做出。'
+      }
+    };
 
-    // ── Activity Log ───────────────────────────────────────────────────
-    const LOG_MAX = 60;
-    function log(msg, type) {
-        const logEl = el('activity-log');
-        if (!logEl) return;
-        const row = document.createElement('div');
-        row.className = 'log-row slide-down';
-        const ts = document.createElement('span');
-        ts.className = 'text-slate-400 flex-shrink-0';
-        ts.textContent = new Date().toLocaleTimeString();
-        const dot = document.createElement('span');
-        dot.className = 'w-1.5 h-1.5 rounded-full flex-shrink-0 mt-0.5 ' + (
-            type === 'error' ? 'bg-red-400' :
-            type === 'success' ? 'bg-emerald-400' :
-            type === 'warning' ? 'bg-amber-400' : 'bg-slate-300'
-        );
-        const text = document.createElement('span');
-        text.className = type === 'error' ? 'text-red-700' : type === 'warning' ? 'text-amber-700' : 'text-slate-700';
-        text.textContent = msg;
-        row.appendChild(ts);
-        row.appendChild(dot);
-        row.appendChild(text);
-        logEl.insertBefore(row, logEl.firstChild);
-        while (logEl.children.length > LOG_MAX) logEl.removeChild(logEl.lastChild);
+    // ─── HELPERS ─────────────────────────────────────────────────────────────
+    function txt(el, value) {
+      if (el) el.textContent = String(value ?? '');
     }
 
-    // ── Deal Status UI ─────────────────────────────────────────────────
-    function badgeClass(val, type) {
-        if (type === 'entry_fee') {
-            if (val === 'paid' || val === 'verified') return 'badge-active';
-            if (val === 'refunded') return 'badge-warning';
-            return 'badge-pending';
-        }
-        if (type === 'handshake') {
-            if (val === 'confirmed') return 'badge-active';
-            if (val === 'rejected') return 'badge-error';
-            return 'badge-pending';
-        }
-        if (type === 'compliance') {
-            if (val === 'verified') return 'badge-active';
-            if (val === 'failed') return 'badge-error';
-            return 'badge-pending';
-        }
-        if (type === 'escrow') {
-            if (val === 'released') return 'badge-active';
-            if (val === 'cancelled') return 'badge-error';
-            if (val === 'locked') return 'badge-warning';
-            return 'badge-pending';
-        }
-        if (val === 'verified') return 'badge-active';
-        if (val === 'failed') return 'badge-error';
-        return 'badge-pending';
+    function inp(el) {
+      return typeof el?.value === 'string' ? el.value.trim() : '';
     }
 
-    function setBadge(id, label, cls) {
-        const e = el(id);
-        if (!e) return;
-        e.textContent = label;
-        e.className = 'status-badge ' + cls;
+    function num(el) {
+      const v = Number(el?.value ?? 0);
+      return Number.isFinite(v) ? v : 0;
     }
 
+    function fmtUsd(v) {
+      return '$' + Number(v).toFixed(2);
+    }
+
+    function currentLocale() {
+      return LOCALE_MAP[inp(languageSelect)] || 'en-US';
+    }
+
+    function setPillarStatus(el, message, type = 'info') {
+      if (!el) return;
+      el.textContent = message;
+      el.className = 'mt-2.5 text-[10px] font-mono text-center min-h-[16px] ' +
+        (type === 'success' ? 'text-emerald-600' :
+         type === 'error'   ? 'text-rose-600' :
+         type === 'loading' ? 'text-blue-600' :
+                              'text-slate-400');
+    }
+
+    // ─── ACTIVITY LOG ─────────────────────────────────────────────────────────
+    function appendLog(message, level = 'info') {
+      if (!activityLog) return;
+      // Clear the placeholder on first real entry
+      const placeholder = activityLog.querySelector('p.italic');
+      if (placeholder) placeholder.remove();
+
+      const entry = document.createElement('p');
+      entry.className = 'log-entry-' + level + ' leading-relaxed';
+      const formatter = new Intl.DateTimeFormat(currentLocale(), { timeStyle: 'short' });
+      const time = document.createElement('span');
+      time.className = 'font-mono text-slate-400 mr-2';
+      time.textContent = formatter.format(new Date());
+      entry.appendChild(time);
+      entry.appendChild(document.createTextNode(message));
+      activityLog.appendChild(entry);
+      activityLog.scrollTop = activityLog.scrollHeight;
+    }
+
+    // ─── CONVERSATION LOG ─────────────────────────────────────────────────────
+    function appendConversation(speaker, message) {
+      if (!conversationLog) return;
+      const placeholder = conversationLog.querySelector('p.italic');
+      if (placeholder) placeholder.remove();
+
+      const row = document.createElement('p');
+      row.className = 'text-sm leading-relaxed';
+      const speakerEl = document.createElement('strong');
+      speakerEl.className = 'text-slate-700';
+      speakerEl.textContent = speaker + ':';
+      const msgEl = document.createTextNode(' ' + message);
+      row.appendChild(speakerEl);
+      row.appendChild(msgEl);
+      conversationLog.appendChild(row);
+      conversationLog.scrollTop = conversationLog.scrollHeight;
+    }
+
+    // ─── SYSTEM STATUS BADGE ──────────────────────────────────────────────────
+    function setSystemStatus(label, type = 'active') {
+      if (!systemStatusBadge) return;
+      const dot = systemStatusBadge.querySelector('.status-dot');
+      const span = systemStatusBadge.querySelector('span:last-child');
+      if (span) span.textContent = label;
+      const colorMap = {
+        active : 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        alert  : 'bg-rose-50 text-rose-700 border-rose-200',
+        warning: 'bg-amber-50 text-amber-700 border-amber-200',
+        busy   : 'bg-blue-50 text-blue-700 border-blue-200'
+      };
+      systemStatusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 border text-[10px] font-bold rounded-full font-mono uppercase ' + (colorMap[type] || colorMap.active);
+      if (dot) dot.className = 'status-dot ' + (type === 'active' ? 'bg-emerald-500' : type === 'alert' ? 'bg-rose-500' : type === 'warning' ? 'bg-amber-500' : 'bg-blue-500');
+    }
+
+    // ─── LIFECYCLE STAGE ─────────────────────────────────────────────────────
+    function updateLifecycleStage() {
+      const s = dealState;
+      let stage = 'Awaiting inputs';
+      if (s.entry_fee_status === 'paid' && s.handshake_status !== 'confirmed') stage = 'Entry paid · awaiting handshake';
+      if (s.handshake_status === 'confirmed' && s.escrow_status === 'locked') stage = 'Handshake confirmed · escrow locked';
+      if (s.escrow_status === 'released') stage = 'Escrow released · withdrawal complete';
+      txt(lifecycleStageTxt, stage);
+    }
+
+    // ─── DEAL STATUS UI ───────────────────────────────────────────────────────
     function updateDealStatusUI() {
-        const d = state.deal;
+      txt(entryFeeStatusEl,   dealState.entry_fee_status);
+      txt(handshakeStatusEl,  dealState.handshake_status);
+      txt(complianceStatusEl, dealState.compliance_status);
+      txt(escrowStatusEl,     dealState.escrow_status);
 
-        // Status command grid
-        setBadge('status-entry-fee', capitalize(d.entry_fee_status), badgeClass(d.entry_fee_status, 'entry_fee'));
-        setBadge('status-handshake', capitalize(d.handshake_status), badgeClass(d.handshake_status, 'handshake'));
-        setBadge('status-compliance', capitalize(d.compliance_status), badgeClass(d.compliance_status, 'compliance'));
-        setBadge('status-escrow', capitalize(d.escrow_status), badgeClass(d.escrow_status, 'escrow'));
-
-        // AI agents
-        const agents = d.ai_agent_status || {};
-        setBadge('status-agent1', capitalize(agents.agent1 || 'pending'), badgeClass(agents.agent1 || 'pending', 'agent'));
-        setBadge('status-agent2', capitalize(agents.agent2 || 'pending'), badgeClass(agents.agent2 || 'pending', 'agent'));
-        setBadge('status-agent3', capitalize(agents.agent3 || 'pending'), badgeClass(agents.agent3 || 'pending', 'agent'));
-
-        // Step badges
-        setBadge('step1-badge', capitalize(d.entry_fee_status), badgeClass(d.entry_fee_status, 'entry_fee'));
-        setBadge('step2-badge', capitalize(d.handshake_status), badgeClass(d.handshake_status, 'handshake'));
-        setBadge('step3-badge', capitalize(d.compliance_status), badgeClass(d.compliance_status, 'compliance'));
-        setBadge('step4-badge', d.escrow_status === 'released' ? 'Released' : 'Locked', badgeClass(d.escrow_status, 'escrow'));
-
-        // Step card styling
-        applyStepCard('step1-card', 'step1-icon', d.entry_fee_status === 'paid' || d.entry_fee_status === 'verified');
-        applyStepCard('step2-card', 'step2-icon', d.handshake_status === 'confirmed');
-        applyStepCard('step3-card', 'step3-icon', d.compliance_status === 'verified');
-        applyStepCard('step4-card', 'step4-icon', d.escrow_status === 'released');
-
-        // Button state
-        const feePaid = d.entry_fee_status === 'paid' || d.entry_fee_status === 'verified';
-        const handshakeDone = d.handshake_status === 'confirmed';
-        const complianceDone = d.compliance_status === 'verified';
-        const allAgents = ['agent1','agent2','agent3'].every(a => (agents[a] || 'pending') === 'verified');
-
-        if (feePaid) disableBtn('btn-entry-fee'); else enableBtn('btn-entry-fee');
-        if (!feePaid || handshakeDone) disableBtn('btn-handshake'); else enableBtn('btn-handshake');
-        if (!handshakeDone || !complianceDone || !allAgents || d.withdrawal_triggered) disableBtn('btn-withdrawal');
-        else enableBtn('btn-withdrawal');
-
-        // Progress
-        let steps = 0;
-        if (feePaid) steps++;
-        if (handshakeDone) steps++;
-        if (complianceDone) steps++;
-        if (d.escrow_status === 'released') steps++;
-        setText('deal-progress-display', steps + ' / 4 steps');
-
-        // Payout summary
-        const amount = Number(d.amount_total || 0);
-        const comm = Number(d.handshake_commission_amount || 0);
-        setText('summary-deal-amount', formatUsd(amount));
-        setText('summary-commission', formatUsd(comm));
-        setText('summary-payout', formatUsd(amount - comm));
-    }
-
-    function applyStepCard(cardId, iconId, done) {
-        const card = el(cardId);
-        const icon = el(iconId);
-        if (card) {
-            card.classList.toggle('done-step', done);
-            card.classList.toggle('active-step', !done);
+      for (const [key, el] of [['agent1', agent1StatusEl], ['agent2', agent2StatusEl], ['agent3', agent3StatusEl]]) {
+        const status = dealState.ai_agent_status[key] || 'pending';
+        const num = key.replace('agent', '');
+        if (el) {
+          el.textContent = num + ' ' + status;
+          el.className = 'rounded-full px-2 py-0.5 text-[10px] font-semibold border ' +
+            (status === 'verified' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
+             status === 'rejected' ? 'bg-rose-100 text-rose-700 border-rose-200' :
+             'bg-slate-100 text-slate-600 border-slate-200');
         }
-        if (icon && done) {
-            icon.textContent = '✓';
-            icon.className = 'w-6 h-6 rounded-full border-2 border-emerald-500 bg-emerald-50 flex items-center justify-center text-xs font-bold text-emerald-600';
-        }
+      }
+
+      updateLifecycleStage();
     }
 
-    function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
-
-    // ── Apply deal record from API response ────────────────────────────
-    function applyDealRecord(deal) {
-        if (!deal) return;
-        if (deal.entry_fee_status) state.deal.entry_fee_status = deal.entry_fee_status;
-        if (deal.handshake_status) state.deal.handshake_status = deal.handshake_status;
-        if (deal.compliance_status) state.deal.compliance_status = deal.compliance_status;
-        if (deal.escrow_status) state.deal.escrow_status = deal.escrow_status;
-        if (deal.ai_agent_status) state.deal.ai_agent_status = deal.ai_agent_status;
-        if (deal.amount_total != null) state.deal.amount_total = Number(deal.amount_total);
-        if (deal.handshake_commission_amount != null) state.deal.handshake_commission_amount = Number(deal.handshake_commission_amount);
-        if (deal.lc_reference_number) state.deal.lc_reference_number = deal.lc_reference_number;
-        if (deal.safe_withdrawal_ready != null) state.deal.safe_withdrawal_ready = deal.safe_withdrawal_ready;
-        if (deal.withdrawal_triggered != null) state.deal.withdrawal_triggered = deal.withdrawal_triggered;
-        // Sync activation state for the deals grid
-        const dealId  = (el('deal-id-input')  || {}).value?.trim() || '';
-        const payerId = (el('payer-id-input') || {}).value?.trim() || '';
-        const activated = state.deal.entry_fee_status === 'paid' || state.deal.entry_fee_status === 'verified';
-        window.__gaccPortal = { activated, dealId, payerId };
-        updateDealStatusUI();
-    }
-
-    // ── API call helper ────────────────────────────────────────────────
-    async function callAPI(path, payload) {
-        const url = FUNCTION_HOST + path;
-        const resp = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const data = await resp.json().catch(() => ({}));
-        return { ok: resp.ok, status: resp.status, data };
-    }
-
-    // ── Deal Flow Handlers ─────────────────────────────────────────────
+    // ─── DEAL ACTIONS ─────────────────────────────────────────────────────────
     async function handleEntryFee() {
-        const dealId = (el('deal-id-input') || {}).value?.trim();
-        const payerId = (el('payer-id-input') || {}).value?.trim();
-        if (!dealId || !payerId) {
-            setMsg('step1-msg', 'Deal ID and Buyer/Payer ID are required.', true);
-            log('Entry fee: missing deal ID or payer ID.', 'error');
-            return;
+      const deal_id  = inp(dealIdInput);
+      const payer_id = inp(buyerIdInput);
+      if (!deal_id || !payer_id) {
+        appendLog('Entry fee: deal ID and buyer ID are required.', 'warning');
+        return;
+      }
+      appendLog('Processing $20.00 access activation fee...', 'info');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/processEntryFee`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ deal_id, payer_id, amount: ENTRY_FEE_AMOUNT, lc_reference_number: inp(lcReferenceInput) })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          appendLog('Entry fee failed: ' + (data.error || resp.statusText), 'alert');
+          return;
         }
-        disableBtn('btn-entry-fee');
-        setMsg('step1-msg', 'Processing…', false);
-        log('Processing $20.00 entry fee…', 'info');
-        try {
-            const { ok, data } = await callAPI('/processEntryFee', {
-                deal_id: dealId,
-                payer_id: payerId,
-                amount: ENTRY_FEE_AMOUNT
-            });
-            if (ok) {
-                applyDealRecord(data.deal);
-                state.deal.entry_fee_status = 'paid';
-                setMsg('step1-msg', 'Entry fee processed. Handshake unlocked.', false);
-                log('Entry fee $20.00 processed successfully.', 'success');
-            } else {
-                enableBtn('btn-entry-fee');
-                setMsg('step1-msg', data.error || 'Entry fee failed. Check deal ID.', true);
-                log('Entry fee failed: ' + (data.error || 'unknown error'), 'error');
-            }
-        } catch (e) {
-            enableBtn('btn-entry-fee');
-            setMsg('step1-msg', 'Network error. Please retry.', true);
-            log('Entry fee network error: ' + e.message, 'error');
+        // Reflect authoritative state from response if available
+        if (data.deal) {
+          dealState.entry_fee_status  = data.deal.entry_fee_status  || 'paid';
+          dealState.compliance_status = data.deal.compliance_status || 'pending';
+        } else {
+          dealState.entry_fee_status = 'paid';
         }
         updateDealStatusUI();
+        setSystemStatus('Entry Fee Paid', 'active');
+        appendLog('$20.00 access fee recorded. Deal activation unlocked.', 'success');
+      } catch (err) {
+        appendLog('Entry fee error: ' + err.message, 'alert');
+      }
     }
 
     async function handleHandshake() {
-        const dealId = (el('deal-id-input') || {}).value?.trim();
-        const payerId = (el('payer-id-input') || {}).value?.trim();
-        const amount = Number((el('deal-amount-input') || {}).value || 0);
-        const lcRef = (el('lc-reference-input') || {}).value?.trim() || null;
-        if (!dealId || !payerId || amount <= 0) {
-            setMsg('step2-msg', 'Deal ID, Payer ID, and a positive deal amount are required.', true);
-            return;
+      const deal_id  = inp(dealIdInput);
+      const payer_id = inp(buyerIdInput);
+      const amount   = num(dealAmountInput);
+      if (!deal_id || !payer_id || amount <= 0) {
+        appendLog('Handshake: deal ID, buyer ID, and a positive amount are required.', 'warning');
+        return;
+      }
+      if (dealState.entry_fee_status !== 'paid') {
+        appendLog('Handshake blocked: entry fee must be paid first.', 'warning');
+        return;
+      }
+      appendLog('Creating L/C session and locking 2% brokerage commission...', 'info');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/createHandshakeSession`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ deal_id, payer_id, amount, lc_reference_number: inp(lcReferenceInput) })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          appendLog('Handshake failed: ' + (data.error || resp.statusText), 'alert');
+          return;
         }
-        disableBtn('btn-handshake');
-        setMsg('step2-msg', 'Confirming handshake…', false);
-        log('Confirming handshake for deal ' + dealId + '…', 'info');
-        try {
-            const { ok, data } = await callAPI('/createHandshakeSession', {
-                deal_id: dealId,
-                payer_id: payerId,
-                amount,
-                lc_reference_number: lcRef
-            });
-            if (ok) {
-                applyDealRecord(data.deal);
-                if (data.commission_amount != null) state.deal.handshake_commission_amount = Number(data.commission_amount);
-                setMsg('step2-msg', 'Handshake confirmed. Compliance verified.', false);
-                log('Handshake confirmed. Commission: ' + formatUsd(data.commission_amount) + '.', 'success');
-            } else {
-                enableBtn('btn-handshake');
-                setMsg('step2-msg', data.error || 'Handshake failed.', true);
-                log('Handshake failed: ' + (data.error || 'unknown'), 'error');
-            }
-        } catch (e) {
-            enableBtn('btn-handshake');
-            setMsg('step2-msg', 'Network error. Please retry.', true);
-            log('Handshake network error: ' + e.message, 'error');
+        if (data.deal) {
+          dealState.handshake_status  = data.deal.handshake_status  || 'confirmed';
+          dealState.escrow_status     = data.deal.escrow_status     || 'locked';
+          dealState.compliance_status = data.deal.compliance_status || 'verified';
+          dealState.ai_agent_status   = data.deal.ai_agent_status   || { agent1:'verified', agent2:'verified', agent3:'verified' };
+        } else {
+          dealState.handshake_status  = 'confirmed';
+          dealState.escrow_status     = 'locked';
+          dealState.compliance_status = 'verified';
+          dealState.ai_agent_status   = { agent1:'verified', agent2:'verified', agent3:'verified' };
         }
+        txt(commissionAmountEl, fmtUsd(data.commission_amount ?? 0));
         updateDealStatusUI();
+        setSystemStatus('L/C Locked · Escrow Active', 'active');
+        appendLog('Letter of credit created. 2% brokerage commission locked in escrow.', 'success');
+        // Redirect to announcement after a short delay
+        setTimeout(() => {
+          const params = new URLSearchParams({
+            deal_id, buyer_name: payer_id, seller_name: 'Counterparty',
+            region: inp(regionSelect) || 'global',
+            lc_ref: inp(lcReferenceInput) || 'LCR-TBD',
+            amount: String(amount)
+          });
+          window.location.href = '/announce.html?' + params.toString();
+        }, 1800);
+      } catch (err) {
+        appendLog('Handshake error: ' + err.message, 'alert');
+      }
     }
 
     async function handleWithdrawal() {
-        const dealId = (el('deal-id-input') || {}).value?.trim();
-        if (!dealId) {
-            setMsg('step4-msg', 'Deal ID is required.', true);
-            return;
+      const deal_id = inp(dealIdInput);
+      if (!deal_id) {
+        appendLog('Withdrawal: deal ID is required.', 'warning');
+        return;
+      }
+      appendLog('Initiating safe withdrawal — verifying agent status and compliance...', 'info');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/processWithdrawal`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ deal_id })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          appendLog('Withdrawal rejected: ' + (data.error || resp.statusText), 'alert');
+          return;
         }
-        const confirmed = window.confirm('Release escrow and trigger withdrawal for deal ' + dealId + '?\n\nThis action cannot be undone.');
-        if (!confirmed) return;
-        disableBtn('btn-withdrawal');
-        setMsg('step4-msg', 'Releasing escrow…', false);
-        log('Triggering withdrawal / escrow release for deal ' + dealId + '…', 'warning');
-        try {
-            const { ok, data } = await callAPI('/processWithdrawal', { deal_id: dealId });
-            if (ok) {
-                applyDealRecord(data.deal);
-                state.deal.escrow_status = 'released';
-                state.deal.withdrawal_triggered = true;
-                if (data.payout_amount != null) {
-                    setMsg('step4-msg', 'Escrow released. Payout: ' + formatUsd(data.payout_amount), false);
-                    log('Escrow released. Payout amount: ' + formatUsd(data.payout_amount) + '.', 'success');
-                } else {
-                    setMsg('step4-msg', 'Escrow released.', false);
-                    log('Escrow released successfully.', 'success');
-                }
-            } else {
-                enableBtn('btn-withdrawal');
-                setMsg('step4-msg', data.error || 'Withdrawal failed.', true);
-                log('Withdrawal failed: ' + (data.error || 'unknown'), 'error');
-            }
-        } catch (e) {
-            enableBtn('btn-withdrawal');
-            setMsg('step4-msg', 'Network error. Please retry.', true);
-            log('Withdrawal network error: ' + e.message, 'error');
+        if (data.deal) {
+          dealState.escrow_status  = data.deal.escrow_status  || 'released';
+          dealState.funds_locked   = data.deal.funds_locked   ?? false;
+        } else {
+          dealState.escrow_status = 'released';
+          dealState.funds_locked  = false;
         }
         updateDealStatusUI();
+        setSystemStatus('Withdrawal Complete', 'active');
+        const payout = data.payout_amount != null ? fmtUsd(data.payout_amount) : '—';
+        appendLog('Escrow released. Net payout: ' + payout + '. LC: ' + (data.lc_reference_number || 'N/A'), 'success');
+      } catch (err) {
+        appendLog('Withdrawal error: ' + err.message, 'alert');
+      }
     }
 
-    // ── Deal amount display sync ───────────────────────────────────────
-    function syncDealAmount() {
-        const val = Number((el('deal-amount-input') || {}).value || 0);
-        const comm = val * HANDSHAKE_COMMISSION_RATE;
-        setText('deal-amount-display', formatUsd(val));
-        setText('commission-amount-display', formatUsd(comm));
-    }
-
-    // ── Meeting Room Handler ───────────────────────────────────────────
+    // ─── MEETING ROOM ─────────────────────────────────────────────────────────
     async function handleCreateRoom() {
-        const company = (el('room-creator-company') || {}).value?.trim();
-        if (!company) {
-            log('Create room: company name required.', 'error');
-            return;
+      const creator_company = inp(document.getElementById('room-company-input'));
+      if (!creator_company) {
+        setPillarStatus(roomStatusEl, 'Enter your company name.', 'error');
+        return;
+      }
+      setPillarStatus(roomStatusEl, 'Creating encrypted room...', 'loading');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/generateInstantRoom`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ creator_company })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          setPillarStatus(roomStatusEl, 'Error: ' + (data.error || resp.statusText), 'error');
+          appendLog('Meeting room creation failed: ' + (data.error || resp.statusText), 'alert');
+          return;
         }
-        disableBtn('btn-create-room');
-        log('Generating encrypted meeting room for ' + company + '…', 'info');
-        try {
-            const participantEmail = (el('room-participant-email') || {}).value?.trim() || null;
-            const { ok, data } = await callAPI('/generateInstantRoom', {
-                creator_company: company,
-                participant_email: participantEmail
-            });
-            if (ok && data.room) {
-                const room = data.room;
-                setText('room-token-display', room.room_token || '');
-                setText('room-name-display', room.room_name || '');
-                setText('room-expires-display', room.expires_at ? new Date(room.expires_at).toLocaleString() : '24h');
-                const joinLink = el('room-join-link');
-                if (joinLink) joinLink.href = 'meeting.html?token=' + encodeURIComponent(room.room_token || '');
-                show('room-result');
-                log('Meeting room created: ' + (room.room_name || room.room_token) + '.', 'success');
-            } else {
-                log('Room creation failed: ' + (data.error || 'unknown'), 'error');
-            }
-        } catch (e) {
-            log('Room creation network error: ' + e.message, 'error');
+        setPillarStatus(roomStatusEl, 'Room created — redirecting...', 'success');
+        appendLog('Secure meeting room created. Token: ' + (data.room_token || '—'), 'success');
+        if (data.share_link) {
+          setTimeout(() => { window.location.href = data.share_link; }, 1200);
         }
-        enableBtn('btn-create-room');
+      } catch (err) {
+        setPillarStatus(roomStatusEl, 'Network error.', 'error');
+        appendLog('Meeting room error: ' + err.message, 'alert');
+      }
     }
 
-    // ── Supply Chain Handlers ──────────────────────────────────────────
+    // ─── SUPPLY CHAIN ─────────────────────────────────────────────────────────
     async function handleInitShipment() {
-        const orderId = (el('sc-order-id') || {}).value?.trim();
-        const origin = (el('sc-origin') || {}).value?.trim();
-        const destination = (el('sc-destination') || {}).value?.trim();
-        const carrier = (el('sc-carrier') || {}).value?.trim() || null;
-        if (!orderId || !origin || !destination) {
-            setMsg('sc-init-msg', 'Order ID, origin, and destination are required.', true);
-            return;
+      const order_id   = inp(document.getElementById('sc-order-id'));
+      const origin     = inp(document.getElementById('sc-origin'));
+      const destination= inp(document.getElementById('sc-destination'));
+      const carrier_id = inp(document.getElementById('sc-carrier-id'));
+      if (!order_id || !origin || !destination) {
+        setPillarStatus(scStatusEl, 'Order ID, origin, and destination required.', 'error');
+        return;
+      }
+      setPillarStatus(scStatusEl, 'Initializing shipment record...', 'loading');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/supplyChainCoordinator`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ action: 'init_shipment', order_id, carrier_id, origin, destination })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          setPillarStatus(scStatusEl, 'Error: ' + (data.error || resp.statusText), 'error');
+          appendLog('Shipment init failed: ' + (data.error || resp.statusText), 'alert');
+          return;
         }
-        disableBtn('btn-init-shipment');
-        setMsg('sc-init-msg', 'Initializing shipment…', false);
-        log('Initializing supply chain for order ' + orderId + '…', 'info');
-        try {
-            const { ok, data } = await callAPI('/supplyChainCoordinator', {
-                action: 'init_shipment',
-                order_id: orderId,
-                carrier_id: carrier,
-                origin,
-                destination
-            });
-            if (ok && data.tracking_record) {
-                const tr = data.tracking_record;
-                setText('sc-tracking-id', tr.id || '');
-                setText('sc-milestone', tr.current_milestone || '');
-                setText('sc-transit-status', tr.transit_status || '');
-                show('sc-result');
-                setMsg('sc-init-msg', 'Shipment initialized successfully.', false);
-                log('Shipment initialized: ' + orderId + ' → tracking ' + (tr.id || 'new').substring(0, 8) + '…', 'success');
-            } else {
-                setMsg('sc-init-msg', data.error || 'Initialization failed.', true);
-                log('Shipment init failed: ' + (data.error || 'unknown'), 'error');
-            }
-        } catch (e) {
-            setMsg('sc-init-msg', 'Network error. Please retry.', true);
-            log('Shipment init error: ' + e.message, 'error');
+        const tracking = data.tracking_record;
+        setPillarStatus(scStatusEl, 'Manifest created · ' + (tracking?.id?.substring(0, 8) || '—'), 'success');
+        appendLog('Shipment initialized. Order: ' + order_id + ' | Route: ' + origin + ' → ' + destination, 'success');
+      } catch (err) {
+        setPillarStatus(scStatusEl, 'Network error.', 'error');
+        appendLog('Supply chain error: ' + err.message, 'alert');
+      }
+    }
+
+    // ─── AI COMPLIANCE SCAN ───────────────────────────────────────────────────
+    async function handleComplianceScan() {
+      const conversation_text = inp(document.getElementById('compliance-text-input'));
+      const room_id           = inp(document.getElementById('compliance-room-id'));
+      if (!conversation_text) {
+        setPillarStatus(complianceScanStatusEl, 'Enter contract text or trade note.', 'error');
+        return;
+      }
+      // room_id is required by aiComplianceLawyer; use a placeholder if blank
+      const effectiveRoomId = room_id || '00000000-0000-0000-0000-000000000000';
+      setPillarStatus(complianceScanStatusEl, 'Scanning for OFAC, AML, KYC violations...', 'loading');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/aiComplianceLawyer`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ room_id: effectiveRoomId, conversation_text })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          setPillarStatus(complianceScanStatusEl, 'Error: ' + (data.error || resp.statusText), 'error');
+          appendLog('Compliance scan failed: ' + (data.error || resp.statusText), 'alert');
+          return;
         }
-        enableBtn('btn-init-shipment');
-    }
-
-    async function handleAdvanceMilestone() {
-        const trackingId = (el('sc-adv-tracking-id') || {}).value?.trim();
-        const milestone = (el('sc-adv-milestone') || {}).value;
-        const summary = (el('sc-adv-summary') || {}).value?.trim() || null;
-        if (!trackingId || !milestone) {
-            setMsg('sc-adv-msg', 'Tracking ID and milestone are required.', true);
-            return;
+        if (data.kill_switch_triggered) {
+          setPillarStatus(complianceScanStatusEl, '⚠ Critical violation detected — kill switch triggered.', 'error');
+          setSystemStatus('Kill Switch Triggered', 'alert');
+          appendLog('CRITICAL: Compliance kill switch triggered. ' + (data.kill_switch_reason || ''), 'alert');
+          const violations = Array.isArray(data.violations) ? data.violations : [];
+          violations.forEach(v => appendLog('Violation: ' + v.type + ' — ' + v.description, 'alert'));
+        } else {
+          const count = Array.isArray(data.violations) ? data.violations.length : 0;
+          setPillarStatus(complianceScanStatusEl, count === 0 ? 'Compliant — no violations found.' : count + ' issue(s) flagged.', count === 0 ? 'success' : 'loading');
+          appendLog('Compliance scan complete. Violations: ' + count + '. Legal frameworks applied: ' + (data.legal_frameworks_applied?.length || 0), count === 0 ? 'success' : 'warning');
+          if (Array.isArray(data.violations)) {
+            data.violations.forEach(v => appendLog('Flag: ' + v.type + ' [' + v.severity + '] — ' + v.description, 'warning'));
+          }
         }
-        disableBtn('btn-advance-milestone');
-        setMsg('sc-adv-msg', 'Advancing milestone…', false);
-        log('Advancing shipment ' + trackingId.substring(0, 8) + '… to ' + milestone, 'info');
-        try {
-            const { ok, data } = await callAPI('/supplyChainCoordinator', {
-                action: 'advance_milestone',
-                tracking_id: trackingId,
-                milestone,
-                summary
-            });
-            if (ok) {
-                setMsg('sc-adv-msg', 'Milestone advanced to: ' + milestone, false);
-                log('Milestone advanced: ' + milestone, 'success');
-            } else {
-                setMsg('sc-adv-msg', data.error || 'Advance failed.', true);
-                log('Milestone advance failed: ' + (data.error || 'unknown'), 'error');
-            }
-        } catch (e) {
-            setMsg('sc-adv-msg', 'Network error. Please retry.', true);
-            log('Milestone advance error: ' + e.message, 'error');
-        }
-        enableBtn('btn-advance-milestone');
-    }
-
-    // ── Compliance Audit Handler ───────────────────────────────────────
-    async function handleComplianceAudit() {
-        const text = (el('compliance-text') || {}).value?.trim();
-        if (!text) {
-            setMsg('compliance-msg', 'Contract text is required.', true);
-            return;
-        }
-        const contractId = (el('compliance-contract-id') || {}).value?.trim() || null;
-        disableBtn('btn-compliance-audit');
-        setMsg('compliance-msg', 'Running AI compliance audit…', false);
-        log('Running AI compliance audit…', 'info');
-        try {
-            const { ok, data } = await callAPI('/auditContractCompliance', {
-                contract_id: contractId,
-                text
-            });
-            if (ok) {
-                const report = data.report || data;
-                hide('compliance-result-empty');
-                show('compliance-result');
-                const compliant = report.compliant === true;
-                setBadge('compliance-verdict',
-                    compliant ? 'Compliant' : 'Issues Found',
-                    compliant ? 'badge-active' : 'badge-warning'
-                );
-                // Discrepancies
-                const discEl = el('compliance-discrepancies');
-                if (discEl) {
-                    discEl.textContent = '';
-                    const items = Array.isArray(report.discrepancies) ? report.discrepancies : [];
-                    if (items.length === 0) {
-                        const li = document.createElement('li');
-                        li.textContent = 'No discrepancies detected.';
-                        li.className = 'text-emerald-700';
-                        discEl.appendChild(li);
-                    } else {
-                        items.forEach(d => {
-                            const li = document.createElement('li');
-                            li.className = 'flex items-start gap-1.5';
-                            const dot = document.createElement('span');
-                            dot.className = 'w-1.5 h-1.5 bg-amber-400 rounded-full mt-1 flex-shrink-0';
-                            const span = document.createElement('span');
-                            span.textContent = d;
-                            li.appendChild(dot);
-                            li.appendChild(span);
-                            discEl.appendChild(li);
-                        });
-                    }
-                }
-                // Recommendations
-                const recEl = el('compliance-recommendations');
-                if (recEl) {
-                    recEl.textContent = '';
-                    const recs = Array.isArray(report.recommended_clauses) ? report.recommended_clauses : [];
-                    if (recs.length === 0) {
-                        const li = document.createElement('li');
-                        li.textContent = 'No additional clauses recommended.';
-                        li.className = 'text-slate-400';
-                        recEl.appendChild(li);
-                    } else {
-                        recs.forEach(r => {
-                            const li = document.createElement('li');
-                            li.className = 'flex items-start gap-1.5';
-                            const dot = document.createElement('span');
-                            dot.className = 'w-1.5 h-1.5 bg-emerald-400 rounded-full mt-1 flex-shrink-0';
-                            const span = document.createElement('span');
-                            span.textContent = r;
-                            li.appendChild(dot);
-                            li.appendChild(span);
-                            recEl.appendChild(li);
-                        });
-                    }
-                }
-                // Frameworks
-                const fwEl = el('compliance-frameworks');
-                if (fwEl && Array.isArray(report.applied_frameworks)) {
-                    fwEl.textContent = report.applied_frameworks.join(' · ');
-                }
-                setMsg('compliance-msg', compliant ? 'Audit complete — compliant.' : 'Audit complete — issues found.', false);
-                log('Compliance audit complete. Status: ' + (compliant ? 'COMPLIANT' : 'ISSUES FOUND'), compliant ? 'success' : 'warning');
-            } else {
-                setMsg('compliance-msg', data.error || 'Audit failed.', true);
-                log('Compliance audit failed: ' + (data.error || 'unknown'), 'error');
-            }
-        } catch (e) {
-            setMsg('compliance-msg', 'Network error. Please retry.', true);
-            log('Compliance audit error: ' + e.message, 'error');
-        }
-        enableBtn('btn-compliance-audit');
-    }
-
-    // ── Locale Sync ────────────────────────────────────────────────────
-    function syncLocale() {
-        const lang = (el('locale-lang') || {}).value || 'en';
-        const region = (el('locale-region') || {}).value || 'US';
-        const userLang = (el('locale-user-lang') || {}).value || 'en';
-        const cpLang = (el('locale-counterparty-lang') || {}).value || 'en';
-        const currency = (el('locale-currency') || {}).value || 'USD';
-        const country = (el('locale-deal-country') || {}).value || 'US';
-
-        state.locale = { lang, region, userLang, counterpartyLang: cpLang, currency, country };
-
-        // Sync nav locale to user-lang select
-        const localeLangEl = el('locale-lang');
-        const userLangEl = el('locale-user-lang');
-        if (localeLangEl && userLangEl && localeLangEl.value !== userLangEl.value) {
-            // nav lang change → sync user-lang
-        }
-
-        setText('locale-region-display', region);
-        setText('locale-lang-display', userLang.toUpperCase());
-        setText('locale-cp-display', cpLang.toUpperCase());
-    }
-
-    function updateTime() {
-        const now = new Date();
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        setText('nav-time', timeStr);
-        setText('nav-timezone', tz.split('/')[1] || tz);
-        setText('locale-time-display', now.toLocaleString());
-    }
-
-    // ── Clear Log ──────────────────────────────────────────────────────
-    function clearLog() {
-        const logEl = el('activity-log');
-        if (logEl) logEl.textContent = '';
-        log('Activity log cleared.', 'info');
-    }
-
-    // ── Event Bindings ─────────────────────────────────────────────────
-    function bindClick(id, fn) {
-        const e = el(id);
-        if (e) e.addEventListener('click', fn);
-    }
-    function bindInput(id, fn) {
-        const e = el(id);
-        if (e) e.addEventListener('input', fn);
-    }
-    function bindChange(id, fn) {
-        const e = el(id);
-        if (e) e.addEventListener('change', fn);
-    }
-
-    // ── Init ──────────────────────────────────────────────────────────
-    window.addEventListener('DOMContentLoaded', function () {
-        // Footer year
-        setText('footer-year', new Date().getFullYear());
-
-        // Time
-        updateTime();
-        setInterval(updateTime, 30000);
-
-        // Initial state render
+        dealState.compliance_status = data.kill_switch_triggered ? 'failed' : (data.violations?.length ? 'pending' : 'verified');
         updateDealStatusUI();
-        syncLocale();
-
-        // Deal amount sync
-        bindInput('deal-amount-input', syncDealAmount);
-
-        // Deal flow
-        bindClick('btn-entry-fee', handleEntryFee);
-        bindClick('btn-handshake', handleHandshake);
-        bindClick('btn-withdrawal', handleWithdrawal);
-
-        // Meeting room
-        bindClick('btn-create-room', handleCreateRoom);
-
-        // Supply chain
-        bindClick('btn-init-shipment', handleInitShipment);
-        bindClick('btn-advance-milestone', handleAdvanceMilestone);
-
-        // Compliance
-        bindClick('btn-compliance-audit', handleComplianceAudit);
-
-        // Log
-        bindClick('btn-clear-log', clearLog);
-
-        // Locale
-        bindChange('locale-lang', function() {
-            const e = el('locale-user-lang');
-            const v = (el('locale-lang') || {}).value;
-            if (e && v) e.value = v;
-            syncLocale();
-        });
-        bindChange('locale-region', syncLocale);
-        bindChange('locale-user-lang', function() {
-            const e = el('locale-lang');
-            const v = (el('locale-user-lang') || {}).value;
-            if (e && v) e.value = v;
-            syncLocale();
-        });
-        bindChange('locale-counterparty-lang', syncLocale);
-        bindChange('locale-currency', syncLocale);
-        bindChange('locale-deal-country', syncLocale);
-
-        // Welcome log entries
-        log('Greens ACC platform initialized.', 'success');
-        log('System integrity check complete. All engines operational.', 'success');
-        log('Secure trade policy enforced: no sanctions, no illegal commodities, full AML/KYC.', 'warning');
-    });
-
-log('Secure trade policy enforced: no sanctions, no illegal commodities, full AML/KYC.', 'warning');
-    });
-
-})();
-</script>
-
-<!-- ═══════════════════════════════════════════════════
-     MARKET CLOCKS SCRIPT
-═══════════════════════════════════════════════════ -->
-<script>
-(function () {
-  'use strict';
-
-  const TRADING_CENTERS = [
-    { id: 'clock-ny',   city: 'New York',   tz: 'America/New_York',  label: 'EST/EDT', flag: '🇺🇸', color: '#10b981' },
-    { id: 'clock-ldn',  city: 'London',     tz: 'Europe/London',     label: 'GMT/BST', flag: '🇬🇧', color: '#3b82f6' },
-    { id: 'clock-fra',  city: 'Frankfurt',  tz: 'Europe/Berlin',     label: 'CET/CEST',flag: '🇩🇪', color: '#f59e0b' },
-    { id: 'clock-tky',  city: 'Tokyo',      tz: 'Asia/Tokyo',        label: 'JST',     flag: '🇯🇵', color: '#ef4444' },
-  ];
-
-  const grid = document.getElementById('clocks-grid');
-  if (!grid) return;
-
-  // Build clock cards
-  TRADING_CENTERS.forEach(function (tc) {
-    const card = document.createElement('div');
-    card.className = 'rounded-2xl p-4 flex flex-col items-center gap-2';
-    card.style.background = '#1e293b';
-    card.style.border = '1px solid #334155';
-
-    // SVG clock face
-    const svgNS = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('viewBox', '0 0 64 64');
-    svg.setAttribute('width', '64');
-    svg.setAttribute('height', '64');
-
-    const circle = document.createElementNS(svgNS, 'circle');
-    circle.setAttribute('cx', '32'); circle.setAttribute('cy', '32'); circle.setAttribute('r', '30');
-    circle.setAttribute('fill', '#0f172a'); circle.setAttribute('stroke', tc.color); circle.setAttribute('stroke-width', '2');
-    svg.appendChild(circle);
-
-    // Hour markers
-    for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * 2 * Math.PI - Math.PI / 2;
-      const tick = document.createElementNS(svgNS, 'line');
-      const r1 = 26, r2 = 29;
-      tick.setAttribute('x1', String(32 + r1 * Math.cos(angle)));
-      tick.setAttribute('y1', String(32 + r1 * Math.sin(angle)));
-      tick.setAttribute('x2', String(32 + r2 * Math.cos(angle)));
-      tick.setAttribute('y2', String(32 + r2 * Math.sin(angle)));
-      tick.setAttribute('stroke', '#475569'); tick.setAttribute('stroke-width', '1.5');
-      svg.appendChild(tick);
-    }
-
-    // Hour hand
-    const hourHand = document.createElementNS(svgNS, 'line');
-    hourHand.setAttribute('id', tc.id + '-h');
-    hourHand.setAttribute('x1', '32'); hourHand.setAttribute('y1', '32');
-    hourHand.setAttribute('stroke', '#f8fafc'); hourHand.setAttribute('stroke-width', '3');
-    hourHand.setAttribute('stroke-linecap', 'round');
-    svg.appendChild(hourHand);
-
-    // Minute hand
-    const minHand = document.createElementNS(svgNS, 'line');
-    minHand.setAttribute('id', tc.id + '-m');
-    minHand.setAttribute('x1', '32'); minHand.setAttribute('y1', '32');
-    minHand.setAttribute('stroke', '#94a3b8'); minHand.setAttribute('stroke-width', '2');
-    minHand.setAttribute('stroke-linecap', 'round');
-    svg.appendChild(minHand);
-
-    // Second hand
-    const secHand = document.createElementNS(svgNS, 'line');
-    secHand.setAttribute('id', tc.id + '-s');
-    secHand.setAttribute('x1', '32'); secHand.setAttribute('y1', '32');
-    secHand.setAttribute('stroke', tc.color); secHand.setAttribute('stroke-width', '1.5');
-    secHand.setAttribute('stroke-linecap', 'round');
-    svg.appendChild(secHand);
-
-    // Center dot
-    const dot = document.createElementNS(svgNS, 'circle');
-    dot.setAttribute('cx', '32'); dot.setAttribute('cy', '32'); dot.setAttribute('r', '2');
-    dot.setAttribute('fill', tc.color);
-    svg.appendChild(dot);
-
-    card.appendChild(svg);
-
-    const cityLabel = document.createElement('div');
-    cityLabel.className = 'text-white text-xs font-bold mt-1';
-    cityLabel.textContent = tc.flag + ' ' + tc.city;
-    card.appendChild(cityLabel);
-
-    const tzLabel = document.createElement('div');
-    tzLabel.className = 'font-mono text-xs';
-    tzLabel.style.color = tc.color;
-    tzLabel.setAttribute('id', tc.id + '-digital');
-    tzLabel.textContent = '--:--:--';
-    card.appendChild(tzLabel);
-
-    const tzCode = document.createElement('div');
-    tzCode.className = 'text-slate-500 text-[10px]';
-    tzCode.textContent = tc.label;
-    card.appendChild(tzCode);
-
-    grid.appendChild(card);
-  });
-
-  function updateClocks() {
-    const now = Date.now();
-    TRADING_CENTERS.forEach(function (tc) {
-      const d = new Date(new Date().toLocaleString('en-US', { timeZone: tc.tz }));
-      const h = d.getHours() % 12;
-      const m = d.getMinutes();
-      const s = d.getSeconds();
-
-      const hAngle = ((h + m / 60) / 12) * 2 * Math.PI - Math.PI / 2;
-      const mAngle = ((m + s / 60) / 60) * 2 * Math.PI - Math.PI / 2;
-      const sAngle = (s / 60) * 2 * Math.PI - Math.PI / 2;
-
-      function setHand(idSuffix, angle, length) {
-        const el = document.getElementById(tc.id + idSuffix);
-        if (!el) return;
-        el.setAttribute('x2', String(32 + length * Math.cos(angle)));
-        el.setAttribute('y2', String(32 + length * Math.sin(angle)));
+      } catch (err) {
+        setPillarStatus(complianceScanStatusEl, 'Network error.', 'error');
+        appendLog('Compliance scan error: ' + err.message, 'alert');
       }
-
-      setHand('-h', hAngle, 16);
-      setHand('-m', mAngle, 22);
-      setHand('-s', sAngle, 24);
-
-      const digital = document.getElementById(tc.id + '-digital');
-      if (digital) {
-        const hh = String(d.getHours()).padStart(2, '0');
-        const mm = String(m).padStart(2, '0');
-        const ss = String(s).padStart(2, '0');
-        digital.textContent = hh + ':' + mm + ':' + ss;
-      }
-    });
-  }
-
-  updateClocks();
-  setInterval(updateClocks, 1000);
-})();
-</script>
-
-<!-- ═══════════════════════════════════════════════════
-     MARKET FEEDS SCRIPT
-═══════════════════════════════════════════════════ -->
-<script>
-(function () {
-  'use strict';
-
-  const TRADE_HEADLINES = [
-    { title: 'Red Sea shipping diversions add 14 days to Asia–Europe transit times', src: 'Lloyd\'s List', time: '2h ago', tag: 'Maritime' },
-    { title: 'ASEAN free-trade bloc finalises new rules of origin for electronics exports', src: 'Trade Finance Global', time: '4h ago', tag: 'Trade Policy' },
-    { title: 'Container spot rates from Shanghai to Rotterdam rise 8% week-on-week', src: 'Freightos Baltic Index', time: '5h ago', tag: 'Freight' },
-    { title: 'India tightens steel import duties following WTO safeguard review', src: 'Metal Bulletin', time: '6h ago', tag: 'Commodities' },
-    { title: 'Port of Rotterdam reports record TEU throughput for Q2', src: 'Port of Rotterdam', time: '8h ago', tag: 'Logistics' },
-    { title: 'WTO: Global merchandise trade volumes forecast to grow 2.7% in 2025', src: 'WTO News', time: '10h ago', tag: 'Macro' },
-    { title: 'Lithium carbonate prices rebound as EV battery demand accelerates', src: 'Benchmark Mineral', time: '11h ago', tag: 'Supply Chain' },
-    { title: 'IMF raises emerging-market trade outlook amid currency stabilisation', src: 'IMF Bulletin', time: '12h ago', tag: 'Finance' },
-  ];
-
-  // Strict exclusion: no fuel/diesel commodities
-  const MARKET_TICKERS = [
-    { sym: 'S&P 500',    val: 5432.10, chg: +0.42, type: 'index' },
-    { sym: 'FTSE 100',   val: 8291.40, chg: -0.18, type: 'index' },
-    { sym: 'DAX 40',     val: 18847.30,chg: +0.61, type: 'index' },
-    { sym: 'Nikkei 225', val: 38754.00,chg: +1.02, type: 'index' },
-    { sym: 'BTC/USD',    val: 67420.00,chg: +2.31, type: 'crypto' },
-    { sym: 'ETH/USD',    val: 3581.50, chg: +1.87, type: 'crypto' },
-    { sym: 'XAU/USD',    val: 2341.80, chg: -0.09, type: 'commodity' },
-    { sym: 'EUR/USD',    val: 1.0842,  chg: +0.11, type: 'forex' },
-    { sym: 'USD/JPY',    val: 157.23,  chg: -0.24, type: 'forex' },
-  ];
-
-  // Simulate live price drift
-  function drift(tickers) {
-    return tickers.map(function (t) {
-      const delta = (Math.random() - 0.49) * 0.3;
-      return Object.assign({}, t, {
-        val: +(t.val * (1 + delta / 100)).toFixed(t.val > 1000 ? 2 : t.val > 100 ? 3 : 4),
-        chg: +(t.chg + (Math.random() - 0.5) * 0.05).toFixed(2)
-      });
-    });
-  }
-
-  let liveTickers = MARKET_TICKERS.slice();
-
-  function renderTradeFeeds() {
-    const list = document.getElementById('trade-feed-list');
-    if (!list || list.children.length > 0) return;
-    TRADE_HEADLINES.forEach(function (item) {
-      const card = document.createElement('div');
-      card.className = 'card p-4 hover:shadow-md transition-shadow cursor-default';
-      const tag = document.createElement('span');
-      tag.className = 'tag tag-green text-[10px] mb-2 inline-block';
-      tag.textContent = item.tag;
-      const title = document.createElement('div');
-      title.className = 'text-sm font-semibold text-slate-800 leading-snug mb-2';
-      title.textContent = item.title;
-      const meta = document.createElement('div');
-      meta.className = 'text-[11px] text-slate-400 flex gap-2';
-      const srcEl = document.createElement('span');
-      srcEl.textContent = item.src;
-      const timeEl = document.createElement('span');
-      timeEl.textContent = '· ' + item.time;
-      meta.appendChild(srcEl);
-      meta.appendChild(timeEl);
-      card.appendChild(tag);
-      card.appendChild(title);
-      card.appendChild(meta);
-      list.appendChild(card);
-    });
-  }
-
-  function renderMarketTickers() {
-    const list = document.getElementById('market-ticker-list');
-    if (!list) return;
-    list.innerHTML = '';
-    liveTickers.forEach(function (t) {
-      const card = document.createElement('div');
-      card.className = 'card p-4';
-      const sym = document.createElement('div');
-      sym.className = 'text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1';
-      sym.textContent = t.sym;
-      const val = document.createElement('div');
-      val.className = 'text-base font-bold text-slate-900 tabular-nums';
-      val.textContent = t.val.toLocaleString('en-US');
-      const chg = document.createElement('div');
-      const positive = t.chg >= 0;
-      chg.className = 'text-xs font-semibold ' + (positive ? 'text-emerald-600' : 'text-red-600');
-      chg.textContent = (positive ? '▲ +' : '▼ ') + t.chg + '%';
-      card.appendChild(sym);
-      card.appendChild(val);
-      card.appendChild(chg);
-      list.appendChild(card);
-    });
-  }
-
-  // Tab switching
-  document.querySelectorAll('.feeds-tab').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      const tab = btn.dataset.tab;
-      document.querySelectorAll('.feeds-tab').forEach(function (b) {
-        b.classList.remove('border-emerald-600', 'text-emerald-700', 'bg-emerald-50');
-        b.classList.add('border-transparent', 'text-slate-500');
-      });
-      btn.classList.add('border-emerald-600', 'text-emerald-700', 'bg-emerald-50');
-      btn.classList.remove('border-transparent', 'text-slate-500');
-      document.querySelectorAll('.feeds-panel').forEach(function (p) { p.classList.add('hidden'); });
-      const panel = document.getElementById('feeds-' + tab);
-      if (panel) panel.classList.remove('hidden');
-      if (tab === 'markets') renderMarketTickers();
-    });
-  });
-
-  renderTradeFeeds();
-
-  // Live ticker refresh every 4 seconds
-  setInterval(function () {
-    liveTickers = drift(liveTickers);
-    const marketsPanel = document.getElementById('feeds-markets');
-    if (marketsPanel && !marketsPanel.classList.contains('hidden')) {
-      renderMarketTickers();
     }
-  }, 4000);
-})();
-</script>
 
-<!-- ═══════════════════════════════════════════════════
-     DEALS GRID SCRIPT
-═══════════════════════════════════════════════════ -->
-<script>
-(function () {
-  'use strict';
-
-  const DEMO_DEALS = [
-    { ref: 'TL-2025-001', commodity: 'Organic Wheat — 2,400 MT', origin: 'Ukraine → Egypt', value: '$1.92M', incoterm: 'CIF Alexandria', status: 'Active', category: 'agri' },
-    { ref: 'TL-2025-002', commodity: 'Green Coffee Beans — 480 MT', origin: 'Ethiopia → Germany', value: '$864K', incoterm: 'FOB Djibouti', status: 'Negotiating', category: 'agri' },
-    { ref: 'TL-2025-003', commodity: 'Cotton Bale — 900 MT', origin: 'Uzbekistan → Bangladesh', value: '$1.17M', incoterm: 'CFR Chittagong', status: 'Active', category: 'agri' },
-    { ref: 'TL-2025-004', commodity: 'Copper Cathode — 600 MT', origin: 'Zambia → China', value: '$5.4M', incoterm: 'CIF Shanghai', status: 'Under Review', category: 'metals' },
-    { ref: 'TL-2025-005', commodity: 'Frozen Chicken — 1,200 MT', origin: 'Brazil → Saudi Arabia', value: '$2.16M', incoterm: 'CIF Jeddah', status: 'Active', category: 'food' },
-    { ref: 'TL-2025-006', commodity: 'Hardwood Timber — 320 CBM', origin: 'Malaysia → UAE', value: '$448K', incoterm: 'FOB Port Klang', status: 'Negotiating', category: 'timber' },
-  ];
-
-  const grid = document.getElementById('deals-locked-grid');
-  const modal = document.getElementById('deals-paywall-modal');
-  if (!grid) return;
-
-  DEMO_DEALS.forEach(function (deal) {
-    const card = document.createElement('div');
-    card.className = 'card p-5 relative overflow-hidden cursor-pointer group';
-    card.style.userSelect = 'none';
-
-    // Blurred content layer
-    const blur = document.createElement('div');
-    blur.className = 'filter blur-sm group-hover:blur-md transition-all duration-200 pointer-events-none select-none';
-
-    const ref = document.createElement('div');
-    ref.className = 'text-[10px] font-mono text-slate-400 mb-2';
-    ref.textContent = deal.ref;
-
-    const commodity = document.createElement('div');
-    commodity.className = 'text-sm font-bold text-slate-900 mb-1';
-    commodity.textContent = deal.commodity;
-
-    const origin = document.createElement('div');
-    origin.className = 'text-xs text-slate-500 mb-3';
-    origin.textContent = '📍 ' + deal.origin;
-
-    const row = document.createElement('div');
-    row.className = 'flex items-center justify-between';
-
-    const val = document.createElement('span');
-    val.className = 'text-sm font-bold text-emerald-700';
-    val.textContent = deal.value;
-
-    const inco = document.createElement('span');
-    inco.className = 'tag';
-    inco.textContent = deal.incoterm;
-
-    row.appendChild(val);
-    row.appendChild(inco);
-
-    blur.appendChild(ref);
-    blur.appendChild(commodity);
-    blur.appendChild(origin);
-    blur.appendChild(row);
-
-    // Lock overlay
-    const lock = document.createElement('div');
-    lock.className = 'absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200';
-
-    const lockIcon = document.createElement('div');
-    lockIcon.className = 'w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center';
-    lockIcon.innerHTML = '<svg class="w-4 h-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>';
-    const lockText = document.createElement('span');
-    lockText.className = 'text-xs font-bold text-slate-700';
-    lockText.textContent = 'Click to unlock';
-
-    lock.appendChild(lockIcon);
-    lock.appendChild(lockText);
-
-    card.appendChild(blur);
-    card.appendChild(lock);
-
-    card.addEventListener('click', function () {
-      var portal = window.__gaccPortal || {};
-      if (portal.activated) {
-        var params = new URLSearchParams({
-          dealId: portal.dealId || deal.ref,
-          userId: portal.payerId || '',
-          commodity: deal.category || 'general',
+    // ─── AI TRADE ANALYSIS ───────────────────────────────────────────────────
+    async function handleAnalyzeTrade() {
+      const context = [
+        'Deal ID: ' + inp(dealIdInput),
+        'Amount: ' + fmtUsd(num(dealAmountInput)),
+        'Region: ' + inp(regionSelect),
+        'LC Reference: ' + inp(lcReferenceInput),
+        'Entry fee: ' + dealState.entry_fee_status,
+        'Handshake: ' + dealState.handshake_status,
+        'Compliance: ' + dealState.compliance_status
+      ].join('. ');
+      appendLog('Sending current deal context to AI analysis engine...', 'info');
+      setSystemStatus('Analyzing', 'busy');
+      try {
+        const resp = await fetch(`${FUNCTION_HOST}/aiAgentAnalyze`, {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ text: context, room: inp(dealIdInput) || 'homepage' })
         });
-        window.location.href = 'deal-room.html?' + params.toString();
-      } else {
-        if (modal) modal.classList.remove('hidden');
+        const data = await resp.json();
+        if (!resp.ok) {
+          appendLog('AI analysis error: ' + (data.error || resp.statusText), 'alert');
+          setSystemStatus('Active', 'active');
+          return;
+        }
+        setSystemStatus('Analysis Ready', 'active');
+        const insights = Array.isArray(data.insights) ? data.insights : [];
+        appendLog('AI analysis complete. ' + insights.length + ' insight(s) returned.', 'success');
+        insights.forEach(i => appendLog('Insight: ' + i, 'warning'));
+        if (insights.length === 0) appendLog('No additional insights at this time.', 'info');
+      } catch (err) {
+        appendLog('AI analysis error: ' + err.message, 'alert');
+        setSystemStatus('Active', 'active');
       }
+    }
+
+    // ─── NEGOTIATION CONVERSATION ────────────────────────────────────────────
+    function handleStartConversation() {
+      if (conversationLog) conversationLog.replaceChildren();
+      const userLang       = NEGOTIATION_PHRASES[inp(languageSelect)]             || NEGOTIATION_PHRASES.en;
+      const counterLang    = NEGOTIATION_PHRASES[inp(counterpartyLanguageSelect)] || NEGOTIATION_PHRASES.en;
+      appendConversation('You',          userLang.hello);
+      setTimeout(() => appendConversation('Counterparty', counterLang.hello),    500);
+      setTimeout(() => appendConversation('You',          userLang.reply),        1000);
+      setTimeout(() => appendConversation('Counterparty', counterLang.reply),     1500);
+      appendLog('Multilingual negotiation channel opened.', 'success');
+      setSystemStatus('Negotiation Active', 'active');
+    }
+
+    // ─── TIME ─────────────────────────────────────────────────────────────────
+    function updateLocalTime() {
+      if (!localTimeEl) return;
+      const locale = currentLocale();
+      localTimeEl.textContent = new Intl.DateTimeFormat(locale, {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+      }).format(new Date());
+      document.documentElement.lang = inp(languageSelect) || 'en';
+    }
+
+    // ─── EVENT BINDINGS ───────────────────────────────────────────────────────
+    function on(el, event, fn) {
+      if (el) el.addEventListener(event, fn);
+    }
+
+    on(btnEntryFee,     'click', handleEntryFee);
+    on(btnHandshake,    'click', handleHandshake);
+    on(btnWithdrawal,   'click', handleWithdrawal);
+    on(btnConversation, 'click', handleStartConversation);
+    on(btnAnalyzeTrade, 'click', handleAnalyzeTrade);
+    on(btnCreateRoom,   'click', handleCreateRoom);
+    on(btnInitShipment, 'click', handleInitShipment);
+    on(btnCompliance,   'click', handleComplianceScan);
+
+    on(btnVaultPay, 'click', () => {
+      document.getElementById('deal-id-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      appendLog('Directed to deal activation. Fill in Deal ID and Buyer ID to begin.', 'info');
     });
 
-    grid.appendChild(card);
-  });
-})();
-</script>
-
-<!-- ═══════════════════════════════════════════════════
-     STAFF PORTAL SCRIPT — RBAC Auth & Role Isolation
-═══════════════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script>
-(function () {
-  'use strict';
-
-  // ── Supabase client ──────────────────────────────────────────────
-  // Credentials are injected at runtime by backend/server.py via
-  // window.__ENV__. Never hard-code keys in source.
-  const supabaseUrl = (window.__ENV__ && window.__ENV__.SUPABASE_URL)   || '';
-  const supabaseKey = (window.__ENV__ && window.__ENV__.SUPABASE_ANON_KEY) || '';
-
-  if (!supabaseUrl || !supabaseKey) {
-    // Portal is still rendered; auth calls will fail gracefully with Supabase errors.
-    console.warn('[StaffPortal] SUPABASE_URL / SUPABASE_ANON_KEY not set — auth disabled.');
-  }
-
-  const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-  // ── Role → clearance label map ───────────────────────────────────
-  const ROLE_LABELS = {
-    admin:              '🔑 Super Admin — Clearance 1',
-    account_manager:    '📊 Account Manager — Clearance 2',
-    financial_manager:  '💹 Financial Manager — Clearance 3',
-    accounting_staff:   '📋 Accounting Staff — Clearance 4',
-    software_engineer:  '⚡ Software Engineer — Clearance 5',
-    analyzer:           '🔬 Analyzer — Clearance 6',
-  };
-
-  // ── DOM helpers ──────────────────────────────────────────────────
-  function show(id)      { var e = document.getElementById(id); if (e) e.classList.remove('hidden'); }
-  function hide(id)      { var e = document.getElementById(id); if (e) e.classList.add('hidden');    }
-  function setText(id,t) { var e = document.getElementById(id); if (e) e.textContent = String(t||''); }
-
-  // ── Show role-specific panel ─────────────────────────────────────
-  function mountRolePanel(role) {
-    document.querySelectorAll('.sp-panel').forEach(function (p) { p.classList.add('hidden'); });
-    var panelId = 'sp-panel-' + (role || 'unknown');
-    var panel = document.getElementById(panelId);
-    if (panel) {
-      panel.classList.remove('hidden');
-    } else {
-      show('sp-panel-unknown');
-    }
-  }
-
-  // ── Sign in ──────────────────────────────────────────────────────
-  async function handleLogin() {
-    var email    = (document.getElementById('sp-email')    || {}).value || '';
-    var password = (document.getElementById('sp-password') || {}).value || '';
-    var msgEl    = document.getElementById('sp-login-msg');
-    var btn      = document.getElementById('sp-login-btn');
-
-    if (!email || !password) {
-      if (msgEl) { msgEl.textContent = 'Please enter email and password.'; msgEl.classList.remove('hidden'); }
-      return;
-    }
-
-    if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
-    if (msgEl) { msgEl.classList.add('hidden'); }
-
-    var result = await _supabase.auth.signInWithPassword({ email: email, password: password });
-    if (result.error) {
-      if (msgEl) { msgEl.textContent = result.error.message; msgEl.classList.remove('hidden'); }
-      if (btn)   { btn.disabled = false; btn.textContent = 'Sign In'; }
-      return;
-    }
-
-    await loadDashboard(result.data.user);
-  }
-
-  // ── Load dashboard ───────────────────────────────────────────────
-  async function loadDashboard(user) {
-    var profileResult = await _supabase
-      .from('profiles')
-      .select('username, role, priority_level')
-      .eq('id', user.id)
-      .single();
-
-    var profile = profileResult.data || {};
-    var role     = profile.role     || 'unknown';
-    var username = profile.username || user.email || 'Staff';
-
-    hide('sp-login');
-    show('sp-dashboard');
-
-    // Avatar initials
-    var avatarEl = document.getElementById('sp-avatar');
-    if (avatarEl) avatarEl.textContent = username.slice(0, 1).toUpperCase();
-
-    setText('sp-username-display', username);
-    setText('sp-role-badge', ROLE_LABELS[role] || role);
-
-    mountRolePanel(role);
-  }
-
-  // ── Sign out ─────────────────────────────────────────────────────
-  async function handleLogout() {
-    await _supabase.auth.signOut();
-    hide('sp-dashboard');
-    show('sp-login');
-    var btn = document.getElementById('sp-login-btn');
-    if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
-    var passEl = document.getElementById('sp-password');
-    if (passEl) passEl.value = '';
-  }
-
-  // ── Resume existing session on page load ─────────────────────────
-  async function checkExistingSession() {
-    var sessionResult = await _supabase.auth.getSession();
-    var session = sessionResult.data && sessionResult.data.session;
-    if (session && session.user) {
-      await loadDashboard(session.user);
-    }
-  }
-
-  // ── Wire events ──────────────────────────────────────────────────
-  window.addEventListener('DOMContentLoaded', function () {
-    var loginBtn  = document.getElementById('sp-login-btn');
-    var logoutBtn = document.getElementById('sp-logout-btn');
-    var pwInput   = document.getElementById('sp-password');
-
-    if (loginBtn)  loginBtn.addEventListener('click', handleLogin);
-    if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
-    if (pwInput)   pwInput.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') handleLogin();
+    on(dealAmountInput, 'input', () => {
+      txt(dealAmountDisplayEl, fmtUsd(num(dealAmountInput)));
     });
 
-    checkExistingSession();
-  });
-})();
-</script>
+    on(languageSelect, 'change', () => {
+      updateLocalTime();
+      appendLog('Interface language updated.', 'success');
+    });
 
-<!-- ═══════════════════════════════════════════════════
-     VIDEO GUIDE SCRIPT
-═══════════════════════════════════════════════════ -->
-<script>
-// VIDEO_ID placeholder — replace with your YouTube video ID when available.
-// e.g. 'dQw4w9WgXcQ'
-var GREENS_ACC_VIDEO_ID = '';
+    on(regionSelect, 'change', () => {
+      const region = regionSelect.selectedOptions?.[0]?.text || 'selected region';
+      appendLog('Operating region set to ' + region + '.', 'info');
+    });
 
-function playVideoGuide() {
-  var overlay = document.getElementById('video-overlay');
-  var frame   = document.getElementById('video-frame');
-  if (!overlay || !frame) return;
-  overlay.classList.add('hidden');
-  frame.classList.remove('hidden');
-  if (GREENS_ACC_VIDEO_ID) {
-    var iframe = document.createElement('iframe');
-    iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(GREENS_ACC_VIDEO_ID) + '?autoplay=1&rel=0&modestbranding=1';
-    iframe.title = 'Greens ACC Platform Walkthrough';
-    iframe.className = 'w-full h-full border-none';
-    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    iframe.allowFullscreen = true;
-    frame.appendChild(iframe);
-  } else {
-    // No video ID configured yet — show a placeholder
-    frame.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-slate-900 text-slate-400 text-sm font-mono">Video coming soon — set GREENS_ACC_VIDEO_ID in the page script.</div>';
-  }
-}
-</script>
+    // ─── INIT ─────────────────────────────────────────────────────────────────
+    window.addEventListener('load', () => {
+      updateLocalTime();
+      setInterval(updateLocalTime, 1000);
+      txt(dealAmountDisplayEl, fmtUsd(num(dealAmountInput)));
+      txt(commissionAmountEl,  fmtUsd(0));
+      updateDealStatusUI();
+      appendLog('Greens ACC platform initialized. All systems active.', 'success');
+      appendLog('Secure trade policy in effect: OFAC, AML, KYC monitoring online.', 'warning');
+    });
+  </script>
 </body>
 </html>
