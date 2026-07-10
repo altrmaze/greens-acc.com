@@ -8,17 +8,19 @@
 -- ============================================================
 
 -- Custom team role enumeration
-CREATE TYPE user_team_role AS ENUM (
-    'admin',
-    'account_manager',
-    'financial_manager',
-    'accounting',
-    'software_engineer',
-    'analyzer'
-);
+DO $$ BEGIN
+    CREATE TYPE user_team_role AS ENUM (
+        'admin',
+        'account_manager',
+        'financial_manager',
+        'accounting',
+        'software_engineer',
+        'analyzer'
+    );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- Master Profiles Table — maps to core Supabase Auth instances
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
     id               UUID          REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
     username         TEXT          UNIQUE NOT NULL,
     role             user_team_role NOT NULL DEFAULT 'analyzer',
@@ -36,6 +38,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS trg_profiles_updated_at ON public.profiles;
 CREATE TRIGGER trg_profiles_updated_at
     BEFORE UPDATE ON public.profiles
     FOR EACH ROW EXECUTE FUNCTION public.handle_profile_updated_at();
@@ -44,11 +47,13 @@ CREATE TRIGGER trg_profiles_updated_at
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Each user can read their own profile unconditionally
+DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
 CREATE POLICY "profiles_select_own"
     ON public.profiles FOR SELECT
     USING (auth.uid() = id);
 
 -- Admins can read all profiles
+DROP POLICY IF EXISTS "profiles_select_admin" ON public.profiles;
 CREATE POLICY "profiles_select_admin"
     ON public.profiles FOR SELECT
     USING (
@@ -60,6 +65,7 @@ CREATE POLICY "profiles_select_admin"
 
 -- Hierarchy view: higher-priority users (lower priority_level number) can see
 -- profiles at their level or below (higher priority_level number)
+DROP POLICY IF EXISTS "profiles_select_hierarchy" ON public.profiles;
 CREATE POLICY "profiles_select_hierarchy"
     ON public.profiles FOR SELECT
     USING (
@@ -69,6 +75,7 @@ CREATE POLICY "profiles_select_hierarchy"
     );
 
 -- Users may update only their own profile (non-privileged fields)
+DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
 CREATE POLICY "profiles_update_own"
     ON public.profiles FOR UPDATE
     USING (auth.uid() = id)
@@ -79,6 +86,7 @@ CREATE POLICY "profiles_update_own"
     );
 
 -- Admins may insert and update any profile
+DROP POLICY IF EXISTS "profiles_admin_write" ON public.profiles;
 CREATE POLICY "profiles_admin_write"
     ON public.profiles FOR ALL
     USING (
