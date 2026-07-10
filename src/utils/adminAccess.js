@@ -1,4 +1,13 @@
 const ADMIN_ACCESS_STORAGE_KEY = 'greens-acc.admin-access';
+export const ADMIN_ACCESS_EVENT = 'greens-acc.admin-access-changed';
+
+function notifyAdminAccessChanged() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  window.dispatchEvent(new Event(ADMIN_ACCESS_EVENT));
+}
 
 function getConfiguredAdminPass() {
   const value = import.meta?.env?.VITE_APP_PASS;
@@ -48,6 +57,7 @@ export function tryUnlockAdminAccess(candidate) {
       ADMIN_ACCESS_STORAGE_KEY,
       getAdminAccessFingerprint(configuredPass),
     );
+    notifyAdminAccessChanged();
   }
 
   return isMatch;
@@ -59,4 +69,5 @@ export function clearUnlockedAdminAccess() {
   }
 
   window.sessionStorage.removeItem(ADMIN_ACCESS_STORAGE_KEY);
+  notifyAdminAccessChanged();
 }

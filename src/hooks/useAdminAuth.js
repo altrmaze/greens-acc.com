@@ -2,12 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { handleDevLogin } from '../utils/devLogin';
 import {
+  ADMIN_ACCESS_EVENT,
   hasUnlockedAdminAccess,
   isAdminAccessConfigured,
   tryUnlockAdminAccess,
 } from '../utils/adminAccess';
 
-export function useAdminAuth() {
+export const useAdminAuth = () => {
   const [userRole, setUserRole] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLocked, setIsLocked] = useState(true);
@@ -15,8 +16,21 @@ export function useAdminAuth() {
   const [isAdminPassConfigured, setIsAdminPassConfigured] = useState(() => isAdminAccessConfigured());
 
   useEffect(() => {
-    setIsAdminPassConfigured(isAdminAccessConfigured());
-  }, []);
+    const syncAdminAccessState = () => {
+      const configured = isAdminAccessConfigured();
+      setIsAdminPassConfigured(configured);
+      setIsLocked(isAdmin ? (!configured || !hasUnlockedAdminAccess()) : true);
+    };
+
+    syncAdminAccessState();
+
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    window.addEventListener(ADMIN_ACCESS_EVENT, syncAdminAccessState);
+    return () => window.removeEventListener(ADMIN_ACCESS_EVENT, syncAdminAccessState);
+  }, [isAdmin]);
 
   useEffect(() => {
     let isMounted = true;
@@ -99,7 +113,7 @@ export function useAdminAuth() {
   }, []);
 
   const verifyAdminPassword = useCallback((passwordInput) => {
-    if (userRole !== 'admin') {
+    if (!isAdmin) {
       return false;
     }
 
@@ -114,7 +128,7 @@ export function useAdminAuth() {
     const unlocked = tryUnlockAdminAccess(passwordInput);
     setIsLocked(!unlocked);
     return unlocked;
-  }, [userRole]);
+  }, [isAdmin]);
 
   return {
     userRole,
@@ -124,4 +138,4 @@ export function useAdminAuth() {
     isAdminPassConfigured,
     verifyAdminPassword,
   };
-}
+};

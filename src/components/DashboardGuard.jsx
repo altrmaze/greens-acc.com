@@ -1,24 +1,13 @@
-import { AdminPassGate } from './AdminPassGate';
+import React from 'react';
+import AdminPassGate from './AdminPassGate';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 
-/**
- * DashboardGuard
- *
- * Wraps any dashboard panel and gates it behind role-based clearance.
- * Renders children only when the authenticated user's role matches
- * `requiredRole` (or 'admin' if `allowAdmin` is true).
- *
- * @param {string}   requiredRole  - The role string required to view the panel.
- * @param {boolean}  allowAdmin    - Whether the 'admin' role bypasses the gate (default true).
- * @param {ReactNode} children     - The protected panel content.
- */
-export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
+export function DashboardGuard({ children }) {
   const {
-    userRole,
-    loading,
+    isAdmin,
     isLocked,
+    loading,
     isAdminPassConfigured,
-    verifyAdminPassword,
   } = useAdminAuth();
 
   if (loading) {
@@ -29,11 +18,7 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
     );
   }
 
-  const accessGranted =
-    userRole === requiredRole || (allowAdmin && userRole === 'admin');
-  const requiresAdminAccessGate = userRole === 'admin' && accessGranted;
-
-  if (!accessGranted) {
+  if (!isAdmin) {
     return (
       <div className="p-6 bg-red-950/40 border border-red-800 text-red-300 rounded-xl
         max-w-2xl mx-auto my-12 font-sans shadow-2xl">
@@ -48,16 +33,11 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
     );
   }
 
-  if (requiresAdminAccessGate) {
-    if (isLocked) {
-      return (
-        <AdminPassGate
-          configured={isAdminPassConfigured}
-          verifyPassword={verifyAdminPassword}
-        />
-      );
-    }
+  if (!isAdminPassConfigured || isLocked) {
+    return <AdminPassGate />;
   }
 
   return <>{children}</>;
 }
+
+export default DashboardGuard;

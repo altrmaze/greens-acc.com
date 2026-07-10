@@ -1,8 +1,7 @@
 import MarketClocks   from './components/MarketClocks';
 import MarketFeeds    from './components/MarketFeeds';
 import DealsGrid      from './components/DealsGrid';
-import { DashboardGuard }   from './components/DashboardGuard';
-import { AdminProtectedRoute } from './components/AdminProtectedRoute';
+import DashboardGuard from './components/DashboardGuard';
 import { CodeSpaceConsole } from './components/CodeSpaceConsole';
 
 /**
@@ -15,41 +14,21 @@ import { CodeSpaceConsole } from './components/CodeSpaceConsole';
 export default function App() {
   return (
     <>
-      {/* ── Public Trading HUD ─────────────────────────────────── */}
-      <MarketClocks />
-      <MarketFeeds />
-      <DealsGrid />
+      <DashboardGuard>
+        <>
+          {/* ── Locked Operations Surface ─────────────────────────── */}
+          <MarketClocks />
+          <MarketFeeds />
+          <DealsGrid />
 
-      {/* ── Role-Isolated Dashboards ───────────────────────────── */}
-
-      {/* Super Admin — root configuration panel */}
-      <AdminProtectedRoute>
-        <AdminPanel />
-      </AdminProtectedRoute>
-
-      {/* Account Manager — oversight analytics & approvals */}
-      <DashboardGuard requiredRole="account_manager">
-        <AccountManagerPanel />
-      </DashboardGuard>
-
-      {/* Financial Manager — macro finance & FX */}
-      <DashboardGuard requiredRole="financial_manager">
-        <FinancialManagerPanel />
-      </DashboardGuard>
-
-      {/* Accounting Staff — data-entry only, no global summaries */}
-      <DashboardGuard requiredRole="accounting_staff">
-        <AccountingStaffPanel />
-      </DashboardGuard>
-
-      {/* Software Engineer — embedded Codespaces console */}
-      <DashboardGuard requiredRole="software_engineer">
-        <CodeSpaceConsole />
-      </DashboardGuard>
-
-      {/* Analyzer — read-only projections */}
-      <DashboardGuard requiredRole="analyzer">
-        <AnalyzerPanel />
+          {/* ── Centralized Admin-Only Modules ───────────────────── */}
+          <AdminPanel />
+          <AccountManagerPanel />
+          <FinancialManagerPanel />
+          <AccountingStaffPanel />
+          <CodeSpaceConsole />
+          <AnalyzerPanel />
+        </>
       </DashboardGuard>
     </>
   );
