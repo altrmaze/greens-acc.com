@@ -1,12 +1,5 @@
-import type { ReactNode } from 'react';
 import { AdminPassGate } from './AdminPassGate';
 import { useAdminAuth } from '../hooks/useAdminAuth';
-
-interface AdminProtectedRouteProps {
-  children: ReactNode;
-  loadingFallback?: ReactNode;
-  unauthorizedFallback?: ReactNode;
-}
 
 function DefaultLoadingFallback() {
   return (
@@ -32,33 +25,33 @@ function DefaultUnauthorizedFallback() {
 
 export function AdminProtectedRoute({
   children,
-  loadingFallback,
-  unauthorizedFallback,
-}: AdminProtectedRouteProps) {
+  loadingFallback = <DefaultLoadingFallback />,
+  unauthorizedFallback = <DefaultUnauthorizedFallback />,
+}) {
   const {
     userRole,
+    isLocked,
     loading,
-    isAdminLocked,
     isAdminPassConfigured,
-    verifyAdminPass,
+    verifyAdminPassword,
   } = useAdminAuth();
 
   if (loading) {
-    return <>{loadingFallback ?? <DefaultLoadingFallback />}</>;
+    return loadingFallback;
   }
 
   if (userRole !== 'admin') {
-    return <>{unauthorizedFallback ?? <DefaultUnauthorizedFallback />}</>;
+    return unauthorizedFallback;
   }
 
-  if (isAdminLocked) {
+  if (isLocked) {
     return (
       <AdminPassGate
         configured={isAdminPassConfigured}
-        verifyPassword={verifyAdminPass}
+        verifyPassword={verifyAdminPassword}
       />
     );
   }
 
-  return <>{children}</>;
+  return children;
 }

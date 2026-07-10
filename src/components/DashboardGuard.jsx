@@ -1,11 +1,5 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
-import { handleDevLogin } from '../utils/devLogin';
 import { AdminPassGate } from './AdminPassGate';
-import {
-  hasUnlockedAdminAccess,
-  isAdminAccessConfigured,
-} from '../utils/adminAccess';
+import { useAdminAuth } from '../hooks/useAdminAuth';
 
 /**
  * DashboardGuard
@@ -19,31 +13,13 @@ import {
  * @param {ReactNode} children     - The protected panel content.
  */
 export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
-  const [userRole, setUserRole] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [adminAccessUnlocked, setAdminAccessUnlocked] = useState(() => hasUnlockedAdminAccess());
-
-  useEffect(() => {
-    async function fetchUserContext() {
-      let { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        await handleDevLogin();
-        ({ data: { user } } = await supabase.auth.getUser());
-      }
-
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        setUserRole(data?.role ?? null);
-      }
-      setLoading(false);
-    }
-    fetchUserContext();
-  }, []);
+  const {
+    userRole,
+    loading,
+    isLocked,
+    isAdminPassConfigured,
+    verifyAdminPassword,
+  } = useAdminAuth();
 
   if (loading) {
     return (
@@ -73,12 +49,13 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
   }
 
   if (requiresAdminAccessGate) {
-    if (!isAdminAccessConfigured()) {
-      return <AdminPassGate configured={false} />;
-    }
-
-    if (!adminAccessUnlocked) {
-      return <AdminPassGate onUnlock={() => setAdminAccessUnlocked(true)} />;
+    if (isLocked) {
+      return (
+        <AdminPassGate
+          configured={isAdminPassConfigured}
+          verifyPassword={verifyAdminPassword}
+        />
+      );
     }
   }
 
