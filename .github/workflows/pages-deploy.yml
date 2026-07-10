@@ -28,6 +28,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      VITE_APP_PASS: ${{ secrets.VITE_APP_PASS }}
       VITE_TEST_USER_EMAIL: ${{ secrets.SUPABASE_TEST_EMAIL }}
       VITE_TEST_USER_PASSWORD: ${{ secrets.SUPABASE_TEST_PASSWORD }}
     steps:
