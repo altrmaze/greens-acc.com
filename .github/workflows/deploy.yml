@@ -84,7 +84,10 @@ jobs:
           CREATE TABLE IF NOT EXISTS auth.users (id UUID PRIMARY KEY);
           CREATE OR REPLACE FUNCTION auth.uid() RETURNS UUID LANGUAGE SQL AS $$ SELECT '00000000-0000-0000-0000-000000000000'::UUID $$;
           ENDSQL
-            supabase db lint --db-url "$DB_URL"
+            for migration in supabase/migrations/*.sql; do
+              echo "Applying migration: $migration"
+              psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$migration"
+            done
           fi
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
