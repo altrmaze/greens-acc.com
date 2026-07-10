@@ -20,12 +20,16 @@ Greens ACC is a static website with Supabase backend support for secure trade es
    - `npm install @supabase/server`
 5. For non-Edge runtimes, copy `.env.example` to `.env` and set:
    - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY` (preferred client/public key name used by the static pages)
    - `SUPABASE_PUBLISHABLE_KEY`
    - `SUPABASE_SECRET_KEY`
    - `SUPABASE_JWKS_URL`
 6. For existing code in this repository, also set:
    - `SUPABASE_SERVICE_ROLE_KEY`
-7. On Supabase Edge Functions, these variables are injected automatically.
+7. For Vite-powered local flows, you can mirror the same public credentials with:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY` (or `VITE_SUPABASE_PUBLISHABLE_KEY`)
+8. On Supabase Edge Functions, these variables are injected automatically.
 
 ## Usage
 
@@ -85,11 +89,14 @@ Greens ACC is a static website with Supabase backend support for secure trade es
 
 The Meeting Suite can use Supabase Realtime for WebRTC signaling. To enable it:
 
-1. Set `window.SUPABASE_CONFIG` in `meeting.html` (or inject dynamically) with your Supabase project URL and anon key:
+1. Set `window.SUPABASE_CONFIG` (or `window.__ENV__`) with your Supabase project URL and anon key:
 
 ```html
 <script>
-   window.SUPABASE_CONFIG = { url: 'https://your-project.supabase.co', anonKey: 'YOUR_SUPABASE_ANON_KEY' };
+   window.__ENV__ = {
+     SUPABASE_URL: 'https://your-project.supabase.co',
+     SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY'
+   };
 </script>
 ```
 

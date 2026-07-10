@@ -11,7 +11,15 @@ const clientId = (() => {
 })();
 
 function initSupabase() {
-  const cfg = window.SUPABASE_CONFIG;
+  const env = window.__ENV__ || {};
+  const cfg = {
+    url: window.SUPABASE_CONFIG?.url || env.SUPABASE_URL || '',
+    anonKey:
+      window.SUPABASE_CONFIG?.anonKey ||
+      env.SUPABASE_ANON_KEY ||
+      env.SUPABASE_PUBLISHABLE_KEY ||
+      ''
+  };
   if (!cfg || !cfg.url || !cfg.anonKey) return null;
   try {
     supabase = window.supabase.createClient(cfg.url, cfg.anonKey);

@@ -178,7 +178,15 @@
   </div>
 
   <script>
-    const supabaseConfig = window.SUPABASE_CONFIG || { url: 'https://your-project.supabase.co', anonKey: 'YOUR_SUPABASE_ANON_KEY' };
+    const runtimeEnv = window.__ENV__ || {};
+    const supabaseConfig = {
+      url: window.SUPABASE_CONFIG?.url || runtimeEnv.SUPABASE_URL || '',
+      anonKey:
+        window.SUPABASE_CONFIG?.anonKey ||
+        runtimeEnv.SUPABASE_ANON_KEY ||
+        runtimeEnv.SUPABASE_PUBLISHABLE_KEY ||
+        ''
+    };
     let supabase = null;
     let currentAnnouncement = null;
     let dealData = null;

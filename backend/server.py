@@ -14,6 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DIST_DIR = ROOT_DIR / "dist"
 PORT = int(os.environ.get("PORT", "5000"))
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "").rstrip("/")
+SUPABASE_PUBLIC_KEY = os.environ.get("SUPABASE_ANON_KEY") or os.environ.get("SUPABASE_PUBLISHABLE_KEY", "")
 SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SECRET_KEY") or os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
 SUPABASE_FUNCTIONS_BASE_URL = os.environ.get("SUPABASE_FUNCTIONS_BASE_URL", "").rstrip("/")
 
@@ -33,6 +34,24 @@ REGION_TIMEZONES = {
 
 def json_bytes(payload: dict[str, Any]) -> bytes:
     return json.dumps(payload, ensure_ascii=False).encode("utf-8")
+
+
+def runtime_env_script() -> str:
+    public_key = SUPABASE_PUBLIC_KEY.strip()
+    payload = {
+        "SUPABASE_URL": SUPABASE_URL,
+        "SUPABASE_ANON_KEY": public_key,
+        "SUPABASE_PUBLISHABLE_KEY": public_key,
+    }
+    config = {"url": SUPABASE_URL, "anonKey": public_key}
+    payload_json = json.dumps(payload).replace("</", "<\\/")
+    config_json = json.dumps(config).replace("</", "<\\/")
+    return (
+        '<script id="greens-acc-runtime-env">'
+        f"window.__ENV__=Object.assign({{}},window.__ENV__||{{}},{payload_json});"
+        f"window.SUPABASE_CONFIG=Object.assign({{}},{config_json},window.SUPABASE_CONFIG||{{}});"
+        "</script>"
+    )
 
 
 def lifecycle_stage(deal: dict[str, Any] | None) -> str:
@@ -82,6 +101,8 @@ class GreensHandler(SimpleHTTPRequestHandler):
         parsed = parse.urlparse(self.path)
         if parsed.path == "/api/system-status":
             self.handle_system_status(parsed)
+            return
+        if self.serve_html_with_runtime_env(parsed.path):
             return
         super().do_GET()
 
@@ -166,6 +187,29 @@ class GreensHandler(SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def serve_html_with_runtime_env(self, request_path: str) -> bool:
+        file_path = Path(self.translate_path(request_path))
+        if file_path.is_dir():
+            file_path = file_path / "index.html"
+        if file_path.suffix.lower() != ".html" or not file_path.is_file():
+            return False
+
+        html = file_path.read_text(encoding="utf-8")
+        marker = 'id="greens-acc-runtime-env"'
+        if marker not in html:
+            if "<head>" in html:
+                html = html.replace("<head>", f"<head>\n    {runtime_env_script()}", 1)
+            else:
+                html = f"{runtime_env_script()}\n{html}"
+
+        body = html.encode("utf-8")
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+        return True
 
     def handle_system_status(self, parsed: parse.ParseResult) -> None:
         params = parse.parse_qs(parsed.query)
