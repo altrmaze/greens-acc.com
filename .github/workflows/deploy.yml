@@ -114,6 +114,10 @@ jobs:
       - name: Deploy Supabase Edge Functions
         run: |
           set -euo pipefail
+          if [ -z "${SUPABASE_ACCESS_TOKEN:-}" ] || [ -z "${SUPABASE_PROJECT_REF:-}" ]; then
+            echo "SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_REF is not configured; skipping edge function deploy."
+            exit 0
+          fi
           for f in supabase/functions/*.js; do
             name="$(basename "$f" .js)"
             echo "Deploying function: $name"
