@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { tryUnlockAdminAccess } from '../utils/adminAccess';
 
-export function AdminPassGate({ configured = true, onUnlock = () => {} }) {
+export function AdminPassGate({
+  configured = true,
+  onUnlock = () => {},
+  verifyPassword = tryUnlockAdminAccess,
+}) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
@@ -12,7 +16,7 @@ export function AdminPassGate({ configured = true, onUnlock = () => {} }) {
       return;
     }
 
-    if (tryUnlockAdminAccess(password)) {
+    if (verifyPassword(password)) {
       setPassword('');
       setError('');
       onUnlock();

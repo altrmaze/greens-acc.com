@@ -2,6 +2,7 @@ import MarketClocks   from './components/MarketClocks';
 import MarketFeeds    from './components/MarketFeeds';
 import DealsGrid      from './components/DealsGrid';
 import { DashboardGuard }   from './components/DashboardGuard';
+import { AdminProtectedRoute } from './components/AdminProtectedRoute';
 import { CodeSpaceConsole } from './components/CodeSpaceConsole';
 
 /**
@@ -22,9 +23,9 @@ export default function App() {
       {/* ── Role-Isolated Dashboards ───────────────────────────── */}
 
       {/* Super Admin — root configuration panel */}
-      <DashboardGuard requiredRole="admin" allowAdmin={false}>
+      <AdminProtectedRoute>
         <AdminPanel />
-      </DashboardGuard>
+      </AdminProtectedRoute>
 
       {/* Account Manager — oversight analytics & approvals */}
       <DashboardGuard requiredRole="account_manager">
