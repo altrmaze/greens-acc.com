@@ -20,6 +20,17 @@ on:
       - 'package.json'
       - 'package-lock.json'
   workflow_dispatch:
+    inputs:
+      run_supabase_dry_run:
+        description: 'Run the Supabase migration dry run'
+        required: false
+        type: boolean
+        default: false
+      run_production_deploy:
+        description: 'Run the production deployment steps'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   validate-and-test:
@@ -44,7 +55,7 @@ jobs:
 
   supabase-dry-run:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.run_supabase_dry_run)
     needs: validate-and-test
     permissions:
       contents: read
@@ -100,7 +111,7 @@ jobs:
 
   deploy-to-production:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.run_production_deploy)
     needs: [validate-and-test]
     permissions:
       contents: read
