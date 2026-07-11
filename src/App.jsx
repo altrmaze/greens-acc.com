@@ -29,7 +29,7 @@ export default function App() {
       <Route path="/analytics" element={<DevGate><AgentAnalytics /></DevGate>} />
 
       {/* ── /dashboard — Healing Blends Regime monitor ──────────── */}
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<DevGate><Dashboard /></DevGate>} />
 
       {/* ── /admin — developer access gate + role selector ─────── */}
       <Route path="/admin" element={<AdminPageRoute />} />

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import AppNav from '../components/AppNav';
 
 const SUPABASE_URL =
   import.meta?.env?.VITE_SUPABASE_URL ||
-  window.__ENV__?.SUPABASE_URL ||
+  (typeof window !== 'undefined' && window.__ENV__?.SUPABASE_URL) ||
   '';
 
 const FUNCTION_BASE = `${SUPABASE_URL}/functions/v1/greens-acc`;
@@ -56,67 +57,75 @@ export default function Dashboard() {
 
   const statusColor =
     metrics.status === 'NOMINAL'
-      ? 'text-emerald-600'
+      ? 'text-emerald-400'
       : metrics.status.startsWith('HEALING')
-      ? 'text-amber-500'
-      : 'text-red-500';
+      ? 'text-amber-400'
+      : 'text-red-400';
 
   return (
-    <section className="max-w-4xl mx-auto px-6 py-10">
-      <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
+      <AppNav />
+
+      {/* ── Page Header ──────────────────────────────────────────────── */}
+      <header className="max-w-7xl mx-auto px-6 pt-10 pb-6 flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-3xl font-extrabold text-emerald-400 tracking-tight">
             🟢 Healing Blends Regime
-          </h2>
-          <p className="text-sm text-slate-500 mt-1">
+          </h1>
+          <p className="text-slate-400 text-sm mt-1">
             System health monitor · auto-refresh every 5 s
           </p>
         </div>
         <button
           onClick={triggerHeal}
           disabled={loading}
-          className="px-5 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold
+          className="hidden sm:block px-5 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold
             hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? 'Sending…' : '⚡ Force Heal'}
         </button>
-      </div>
+      </header>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <MetricCard
-          label="System Status"
-          value={<span className={statusColor}>{metrics.status}</span>}
-        />
-        <MetricCard label="Faults Detected" value={metrics.faults_detected} />
-        <MetricCard label="Healed Incidents" value={metrics.healed_incidents} />
-        <MetricCard
-          label="Green Box Automation"
-          value={metrics.green_box_automation}
-        />
-        <MetricCard
-          label="Green Bubbles Sandbox"
-          value={metrics.green_bubbles_sandbox}
-        />
-        <MetricCard
-          label="Multi-Agent Orchestration"
-          value={metrics.multi_agent_orchestration}
-        />
-        <MetricCard label="Active Waiting Areas" value={waitingCount} />
-        <MetricCard label="Active Green Rooms" value={roomsCount} />
-      </div>
+      <main className="max-w-7xl mx-auto px-6 pb-16 space-y-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <MetricCard
+            label="System Status"
+            value={<span className={statusColor}>{metrics.status}</span>}
+          />
+          <MetricCard label="Faults Detected"          value={metrics.faults_detected} />
+          <MetricCard label="Healed Incidents"          value={metrics.healed_incidents} />
+          <MetricCard label="Last Heal"                 value={metrics.last_heal_timestamp} />
+          <MetricCard label="Green Box Automation"      value={metrics.green_box_automation} />
+          <MetricCard label="Green Bubbles Sandbox"     value={metrics.green_bubbles_sandbox} />
+          <MetricCard label="Multi-Agent Orchestration" value={metrics.multi_agent_orchestration} />
+          <MetricCard label="Active Green Rooms"        value={roomsCount} />
+        </div>
 
-      <p className="mt-6 text-xs text-slate-400">
-        Last heal: {metrics.last_heal_timestamp}
-      </p>
-    </section>
+        <p className="text-xs text-slate-500 font-mono">
+          Active waiting areas: {waitingCount}
+        </p>
+
+        {/* Mobile Force Heal button */}
+        <div className="sm:hidden">
+          <button
+            onClick={triggerHeal}
+            disabled={loading}
+            className="w-full px-5 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-semibold
+              hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Sending…' : '⚡ Force Heal'}
+          </button>
+        </div>
+      </main>
+    </div>
   );
 }
 
 function MetricCard({ label, value }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white px-5 py-4">
-      <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">{label}</p>
-      <p className="text-lg font-bold text-slate-800">{value}</p>
+    <div className="rounded-xl border border-slate-800 bg-slate-900 px-5 py-4">
+      <p className="text-xs text-slate-500 uppercase tracking-wide font-mono mb-1">{label}</p>
+      <p className="text-sm font-bold text-slate-100 truncate">{value}</p>
     </div>
   );
 }
