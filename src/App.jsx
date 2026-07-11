@@ -6,6 +6,7 @@ import { DashboardGuard }   from './components/DashboardGuard';
 import { CodeSpaceConsole } from './components/CodeSpaceConsole';
 import { DevGate }          from './components/DevGate';
 import AdminPageRoute        from './AdminPageRoute';
+import Dashboard             from './pages/Dashboard';
 
 /**
  * Root application component — Greens ACC
@@ -24,6 +25,9 @@ export default function App() {
     <Routes>
       {/* ── /admin — developer access gate + role selector ─────── */}
       <Route path="/admin" element={<AdminPageRoute />} />
+
+      {/* ── /dashboard — Healing Blends Regime monitor ──────────── */}
+      <Route path="/dashboard" element={<Dashboard />} />
 
       {/* ── Default — public trading HUD + role dashboards ─────── */}
       <Route
