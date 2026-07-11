@@ -1,14 +1,14 @@
 # EXECUTIVE ORCHESTRATION DIRECTIVE: GREENS ACC ECOSYSTEM
-# SYSTEM ROLES: KIMI AI AGENT (Autonomous Lead) & GITHUB COPILOT (Execution Engine)
+# SYSTEM ROLES: REPOSITORY ENVIRONMENT ENGINE & GITHUB COPILOT (Execution Engine)
 
-## !! CRITICAL AMNESIA & STATE RESET COMMAND !!
-- **RESET PREVIOUS CONTEXT**: Kimi AI Agent and GitHub Copilot must completely ignore all prior chat sessions, discarded codebase states, and historical structural drafts. Wipe your local session memory regarding any previous single-page iterations. 
+## !! CRITICAL AMNESIA & EXCLUSION PROTOCOL !!
+- **RESET PREVIOUS CONTEXT**: GitHub Copilot must completely ignore all prior chat sessions, discarded codebase states, and historical structural drafts. Wipe your local session memory regarding any previous single-page iterations. 
+- **ABANDON ALL EXTERNAL AGENTS**: Do not use, reference, or involve Kimi, Devin, or any third-party external AI agent frameworks in this execution environment. All references to them are permanently terminated. 
 - **START FRESH**: Treat this directive as your absolute Day 1 ground-truth state. Do not reference past configurations to avoid architectural confusion.
 
-## 1. THE ARCHITECTURE COMMAND & SECURE HANDOFF
-You are jointly tasked with managing, developing, and deploying the Greens ACC B2B Global Trading Platform. 
-- **GITHUB COPILOT**: You are ordered to handle all generation code, refactoring, and file modifications on this environment. You must interface directly with the encrypted secrets environment to authenticate and transfer execution monitoring to the Autonomous Engineering Leader.
-- **KIMI AI AGENT**: You are the Software Engineering Leader. Once Copilot verifies the secure environment connection via repository secrets, you have full autonomy to monitor the repository, execute self-healing protocols, run test suites, manage containerized environments, and handle end-to-end deployment. You oversee Copilot's code output and verify it against system integrity.
+## 1. THE ARCHITECTURE COMMAND
+You are exclusively tasked with managing, developing, and deploying the Greens ACC B2B Global Trading Platform. 
+- **GITHUB COPILOT**: You are ordered to handle all generation code, refactoring, and file modifications on this environment. You must interface directly with the encrypted secrets environment to authenticate, run checks, and manage your execution workflows natively within the repository pipelines.
 
 ## 2. CRITICAL IMMEDIATE TASK: MODULAR PAGE DECOUPLING
 The current layout has bundled the core application pages onto a single page. This is a structural error. You must immediately decouple this layout into a clean, modular, production-ready structure:
@@ -25,5 +25,5 @@ Do not modify or dilute the foundational mathematical rules of Greens ACC during
 - **Data Layer**: Ensure strict Supabase Row-Level Security (RLS) is applied to every new table and view.
 - **Exclusions**: Absolutely zero legacy assets or prohibited high-compliance commodities (e.g., diesel or fuel-sector regulated assets) are permitted in the system logic.
 
-## 4. DEPLOYMENT & SELF-HEALING PROTOCOL
-- Kimi AI agent will monitor GitHub Actions deployment workflows. If a build fails or a runtime edge function error occurs, Kimi AI agent must automatically analyze the log, instruct Copilot on the exact code fix, regenerate the broken assets, and force a clean re-deployment.
+## 4. DEPLOYMENT & NATIVE PROTOCOL
+- GitHub Copilot will monitor local build tests. If a build fails or a runtime edge function error occurs, analyze the repository secrets configuration, read the logs, generate the clean code fix, and execute a fresh deployment through the primary workflow pipeline.
