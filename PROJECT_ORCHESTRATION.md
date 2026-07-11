@@ -9,11 +9,11 @@
 ## 1. FIRST PAGE: PUBLIC ENTRY GATEWAY & LOCKDOWN
 Devin AI and Copilot must design the absolute First Page of the website as the single entry portal:
 - **Strict Lockdown Authentication**: The website is inaccessible beyond this point. The view must present text input fields for Username and Password, and an "Entry to my Website" button.
-- **Target Credentials**: Connect the authentication check directly to the environment parameters already mapped and confirmed by GitHub Copilot (`greensacc_admin_username` and `greensacc_admin_passaword`). These credentials act as the master access key for all admin entry.
+- **Target Credentials**: Connect the authentication check directly to the environment parameters already mapped and confirmed by GitHub Copilot (`greensacc_admin_username` and `greensacc_admin_password`). These credentials act as the master access key for all admin entry.
 - **Global Localization**: The gateway must include selection structures supporting all countries and all language information options for regional optimization before authentication.
 
 ## 2. THE MASTER DASHBOARD PATTERN (POST-LOGIN ENVIRONMENT)
-Once the correct credentials (`greensacc_admin_username` and `greensacc_admin_passaword`) are entered on the first page, the user is granted entry to the secure Dashboard system. This dashboard natively incorporates:
+Once the correct credentials (`greensacc_admin_username` and `greensacc_admin_password`) are entered on the first page, the user is granted entry to the secure Dashboard system. This dashboard natively incorporates:
 - **Employee & Multi-User Provisioning Engine**: An administrative workspace interface to dynamically spin up secure environments, role-based permissions, and isolated data channels for staff.
 - **Comprehensive Telemetry & Monitoring Matrix**: Real-time logging of customer activity journeys, live tracking grids for database/agent pipelines, and automated system compliance reporting.
 - **The Core Multi-Agent Consensus Tracking**: Live data panels managing the 5 Presidential AIs (Legal, Security, Logistics, Finance, Media) overseen by the Executive AI Secretary.

@@ -18,6 +18,6 @@ jobs:
           prompt: |
             "IGNORE ALL PREVIOUS CODE HISTORIES TO AVOID CONFUSION. Act as the Software Engineering Leader for Greens ACC on a persistent STANDBY state to receive and process orders.
 
-            CRITICAL ORDER: Configure the absolute First Page of the website to require the 'greensacc_admin_username' and 'greensacc_admin_passaword' credentials already verified in the environment. This page must house the Username input, Password input, 'Entry to my Website' submit button, and selection information for all countries and languages. Lock down the entire system behind this verification gate using Supabase authentication hooks.
+            CRITICAL ORDER: Configure the absolute First Page of the website to require the 'greensacc_admin_username' and 'greensacc_admin_password' credentials already verified in the environment. This page must house the Username input, Password input, 'Entry to my Website' submit button, and selection information for all countries and languages. Lock down the entire system behind this verification gate using Supabase authentication hooks.
 
             CONTINUOUS ORDERS: Bind the interior dashboard with employee environment provisioning tools, customer behavior trackers, multi-agent metrics monitoring, the 0.995 safety consensus telemetry panel, and the self-healing pipeline reconnection tracking system. Maintain a persistent code sync with our GitHub repository and execute a full live deployment immediately once verification passes."
