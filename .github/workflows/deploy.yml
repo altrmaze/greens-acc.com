@@ -129,9 +129,18 @@ jobs:
             echo "SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_REF is not configured; skipping edge function deploy."
             exit 0
           fi
+          # Deploy flat JS functions (legacy format)
           for f in supabase/functions/*.js; do
+            [ -f "$f" ] || continue
             name="$(basename "$f" .js)"
-            echo "Deploying function: $name"
+            echo "Deploying JS function: $name"
+            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF"
+          done
+          # Deploy directory-based functions (Deno / TypeScript format)
+          for dir in supabase/functions/*/; do
+            [ -f "${dir}index.ts" ] || continue
+            name="$(basename "$dir")"
+            echo "Deploying TS function: $name"
             supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF"
           done
         env:
