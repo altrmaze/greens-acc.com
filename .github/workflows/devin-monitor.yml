@@ -1,0 +1,19 @@
+name: Devin AI Autonomous Engineering Monitor
+on:
+  push:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+jobs:
+  devin_orchestrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Notify Devin AI Autonomous Leader via Secure Secrets Vault
+        uses: devin-ai/devin-action@v1
+        with:
+          api-key: ${{ secrets.DEVIN_API_KEY }}
+          prompt: |
+            "IGNORE ALL PREVIOUS CODE HISTORIES TO AVOID CONFUSION. Act as the Software Engineering Leader for Greens ACC starting completely fresh from PROJECT_ORCHESTRATION.md. Thoroughly check the entire workspace. Match the frontend elements with the backend database structures. Fix all runtime and structural code errors. Decouple the monolith layout cleanly across the Main Page, Second Page, and Third Page while strictly enforcing the 0.995 safety consensus threshold algorithm. Once all structural elements match and code fixes are complete, execute a full deployment of everything immediately."
