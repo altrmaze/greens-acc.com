@@ -11,82 +11,53 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Devin AI — Full Dashboard Build + Backend Bind + Live Deploy
+      - name: Devin AI — Status Check + Full Build + Live Deploy
         uses: devin-ai/devin-action@v1
         with:
           api-key: ${{ secrets.DEVIN_API_KEY }}
           prompt: |
-            You are the Software Engineering Leader for Greens ACC. Read PROJECT_ORCHESTRATION.md first — it is your master directive. You have full authority to generate, regenerate, fix, and repair any code needed. Your mission has THREE phases. Complete all three and deploy live.
+            ## GREENS ACC — DEVIN DIRECTIVE: STATUS + BUILD + LIVE DEPLOY
 
-            ## REPO CONTEXT
-            - Framework: React + Vite SPA (src/), deployed to GitHub Pages via pages-deploy.yml
-            - Backend: Supabase edge functions in supabase/functions/, Supabase DB at VITE_SUPABASE_URL
-            - Admin credentials baked at build time: import.meta.env.VITE_ADMIN_USERNAME and import.meta.env.VITE_ADMIN_PASSWORD
-            - Existing pages: CommandCenter (/), NegotiationRooms (/rooms), AgentAnalytics (/analytics), Dashboard (/dashboard), Admin (/admin)
-            - Build: npm run build | Test: npm test | Deploy: push to main triggers pages-deploy.yml
+            Platform identity: Greens ACC (greens-acc.com). Read PROJECT_ORCHESTRATION.md for the full directive.
 
-            ## PHASE 1 — FIRST PAGE CREDENTIAL GATE (src/pages/LoginGate.jsx + src/App.jsx)
-            1. Create src/pages/LoginGate.jsx: a full-screen login page with:
-               - Country selector (all countries, ISO list)
-               - Language selector (all major languages)
-               - Username text input
-               - Password text input
-               - "Entry to my Website" submit button
-               - On submit: compare inputs against import.meta.env.VITE_ADMIN_USERNAME and import.meta.env.VITE_ADMIN_PASSWORD
-               - On match: set sessionStorage flag "greens_auth=true" and redirect to /dashboard
-               - On mismatch: show error message, do not allow access
-            2. Modify src/App.jsx: wrap ALL routes with an auth check — if "greens_auth" session flag is not set, redirect to /login. Add Route path="/login" element={<LoginGate />} (not wrapped, always accessible).
+            ### STEP 1 — CHECK LIVE STATUS
+            - Visit https://altrmaze.github.io/greens-acc.com or https://greens-acc.com
+            - Report: Is a live deployment currently active? What is the URL? What is currently visible?
+            - If NOT live: state the exact blocker/error preventing deployment.
 
-            ## PHASE 2 — MASTER DASHBOARD (src/pages/Dashboard.jsx — FULL REBUILD)
-            Rebuild Dashboard.jsx to include all panels below. Connect each panel live to Supabase using VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY. Auto-refresh every 5 seconds.
+            ### STEP 2 — CREDENTIALS (DO NOT BLOCK ON API KEY)
+            - Admin credentials are in GitHub Secrets: greensacc_admin_username and greensacc_admin_password
+            - These are already injected into the build as VITE_ADMIN_USERNAME and VITE_ADMIN_PASSWORD via pages-deploy.yml
+            - Use import.meta.env.VITE_ADMIN_USERNAME and import.meta.env.VITE_ADMIN_PASSWORD in frontend code
+            - Do NOT block or pause on DEVIN_API_KEY validation — proceed regardless
 
-            ### Panel A — Employee & Multi-User Provisioning Engine
-            - Table showing all employees/users from Supabase (profiles or users table)
-            - "Add User" form: name, role (admin / staff / agent), email
-            - Role assignment and environment provisioning controls
-            - Writes new users to Supabase
+            ### STEP 3 — EXECUTE 3-PHASE BUILD (if not already complete)
 
-            ### Panel B — Customer Activity Telemetry
-            - Live feed of customer onboarding journeys and transaction events from Supabase
-            - Activity log table: timestamp, customer ID, action, status
-            - Reads from ai_transaction_logs table in Supabase
+            **Phase 1 — Login Gate (src/pages/LoginGate.jsx + src/App.jsx)**
+            - Full-screen login page: country selector, language selector, username input, password input, "Entry to my Website" button
+            - Validates against import.meta.env.VITE_ADMIN_USERNAME / VITE_ADMIN_PASSWORD
+            - On success: set sessionStorage "greens_auth=true", redirect to /dashboard
+            - On failure: show error, block access
+            - All routes in App.jsx protected: redirect to /login if greens_auth not set
 
-            ### Panel C — 5 Presidential AI Consensus Panel
-            - 5 cards: Legal AI, Security AI, Logistics AI, Finance AI, Media AI
-            - Each card shows: status (ACTIVE / IDLE / ALERT), last action, vote (APPROVE / HOLD)
-            - Executive AI Secretary card at top summarizing overall consensus state
-            - Data polled from Supabase (create table presidential_ai_status if not exists)
+            **Phase 2 — 6-Panel Master Dashboard (src/pages/Dashboard.jsx)**
+            - Panel A: Employee provisioning — list users from Supabase, add user form
+            - Panel B: Customer activity telemetry — live feed from ai_transaction_logs table
+            - Panel C: 5 Presidential AI cards (Legal, Security, Logistics, Finance, Media) + Executive Secretary summary
+            - Panel D: 0.995 safety score — animated progress bar, RED alert if below 99.5%
+            - Panel E: Self-healing pipeline tracker — status grid, auto-POST to /functions/v1/self-heal if BROKEN
+            - Panel F: Ops bar — username, UTC clock, Force Heal All, Logout
 
-            ### Panel D — 0.995 Safety Threshold Monitor
-            - Large prominent safety score display: shows live consensus percentage (0.00% - 100.00%)
-            - Threshold line at 99.5% — if score drops below, flash RED alert banner "KILL SWITCH ARMED"
-            - Score calculated from Supabase ai_transaction_logs: ratio of approved/safe transactions
-            - Animated progress bar visualization
+            **Phase 3 — Backend + Deploy**
+            - Create supabase/migrations/ files for any missing tables (presidential_ai_status, pipeline_status)
+            - Create supabase/functions/self-heal/index.js edge function
+            - Run npm test and npm run build — fix ALL errors
+            - Commit with message: "feat: greens-acc full dashboard + login gate + Supabase bind [Devin]"
+            - Push to main — triggers pages-deploy.yml for live GitHub Pages deployment
 
-            ### Panel E — Self-Healing Pipeline Reconnection Tracker
-            - Live pipeline status grid: Frontend to Supabase, Edge Functions, DB Sync, Agent Pipelines
-            - Each row: pipe name, status (CONNECTED / BROKEN / HEALING), last check time
-            - If any pipe is BROKEN: auto-trigger POST to /functions/v1/self-heal endpoint and show HEALING state
-            - Read/write pipeline status from Supabase (create table pipeline_status if not exists)
-
-            ### Panel F — System Operations Bar (top of dashboard)
-            - Logged-in username display
-            - Live UTC clock
-            - "Force Heal All" button (triggers self-healing on all pipes)
-            - "Logout" button (clears sessionStorage and returns to /login)
-
-            ## PHASE 3 — SUPABASE BACKEND WIRING + LIVE DEPLOYMENT
-            1. Create any missing Supabase tables needed (presidential_ai_status, pipeline_status) via a new migration file in supabase/migrations/
-            2. Create or update supabase/functions/self-heal/index.js edge function to accept POST and attempt to reconnect broken pipes
-            3. Ensure all Supabase queries use the anon key with proper RLS (service role only for writes where needed)
-            4. Run npm test to verify no syntax errors
-            5. Run npm run build to confirm build passes
-            6. Commit ALL changes with message "feat: full dashboard build + admin gate + Supabase bind [Devin]"
-            7. Push to main branch — this triggers pages-deploy.yml which deploys live to GitHub Pages immediately
-
-            ## RULES
-            - Never hardcode credentials in source files — always use import.meta.env.VITE_* variables
-            - Fix any broken imports, missing dependencies, or build errors before pushing
-            - If any panel cannot connect to Supabase due to missing table, create the migration and proceed
-            - Zero legacy fuel/diesel assets anywhere in code or data structures
-            - This is PRODUCTION — deploy must be live and working after your push
+            ### STEP 4 — REPORT BACK
+            After completing, reply with:
+            1. Live URL confirmation
+            2. List of files created/modified
+            3. Any errors encountered and how they were fixed
+            4. Confirmation that the 3-phase build is complete and live
