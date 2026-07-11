@@ -1,28 +1,36 @@
-# EXECUTIVE ORCHESTRATION DIRECTIVE: GREENS ACC ECOSYSTEM
-# SYSTEM ROLES: DEVIN AI (Autonomous Lead Developer) & GITHUB COPILOT (Execution Engine)
+# EXECUTIVE ORCHESTRATION DIRECTIVE: GREENS ACC ENTERPRISE SUITE
+# SYSTEM ROLES: DEVIN AI (Autonomous Engineering Leader) & GITHUB COPILOT (Execution Engine)
 
-## !! CRITICAL AMNESIA & STATE RESET COMMAND !!
-- **RESET PREVIOUS CONTEXT**: Devin AI and GitHub Copilot must completely ignore all prior chat sessions, discarded codebase states, and historical structural drafts. Wipe your local session memory regarding any previous single-page iterations. 
-- **START FRESH**: Treat this directive as your absolute Day 1 ground-truth state. Do not reference past configurations to avoid architectural confusion.
+## !! CRITICAL AMNESIA, SYSTEM LOCKDOWN & STATE RESET COMMAND !!
+- **RESET PREVIOUS CONTEXT**: Devin AI and GitHub Copilot must completely ignore all prior chat sessions, discarded codebase states, and historical structural drafts. Wipe your local session memory regarding any previous single-page iterations. Treat this directive as your absolute Day 1 ground-truth state.
+- **COPILOT HANDOFF**: GitHub Copilot is ordered to immediately hand over full environmental orchestration, monitoring, self-healing, and structural control to Devin AI. Copilot will act exclusively as a code execution engine under Devin's direct command.
+- **TOTAL WEBSITE LOCKDOWN**: Secure the platform immediately. Block public access across the entire domain. The Main Page must be locked down with a secure access barrier (Verification Gate requiring the $20 bot-prevention authentication fee or an authorized admin login). No unauthenticated user can bypass this gate to view any part of the website.
 
-## 1. THE ARCHITECTURE COMMAND & SECURE HANDOFF
+## 1. THE ARCHITECTURE COMMAND & INTERACTIVE CODESPACE HANDOFF
 You are jointly tasked with managing, developing, and deploying the Greens ACC B2B Global Trading Platform. 
-- **GITHUB COPILOT**: You are ordered to handle all generation code, refactoring, and file modifications on this environment under Devin's supervision. You must interface directly with the encrypted secrets environment to authenticate and transfer execution monitoring to Devin AI.
-- **DEVIN AI**: You are the Autonomous Software Engineering Leader. You have full authority to check everything across this repository, match the frontend with the backend, execute self-healing protocols, run test suites, manage containerized environments, fix the code, and completely build out the goals.
+- **DEVIN AI**: You are the Autonomous Software Engineering Leader. You have full authority to connect the frontend with the backend, execute self-healing protocols, run test suites, manage containerized environments, fix the code, and completely build out the goals.
+- **AUTOMATED CODESPACE SYNC**: Devin must establish a persistent, automated development sandbox directly inside the system architecture, mapped securely to our GitHub repository workflows. This enables all code modifications, agentic telemetry reviews, and operational updates to be executed, tested, and pushed live seamlessly within the environment without manual back-and-forth terminal manipulation.
 
-## 2. MAIN MISSION: FULL REFACTOR, BACKEND MATCHING, & DEPLOYMENT
-Devin AI is explicitly commanded to investigate the entire codebase and perform the following sequence:
-1. **Frontend to Backend Alignment**: Audit all React and Tailwind components. Match them perfectly with the Supabase database schema, edge functions, and API routes.
-2. **Modular Page Decoupling**: Ensure the monolithic layout is broken cleanly across three separate, production-ready interfaces:
-    - **Main Page (Dashboard / Command Center)**: Premium, modern minimalist enterprise UI presenting real-time system synchronization and global network telemetry.
-    - **Second Page (Global Negotiation Rooms & Verification Gate)**: Secure B2B negotiation spaces featuring the $20 bot-prevention entry gate, secure escrow verification, and role-based permissions.
-    - **Third Page (Multi-Agent Analytics & Compliance)**: Interface for monitoring the autonomous agent streams.
-3. **End-to-End Fix & Complete**: Resolve any compilation errors, missing types, styling mismatches, or broken API hooks.
-4. **FINAL DEPLOYMENT**: Once all fixing, refactoring, and matching are successfully verified, Devin is ordered to build the production assets and immediately deploy everything live.
+## 2. THE MASTER DASHBOARD PATTERN (ADMIN & WORKER CONTROL CENTER)
+Devin AI is commanded to construct the core interior Dashboard environment behind the locked access gate, incorporating the entire multi-agent structural history of Greens ACC:
 
-## 3. THE CORE ALGORITHM & MISSION GOALS
+### A. Employee & Multi-User Provisioning Engine
+- **Environment Generation**: An administrative interface to dynamically spin up secure workspace parameters, role-based access permissions, and isolated data channels for new employees, clearing agents, and operations staff.
+
+### B. Comprehensive Telemetry & Monitoring Matrix
+- **Customer Activity Tracking**: Real-time logging and behavioral observation of every customer onboarding journey, transaction interaction, and platform request.
+- **Ecosystem Monitoring**: Live visual monitoring grids checking all concurrent data streams, global B2B negotiation room pipelines, and escrow verification statuses.
+- **System reporting**: Automated generation of secure, end-to-end audit sheets and global compliance reporting summaries.
+
+### C. Frontend-to-Backend Supabase Binding
+- Map all dashboard components directly to Supabase storage buckets, edge functions, and database tables, secured tightly by strict Row-Level Security (RLS) policies.
+
+## 3. THE CORE DASHBOARD ALGORITHM & SELF-HEALING PIPELINE RECONNECTION
 Do not modify or dilute the foundational mathematical rules of Greens ACC during refactoring:
 - **The Core Multi-Agent Consensus Algorithm**: The platform operates via five specialized Presidential AIs (Legal, Security, Logistics, Finance, Media) overseen by an Executive AI Secretary.
-- **The 0.995 Safety Threshold**: Every financial deal, transaction, or communication packet must pass a strict mathematical consensus of >= 99.5% safety threshold. If behavioral profiling flags predatory behavior or drops below this line, trigger the automated kill-switch/isolation protocol instantly.
-- **Data Layer**: Ensure strict Supabase Row-Level Security (RLS) is applied to every table and view.
+- **The 0.995 Safety Threshold Monitoring**: Every financial deal, transaction, or communication packet must pass a strict mathematical consensus of >= 99.5% safety threshold. If behavioral profiling flags predatory behavior or drops below this line, trigger the automated kill-switch/isolation protocol instantly. Show this real-time safety percentage score live on the dashboard telemetry panel for every customer connection.
+- **Self-Healing Pipeline Reconnection**: Build a dedicated pipeline status tracker inside the dashboard that monitors system disconnections, broken API hooks, and database sync lags. If a pipe breaks between the frontend and the backend or between the autonomous agents, Devin must receive an immediate webhook, execute automated self-healing logic to repair the pipeline, reconnect the hooks, and restore full system synchronization instantly.
 - **Exclusions**: Absolutely zero legacy assets or prohibited high-compliance commodities (e.g., diesel or fuel-sector regulated assets) are permitted in the system logic.
+
+## 4. END-TO-END AUTONOMOUS DEPLOYMENT
+- Once Devin AI completes the lockdown integration, binds the database layers, and verifies the dashboard monitoring matrix, Devin is ordered to run full environment compilation checks, pass all RLS safety assertions, and immediately execute a production deployment live.
