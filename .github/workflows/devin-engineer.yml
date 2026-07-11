@@ -1,0 +1,29 @@
+name: Devin Software Engineer Agent
+
+on:
+  push:
+    branches: [ main, copilot/deploy-check-success ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  devin-initialization:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Initialize Devin Engineering Agent
+        uses: cognitionlabs/devin-action@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # Keeping his focus limited to watching the deployment and proposals first
+          prompt: |
+            You are now initialized as the software engineer on this repository. 
+            For this run, your only tasks are:
+            1. Verify your environment variables and ensure you can access your system securely.
+            2. Monitor the current branch and ensure Copilot's deployment proposals finish successfully without errors.
+            Do not modify any dashboard configurations or database logic yet.
+        env:
+          DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
