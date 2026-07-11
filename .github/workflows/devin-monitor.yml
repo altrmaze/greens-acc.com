@@ -1,4 +1,4 @@
-name: Devin AI Autonomous Engineering Monitor
+name: Devin AI On-Standby Enterprise Monitor
 on:
   push:
     branches: [ main, dev ]
@@ -11,9 +11,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Notify Devin AI Autonomous Leader via Secure Secrets Vault
+      - name: Notify Devin AI to Standby and Execute First Page Locked Blueprint
         uses: devin-ai/devin-action@v1
         with:
           api-key: ${{ secrets.DEVIN_API_KEY }}
           prompt: |
-            "IGNORE ALL PREVIOUS CODE HISTORIES TO AVOID CONFUSION. Act as the Software Engineering Leader for Greens ACC starting completely fresh from PROJECT_ORCHESTRATION.md. Thoroughly check the entire workspace. Lock down the main entry view with a secure authentication gate to prevent public access. Build the core Dashboard environment pattern, linking the frontend views to the Supabase backend. Integrate employee environment provisioning tools, customer behavior trackers, system metrics monitoring, and automated auditing systems. Enforce the 0.995 safety consensus threshold and display its metrics on the dashboard UI. Build the self-healing pipeline reconnection monitor to watch and automatically fix broken frontend-backend connections. Configure the persistent GitHub Codespace workflow sync. Once structural items match and code fixes are complete, deploy everything immediately."
+            "IGNORE ALL PREVIOUS CODE HISTORIES TO AVOID CONFUSION. Act as the Software Engineering Leader for Greens ACC on a persistent STANDBY state to receive and process orders.
+
+            CRITICAL ORDER: Configure the absolute First Page of the website to require the 'greensacc_admin_username' and 'greensacc_admin_passaword' credentials already verified in the environment. This page must house the Username input, Password input, 'Entry to my Website' submit button, and selection information for all countries and languages. Lock down the entire system behind this verification gate using Supabase authentication hooks.
+
+            CONTINUOUS ORDERS: Bind the interior dashboard with employee environment provisioning tools, customer behavior trackers, multi-agent metrics monitoring, the 0.995 safety consensus telemetry panel, and the self-healing pipeline reconnection tracking system. Maintain a persistent code sync with our GitHub repository and execute a full live deployment immediately once verification passes."
