@@ -12,18 +12,22 @@ export default function Dashboard() {
     faults_detected: 0,
     healed_incidents: 0,
     status: 'NOMINAL',
-    green_box_automation: 'ACTIVE',
-    green_bubbles_sandbox: 'SHIELDED',
+    green_box_automation: 'ACTIVE RUNNING',
+    green_bubbles_sandbox: 'SHIELDED / SECURE',
     multi_agent_orchestration: 'IDLE',
     last_heal_timestamp: 'Never',
   });
+  const [waitingCount, setWaitingCount] = useState(0);
+  const [roomsCount, setRoomsCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const fetchStatus = async () => {
     try {
-      const res = await fetch(`${FUNCTION_BASE}/api/system/status`);
+      const res = await fetch(`${FUNCTION_BASE}/api/v1/system/status`);
       const data = await res.json();
       setMetrics(data.healing_blends_regime);
+      setWaitingCount(data.waiting_areas_count ?? 0);
+      setRoomsCount(data.active_rooms_count ?? 0);
     } catch (err) {
       console.error('Dashboard sync error:', err);
     }
@@ -32,9 +36,11 @@ export default function Dashboard() {
   const triggerHeal = async () => {
     setLoading(true);
     try {
-      await fetch(`${FUNCTION_BASE}/api/system/force-heal`, { method: 'POST' });
+      await fetch(`${FUNCTION_BASE}/api/v1/system/force-heal?deal_id=deal-777`, {
+        method: 'POST',
+      });
       alert('Manual Override: Healing Blends Regime Activated.');
-      setTimeout(fetchStatus, 2000);
+      setTimeout(fetchStatus, 2500);
     } catch (err) {
       alert('Failed to send override command.');
     } finally {
@@ -51,7 +57,7 @@ export default function Dashboard() {
   const statusColor =
     metrics.status === 'NOMINAL'
       ? 'text-emerald-600'
-      : metrics.status === 'HEALING_ACTIVE'
+      : metrics.status.startsWith('HEALING')
       ? 'text-amber-500'
       : 'text-red-500';
 
@@ -95,6 +101,8 @@ export default function Dashboard() {
           label="Multi-Agent Orchestration"
           value={metrics.multi_agent_orchestration}
         />
+        <MetricCard label="Active Waiting Areas" value={waitingCount} />
+        <MetricCard label="Active Green Rooms" value={roomsCount} />
       </div>
 
       <p className="mt-6 text-xs text-slate-400">
