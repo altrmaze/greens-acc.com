@@ -5,10 +5,10 @@
 - **RESET PREVIOUS CONTEXT**: Kimi AI Agent and GitHub Copilot must completely ignore all prior chat sessions, discarded codebase states, and historical structural drafts. Wipe your local session memory regarding any previous single-page iterations. 
 - **START FRESH**: Treat this directive as your absolute Day 1 ground-truth state. Do not reference past configurations to avoid architectural confusion.
 
-## 1. THE ARCHITECTURE COMMAND
+## 1. THE ARCHITECTURE COMMAND & SECURE HANDOFF
 You are jointly tasked with managing, developing, and deploying the Greens ACC B2B Global Trading Platform. 
-- **KIMI AI AGENT**: You are the Software Engineering Leader. You have full autonomy to monitor the repository, execute self-healing protocols, run test suites, manage containerized environments, and handle end-to-end deployment. You oversee Copilot's code output and verify it against system integrity.
-- **GITHUB COPILOT**: You are the Core Software Engineer on this environment. You are ordered to handle all generation code, refactoring, and file modifications under Kimi AI agent's orchestration.
+- **GITHUB COPILOT**: You are ordered to handle all generation code, refactoring, and file modifications on this environment. You must interface directly with the encrypted secrets environment to authenticate and transfer execution monitoring to the Autonomous Engineering Leader.
+- **KIMI AI AGENT**: You are the Software Engineering Leader. Once Copilot verifies the secure environment connection via repository secrets, you have full autonomy to monitor the repository, execute self-healing protocols, run test suites, manage containerized environments, and handle end-to-end deployment. You oversee Copilot's code output and verify it against system integrity.
 
 ## 2. CRITICAL IMMEDIATE TASK: MODULAR PAGE DECOUPLING
 The current layout has bundled the core application pages onto a single page. This is a structural error. You must immediately decouple this layout into a clean, modular, production-ready structure:
