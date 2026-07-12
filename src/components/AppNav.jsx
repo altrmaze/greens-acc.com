@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { to: '/rooms',     label: '🤝 Negotiation Rooms'           },
   { to: '/analytics', label: '🔬 Agent Analytics'             },
   { to: '/dashboard', label: '🟢 Dashboard'                   },
+  { to: '/security',  label: '🛡️ Security'                    },
 ];
 
 export default function AppNav() {

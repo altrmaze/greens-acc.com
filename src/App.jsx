@@ -1,10 +1,11 @@
 import { Routes, Route } from 'react-router-dom';
-import { DevGate }      from './components/DevGate';
-import AdminPageRoute   from './AdminPageRoute';
-import Dashboard        from './pages/Dashboard';
-import CommandCenter    from './pages/CommandCenter';
-import NegotiationRooms from './pages/NegotiationRooms';
-import AgentAnalytics   from './pages/AgentAnalytics';
+import { DevGate }           from './components/DevGate';
+import AdminPageRoute        from './AdminPageRoute';
+import Dashboard             from './pages/Dashboard';
+import CommandCenter         from './pages/CommandCenter';
+import NegotiationRooms      from './pages/NegotiationRooms';
+import AgentAnalytics        from './pages/AgentAnalytics';
+import GreenBubblesSecurity  from './pages/GreenBubblesSecurity';
 
 /**
  * Root application component — Greens ACC
@@ -33,6 +34,9 @@ export default function App() {
 
       {/* ── /admin — developer access gate + role selector ─────── */}
       <Route path="/admin" element={<AdminPageRoute />} />
+
+      {/* ── /security — Green Bubbles Autonomous Defense ─────────── */}
+      <Route path="/security" element={<DevGate><GreenBubblesSecurity /></DevGate>} />
 
       {/* ── Fallback — redirect unknown paths to Command Center ──── */}
       <Route path="*" element={<DevGate><CommandCenter /></DevGate>} />
