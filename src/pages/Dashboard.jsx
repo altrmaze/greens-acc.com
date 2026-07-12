@@ -31,6 +31,7 @@ export default function Dashboard() {
       setRoomsCount(data.active_rooms_count ?? 0);
     } catch (err) {
       console.error('Dashboard sync error:', err);
+      // Using last known / default data — backend sync pending
     }
   };
 
@@ -74,6 +75,9 @@ export default function Dashboard() {
           </h1>
           <p className="text-slate-400 text-sm mt-1">
             System health monitor · auto-refresh every 5 s
+          </p>
+          <p className="text-amber-400 text-xs mt-1 font-mono">
+            ⚠ Last known data — backend sync pending
           </p>
         </div>
         <button
