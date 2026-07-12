@@ -112,9 +112,15 @@ function PanelHeader({ icon, title, subtitle }) {
 }
 
 function ModuleCard({ label }) {
+  const handleClick = () => {
+    alert(`${label}\n\nCOMING SOON — this module is not yet available.`);
+  };
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-800 px-5 py-4 text-sm font-semibold
-      text-slate-300 hover:border-emerald-500/50 hover:bg-slate-700 transition-all cursor-pointer">
+    <div
+      onClick={handleClick}
+      className="rounded-xl border border-slate-700 bg-slate-800 px-5 py-4 text-sm font-semibold
+        text-slate-300 hover:border-emerald-500/50 hover:bg-slate-700 transition-all cursor-pointer"
+    >
       {label}
     </div>
   );
