@@ -1,65 +1,17 @@
-import { Routes, Route } from 'react-router-dom';
-import { DevGate }           from './components/DevGate';
-import AdminPageRoute        from './AdminPageRoute';
-import Dashboard             from './pages/Dashboard';
-import CommandCenter         from './pages/CommandCenter';
-import NegotiationRooms      from './pages/NegotiationRooms';
-import AgentAnalytics        from './pages/AgentAnalytics';
-import GreenBubblesSecurity  from './pages/GreenBubblesSecurity';
-import ProtectedRoute        from './components/ProtectedRoute';
-import Login                 from './pages/Login';
-import GreenContainer        from './pages/GreenContainer';
-import Documents             from './pages/Documents';
-import Automations           from './pages/Automations';
-import Voice                 from './pages/Voice';
-import Travel                from './pages/Travel';
-import Forms                 from './pages/Forms';
-import Bills                 from './pages/Bills';
-import Household             from './pages/Household';
-import Permissions           from './pages/Permissions';
-import Activity              from './pages/Activity';
-import Settings              from './pages/Settings';
-import AegisMonitor          from './pages/AegisMonitor';
-import AdminDashboard        from './pages/admin/AdminDashboard';
-
 export default function App() {
   return (
-    <Routes>
-      {/* ── Auth ─────────────────────────────────────────────────── */}
-      <Route path="/login" element={<Login />} />
-
-      {/* ── Existing public pages ────────────────────────────────── */}
-      <Route path="/" element={<DevGate><CommandCenter /></DevGate>} />
-      <Route path="/rooms" element={<DevGate><NegotiationRooms /></DevGate>} />
-      <Route path="/analytics" element={<DevGate><AgentAnalytics /></DevGate>} />
-      <Route path="/dashboard" element={<DevGate><Dashboard /></DevGate>} />
-      <Route path="/admin" element={<AdminPageRoute />} />
-      <Route path="/security" element={<DevGate><GreenBubblesSecurity /></DevGate>} />
-
-      {/* ── Customer protected pages ─────────────────────────────── */}
-      <Route path="/container"   element={<ProtectedRoute><GreenContainer /></ProtectedRoute>} />
-      <Route path="/documents"   element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-      <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
-      <Route path="/voice"       element={<ProtectedRoute><Voice /></ProtectedRoute>} />
-      <Route path="/travel"      element={<ProtectedRoute><Travel /></ProtectedRoute>} />
-      <Route path="/forms"       element={<ProtectedRoute><Forms /></ProtectedRoute>} />
-      <Route path="/bills"       element={<ProtectedRoute><Bills /></ProtectedRoute>} />
-      <Route path="/household"   element={<ProtectedRoute><Household /></ProtectedRoute>} />
-      <Route path="/permissions" element={<ProtectedRoute><Permissions /></ProtectedRoute>} />
-      <Route path="/activity"    element={<ProtectedRoute><Activity /></ProtectedRoute>} />
-      <Route path="/settings"    element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-      <Route path="/aegis"       element={<ProtectedRoute><AegisMonitor /></ProtectedRoute>} />
-
-      {/* ── Admin sub-route dashboards ───────────────────────────── */}
-      <Route path="/dashboard/admin"             element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/engineer"          element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/accounting"        element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/account-manager"   element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/financial-manager" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/analyzer"          element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-
-      {/* ── Fallback ─────────────────────────────────────────────── */}
-      <Route path="*" element={<DevGate><CommandCenter /></DevGate>} />
-    </Routes>
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center px-6">
+      <section className="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900/80 p-8 text-center">
+        <p className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-400">
+          Greens ACC
+        </p>
+        <h1 className="mt-3 text-3xl font-extrabold text-white">
+          Website Under Construction
+        </h1>
+        <p className="mt-4 text-slate-300">
+          We&apos;re currently upgrading the platform. Please check back soon.
+        </p>
+      </section>
+    </main>
   );
 }
