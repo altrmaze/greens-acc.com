@@ -1,0 +1,161 @@
+# Trigger marker for workflow path filter.
+# Trigger marker 2 for workflow path filter.
+name: Supabase Production Deployment
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/deploy.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/deploy.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+    inputs:
+      run_supabase_dry_run:
+        description: 'Run the Supabase migration dry run'
+        required: false
+        type: boolean
+        default: false
+      run_production_deploy:
+        description: 'Run the production deployment steps'
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Code Linting & Tests
+        run: npm test
+
+  supabase-dry-run:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.run_supabase_dry_run)
+    needs: validate-and-test
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Verify Database Migrations (Dry Run)
+        run: |
+          if [ -n "${SUPABASE_ACCESS_TOKEN:-}" ] && [ -n "${SUPABASE_PROJECT_REF:-}" ]; then
+            echo "Running supabase db lint against linked project..."
+            supabase db lint --linked --project-ref "$SUPABASE_PROJECT_REF"
+          else
+            echo "Supabase credentials not configured; linting migrations against local postgres..."
+            DB_URL="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}"
+            psql "$DB_URL" -v ON_ERROR_STOP=1 <<'ENDSQL'
+          CREATE SCHEMA IF NOT EXISTS auth;
+          CREATE TABLE IF NOT EXISTS auth.users (id UUID PRIMARY KEY);
+          CREATE OR REPLACE FUNCTION auth.uid() RETURNS UUID LANGUAGE SQL AS $$ SELECT '00000000-0000-0000-0000-000000000000'::UUID $$;
+          ENDSQL
+            for migration in supabase/migrations/*.sql; do
+              echo "Applying migration: $migration"
+              psql "$DB_URL" -v ON_ERROR_STOP=1 -f "$migration"
+            done
+          fi
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: postgres
+
+  deploy-to-production:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.run_production_deploy)
+    needs: [validate-and-test]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+
+      - name: Deploy Supabase Edge Functions
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_ACCESS_TOKEN:-}" ] || [ -z "${SUPABASE_PROJECT_REF:-}" ]; then
+            echo "SUPABASE_ACCESS_TOKEN or SUPABASE_PROJECT_REF is not configured; skipping edge function deploy."
+            exit 0
+          fi
+          # Deploy flat JS functions (legacy format)
+          for f in supabase/functions/*.js; do
+            [ -f "$f" ] || continue
+            name="$(basename "$f" .js)"
+            echo "Deploying JS function: $name"
+            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF"
+          done
+          # Deploy directory-based functions (Deno / TypeScript format)
+          for dir in supabase/functions/*/; do
+            [ -f "${dir}index.ts" ] || continue
+            name="$(basename "$dir")"
+            echo "Deploying TS function: $name"
+            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF"
+          done
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+      - name: Push Database Changes to Production
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_DB_PASSWORD:-}" ]; then
+            echo "SUPABASE_DB_PASSWORD is not configured; skipping db push."
+            exit 0
+          fi
+          supabase db push --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}

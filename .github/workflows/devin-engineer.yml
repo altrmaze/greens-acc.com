@@ -1,0 +1,35 @@
+name: Devin Software Engineer Agent
+
+on:
+  push:
+    branches: [ main, copilot/deploy-check-success ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  devin-initialization:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Initialize Devin Engineering Agent
+        uses: cognitionlabs/devin-action@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            You are the primary software engineer on the Greens ACC repository (https://github.com/altrmaze/greens-acc.com).
+            You have full read/write access to the entire repository and are authorized to modify, repair, and deploy any part of the codebase.
+            Your tasks for this run:
+            1. Verify your environment variables and confirm secure system access.
+            2. Audit the current branch for any failing CI checks or deployment errors and resolve them.
+            3. Review and repair the Greens ACC dashboard — fix any layout, styling, component, or data-binding issues you find.
+            4. Ensure all changes pass `npm test` and `npm run build` before committing.
+            5. Commit and push any fixes directly to the active branch.
+        env:
+          DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}

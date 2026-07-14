@@ -1,5 +1,5 @@
--- Supabase database schema for GreenACC payment lifecycle and escrow deals
--- This schema defines the master deal table for the GreenACC platform.
+-- Supabase database schema for Greens ACC payment lifecycle and escrow deals
+-- This schema defines the master deal table for the Greens ACC platform.
 
 create extension if not exists "pgcrypto";
 
@@ -145,6 +145,7 @@ create index if not exists idx_compliance_logs_severity on public.compliance_log
 create index if not exists idx_room_sessions_status on public.room_sessions (session_status);
 
 -- ============================================================
+<<<<<<< HEAD
 -- GREENS ACC FRAMEWORK — SUPPLY CHAIN ENGINE
 -- ============================================================
 
@@ -166,10 +167,27 @@ create table if not exists public.supply_shipments (
   actual_arrival timestamptz,
   incoterms text,
   metadata jsonb,
+=======
+-- TRADING MONOLITH TABLES
+-- ============================================================
+
+-- Marketplace listings (Module 1: Secure Marketplace Engine)
+create table if not exists public.marketplace_listings (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  category text not null,
+  description text,
+  quantity numeric(14,4),
+  price_per_unit numeric(14,4),
+  seller_id uuid not null,
+  is_verified boolean not null default false,
+  status text not null default 'pending_verification',
+>>>>>>> origin/main
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
+<<<<<<< HEAD
 -- Milestone checkpoints per shipment
 create table if not exists public.supply_milestones (
   id uuid primary key default gen_random_uuid(),
@@ -293,3 +311,230 @@ create index if not exists idx_compliance_runs_room on public.compliance_runs (r
 create index if not exists idx_compliance_runs_deal on public.compliance_runs (deal_id);
 create index if not exists idx_compliance_checks_run on public.compliance_checks (run_id);
 create index if not exists idx_compliance_checks_status on public.compliance_checks (check_status);
+=======
+create index if not exists idx_marketplace_listings_seller on public.marketplace_listings (seller_id);
+create index if not exists idx_marketplace_listings_status on public.marketplace_listings (status);
+
+-- User profiles with compliance flags (kill-switch target)
+create table if not exists public.user_profiles (
+  id uuid primary key default gen_random_uuid(),
+  display_name text,
+  email text,
+  account_status text not null default 'active',
+  security_flags text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_user_profiles_status on public.user_profiles (account_status);
+
+-- Legal audit logs (Module 2: AI Compliance Lawyer contract audits)
+create table if not exists public.legal_audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  contract_id uuid,
+  is_compliant boolean not null default false,
+  report_payload jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_legal_audit_logs_contract on public.legal_audit_logs (contract_id);
+create index if not exists idx_legal_audit_logs_compliant on public.legal_audit_logs (is_compliant);
+
+-- Supply chain tracking (Module 3: Supply Chain & Logistics Coordinator)
+create table if not exists public.supply_chain_tracking (
+  id uuid primary key default gen_random_uuid(),
+  order_id text not null,
+  carrier_identity text not null default 'unassigned',
+  origin_point text not null,
+  destination_point text not null,
+  current_milestone text not null default 'manifest_created',
+  transit_status text not null default 'in_preparation',
+  logs jsonb not null default '[]',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_supply_chain_order on public.supply_chain_tracking (order_id);
+create index if not exists idx_supply_chain_status on public.supply_chain_tracking (transit_status);
+
+-- ============================================================
+-- DEAL CLEARANCE ROOM TABLES
+-- ============================================================
+
+-- Master clearance record per (user, deal) pair
+create table if not exists public.deal_clearances (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  user_id uuid not null,
+  commodity_type text not null default 'general',
+  status text not null default 'PENDING_DOCUMENTS'
+    check (status in ('PENDING_DOCUMENTS','PENDING_REVIEW','APPROVED','REJECTED')),
+  ncnda_signed boolean not null default false,
+  ncnda_signed_at timestamptz,
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (deal_id, user_id)
+);
+
+create index if not exists idx_deal_clearances_deal on public.deal_clearances (deal_id);
+create index if not exists idx_deal_clearances_user on public.deal_clearances (user_id);
+create index if not exists idx_deal_clearances_status on public.deal_clearances (status);
+
+-- Documents uploaded per clearance
+create table if not exists public.deal_documents (
+  id uuid primary key default gen_random_uuid(),
+  clearance_id uuid not null references public.deal_clearances(id) on delete cascade,
+  document_type text not null,
+  file_name text not null,
+  file_size_bytes int,
+  status text not null default 'PENDING_REVIEW'
+    check (status in ('PENDING_REVIEW','APPROVED','REJECTED')),
+  reviewer_notes text,
+  uploaded_at timestamptz not null default now()
+);
+
+create index if not exists idx_deal_documents_clearance on public.deal_documents (clearance_id);
+create index if not exists idx_deal_documents_status on public.deal_documents (status);
+
+-- Appointment slots booked inside the waiting room
+create table if not exists public.deal_appointments (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  user_id uuid not null,
+  scheduled_at timestamptz not null,
+  duration_minutes int not null default 60,
+  timezone text not null default 'UTC',
+  status text not null default 'pending'
+    check (status in ('pending','confirmed','cancelled')),
+  notes text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_deal_appointments_deal on public.deal_appointments (deal_id);
+create index if not exists idx_deal_appointments_user on public.deal_appointments (user_id);
+create index if not exists idx_deal_appointments_status on public.deal_appointments (status);
+
+-- Government filing tracker — human-initiated, manually tracked compliance submissions
+-- This is a record-keeping ledger. No automated bot submissions to external portals.
+create table if not exists public.proxy_gov_filings (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  deal_id uuid not null,
+  agency_target_name text not null,
+  document_type_scope text not null,
+  execution_status text not null default 'DRAFT'
+    check (execution_status in ('DRAFT','SUBMITTED','ACKNOWLEDGED','REISSUED','REJECTED','FAILED')),
+  preferred_language text not null default 'en',
+  proxy_authorization_signed boolean not null default false,
+  tracking_reference_logs jsonb not null default '{}',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_proxy_gov_filings_deal on public.proxy_gov_filings (deal_id);
+create index if not exists idx_proxy_gov_filings_user on public.proxy_gov_filings (user_id);
+create index if not exists idx_proxy_gov_filings_status on public.proxy_gov_filings (execution_status);
+
+-- ============================================================
+-- FULFILLMENT & SECONDARY MARKETPLACE TABLES
+-- ============================================================
+
+-- Post-handshake fulfillment record per deal (escrow + logistics)
+create table if not exists public.deal_fulfillments (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null unique,
+  buyer_id uuid,
+  seller_id uuid,
+  gross_value_usd numeric(15,2) not null default 0.00,
+  platform_fee_usd numeric(15,2) generated always as (round(gross_value_usd * 0.02, 2)) stored,
+  stripe_session_id text,
+  stripe_payment_status text not null default 'PENDING'
+    check (stripe_payment_status in ('PENDING','PAID','FAILED','REFUNDED')),
+  current_logistics_status text not null default 'ORIGIN_PORT'
+    check (current_logistics_status in ('ORIGIN_PORT','IN_TRANSIT','CUSTOMS_CLEARANCE','DELIVERED')),
+  vessel_tracking_id text,
+  origin_port text,
+  destination_port text,
+  estimated_delivery_date date,
+  route_coordinates jsonb not null default '[]',
+  milestone_log jsonb not null default '[]',
+  commodity_type text,
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_deal_fulfillments_deal on public.deal_fulfillments (deal_id);
+create index if not exists idx_deal_fulfillments_buyer on public.deal_fulfillments (buyer_id);
+create index if not exists idx_deal_fulfillments_seller on public.deal_fulfillments (seller_id);
+create index if not exists idx_deal_fulfillments_status on public.deal_fulfillments (stripe_payment_status);
+create index if not exists idx_deal_fulfillments_logistics on public.deal_fulfillments (current_logistics_status);
+
+-- ============================================================
+-- MEETING ROOM TABLES
+-- ============================================================
+
+-- Documents uploaded during a live negotiation session
+create table if not exists public.meeting_room_documents (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  uploader_id uuid not null,
+  file_name text not null,
+  file_path text not null,
+  mime_type text not null,
+  file_size_bytes int,
+  scan_status text not null default 'PENDING'
+    check (scan_status in ('PENDING','CLEAN','QUARANTINED')),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_meeting_docs_deal on public.meeting_room_documents (deal_id);
+create index if not exists idx_meeting_docs_uploader on public.meeting_room_documents (uploader_id);
+
+-- Private AI Secretary memos — contract-text analysis only, not counter-party surveillance.
+-- The AI analyses the deal documents and surfaces flags (e.g. "Penalty clause §4.2 is unusually broad").
+-- It does NOT monitor the other party's reading time, mouse activity, or engagement index.
+create table if not exists public.meeting_memos (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid not null,
+  receiver_id uuid not null,
+  memo_type text not null default 'CONTRACT_FLAG'
+    check (memo_type in ('CONTRACT_FLAG','COMPLIANCE_ALERT','DOCUMENT_NOTE','GENERAL')),
+  content_message text not null,
+  source_clause text,
+  severity text not null default 'INFO'
+    check (severity in ('INFO','WARNING','CRITICAL')),
+  is_read boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_meeting_memos_deal on public.meeting_memos (deal_id);
+create index if not exists idx_meeting_memos_receiver on public.meeting_memos (receiver_id);
+create index if not exists idx_meeting_memos_read on public.meeting_memos (is_read);
+
+-- ============================================================
+-- API TOKEN MANAGEMENT
+-- ============================================================
+
+-- API access tokens for programmatic platform access
+-- The full token is shown to the user once on creation only.
+-- token_hash stores a SHA-256 hex digest so the plaintext is never persisted.
+create table if not exists public.api_tokens (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  name text not null,
+  token_prefix text not null,        -- first 12 chars of the token (safe to display)
+  token_hash text not null unique,   -- SHA-256 hex of the full token
+  scopes text[] not null default '{}', -- e.g. '{read:deals,write:deals,read:shipments}'
+  is_active boolean not null default true,
+  last_used_at timestamptz,
+  expires_at timestamptz,            -- null = never expires
+  revoked_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_api_tokens_user on public.api_tokens (user_id);
+create index if not exists idx_api_tokens_prefix on public.api_tokens (token_prefix);
+create index if not exists idx_api_tokens_hash on public.api_tokens (token_hash);
+create index if not exists idx_api_tokens_active on public.api_tokens (is_active);
+>>>>>>> origin/main
