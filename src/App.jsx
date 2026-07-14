@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
 import { DevGate }           from './components/DevGate';
-import AdminPageRoute        from './AdminPageRoute';
 import Dashboard             from './pages/Dashboard';
 import CommandCenter         from './pages/CommandCenter';
 import NegotiationRooms      from './pages/NegotiationRooms';
@@ -32,11 +31,10 @@ export default function App() {
       <Route path="/" element={<DevGate><CommandCenter /></DevGate>} />
       <Route path="/rooms" element={<DevGate><NegotiationRooms /></DevGate>} />
       <Route path="/analytics" element={<DevGate><AgentAnalytics /></DevGate>} />
-      <Route path="/dashboard" element={<DevGate><Dashboard /></DevGate>} />
-      <Route path="/admin" element={<AdminPageRoute />} />
-      <Route path="/security" element={<DevGate><GreenBubblesSecurity /></DevGate>} />
 
       {/* ── Customer protected pages ─────────────────────────────── */}
+      <Route path="/dashboard"   element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/security"    element={<ProtectedRoute><GreenBubblesSecurity /></ProtectedRoute>} />
       <Route path="/container"   element={<ProtectedRoute><GreenContainer /></ProtectedRoute>} />
       <Route path="/documents"   element={<ProtectedRoute><Documents /></ProtectedRoute>} />
       <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
