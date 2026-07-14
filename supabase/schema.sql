@@ -145,7 +145,6 @@ create index if not exists idx_compliance_logs_severity on public.compliance_log
 create index if not exists idx_room_sessions_status on public.room_sessions (session_status);
 
 -- ============================================================
-<<<<<<< HEAD
 -- GREENS ACC FRAMEWORK — SUPPLY CHAIN ENGINE
 -- ============================================================
 
@@ -167,27 +166,10 @@ create table if not exists public.supply_shipments (
   actual_arrival timestamptz,
   incoterms text,
   metadata jsonb,
-=======
--- TRADING MONOLITH TABLES
--- ============================================================
-
--- Marketplace listings (Module 1: Secure Marketplace Engine)
-create table if not exists public.marketplace_listings (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  category text not null,
-  description text,
-  quantity numeric(14,4),
-  price_per_unit numeric(14,4),
-  seller_id uuid not null,
-  is_verified boolean not null default false,
-  status text not null default 'pending_verification',
->>>>>>> origin/main
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
-<<<<<<< HEAD
 -- Milestone checkpoints per shipment
 create table if not exists public.supply_milestones (
   id uuid primary key default gen_random_uuid(),
@@ -311,7 +293,26 @@ create index if not exists idx_compliance_runs_room on public.compliance_runs (r
 create index if not exists idx_compliance_runs_deal on public.compliance_runs (deal_id);
 create index if not exists idx_compliance_checks_run on public.compliance_checks (run_id);
 create index if not exists idx_compliance_checks_status on public.compliance_checks (check_status);
-=======
+
+-- ============================================================
+-- TRADING MONOLITH TABLES
+-- ============================================================
+
+-- Marketplace listings (Module 1: Secure Marketplace Engine)
+create table if not exists public.marketplace_listings (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  category text not null,
+  description text,
+  quantity numeric(14,4),
+  price_per_unit numeric(14,4),
+  seller_id uuid not null,
+  is_verified boolean not null default false,
+  status text not null default 'pending_verification',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create index if not exists idx_marketplace_listings_seller on public.marketplace_listings (seller_id);
 create index if not exists idx_marketplace_listings_status on public.marketplace_listings (status);
 
@@ -537,4 +538,3 @@ create index if not exists idx_api_tokens_user on public.api_tokens (user_id);
 create index if not exists idx_api_tokens_prefix on public.api_tokens (token_prefix);
 create index if not exists idx_api_tokens_hash on public.api_tokens (token_hash);
 create index if not exists idx_api_tokens_active on public.api_tokens (is_active);
->>>>>>> origin/main
