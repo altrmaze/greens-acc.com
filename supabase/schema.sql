@@ -145,6 +145,156 @@ create index if not exists idx_compliance_logs_severity on public.compliance_log
 create index if not exists idx_room_sessions_status on public.room_sessions (session_status);
 
 -- ============================================================
+-- GREENS ACC FRAMEWORK — SUPPLY CHAIN ENGINE
+-- ============================================================
+
+-- Master shipment tracking table
+create table if not exists public.supply_shipments (
+  id uuid primary key default gen_random_uuid(),
+  deal_id uuid references public.green_acc_deals(id) on delete set null,
+  tracking_number text not null unique,
+  origin_country text not null,
+  destination_country text not null,
+  carrier text,
+  commodity_description text,
+  hs_code text,
+  gross_weight_kg numeric(10,2),
+  volume_cbm numeric(10,3),
+  status text not null default 'pending'
+    check (status in ('pending','in_transit','customs_hold','cleared','delivered','exception','cancelled')),
+  estimated_arrival timestamptz,
+  actual_arrival timestamptz,
+  incoterms text,
+  metadata jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Milestone checkpoints per shipment
+create table if not exists public.supply_milestones (
+  id uuid primary key default gen_random_uuid(),
+  shipment_id uuid not null references public.supply_shipments(id) on delete cascade,
+  milestone_type text not null,
+  milestone_status text not null default 'pending'
+    check (milestone_status in ('pending','in_progress','completed','failed','skipped')),
+  location text,
+  notes text,
+  completed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+-- Immutable audit / event log for each shipment
+create table if not exists public.supply_shipment_events (
+  id uuid primary key default gen_random_uuid(),
+  shipment_id uuid not null references public.supply_shipments(id) on delete cascade,
+  event_type text not null,
+  previous_status text,
+  new_status text,
+  actor text,
+  description text,
+  metadata jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_supply_shipments_status on public.supply_shipments (status);
+create index if not exists idx_supply_shipments_deal on public.supply_shipments (deal_id);
+create index if not exists idx_supply_milestones_shipment on public.supply_milestones (shipment_id);
+create index if not exists idx_supply_shipment_events_shipment on public.supply_shipment_events (shipment_id);
+
+-- ============================================================
+-- GREENS ACC FRAMEWORK — GLOBAL B2B MEETING ROOM ENHANCEMENTS
+-- ============================================================
+
+-- Negotiation state machine per room
+create table if not exists public.meeting_negotiations (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid references public.instant_rooms(id) on delete cascade,
+  negotiation_phase text not null default 'discovery'
+    check (negotiation_phase in ('discovery','proposal','counter_proposal','final_terms','agreed','failed')),
+  proposed_terms jsonb,
+  counter_terms jsonb,
+  agreed_terms jsonb,
+  last_actor text,
+  phase_changed_at timestamptz not null default now(),
+  created_at timestamptz not null default now()
+);
+
+-- Live presence tracking per room
+create table if not exists public.meeting_presence (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid references public.instant_rooms(id) on delete cascade,
+  participant_id text not null,
+  participant_name text,
+  company text,
+  role text,
+  joined_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now(),
+  is_online boolean not null default true
+);
+
+-- Structured event log for meeting room activity
+create table if not exists public.room_events (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid references public.instant_rooms(id) on delete cascade,
+  event_type text not null,
+  actor_id text,
+  actor_name text,
+  payload jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_meeting_negotiations_room on public.meeting_negotiations (room_id);
+create index if not exists idx_meeting_presence_room on public.meeting_presence (room_id);
+create index if not exists idx_meeting_presence_online on public.meeting_presence (is_online);
+create index if not exists idx_room_events_room on public.room_events (room_id);
+create index if not exists idx_room_events_type on public.room_events (event_type);
+
+-- ============================================================
+-- GREENS ACC FRAMEWORK — AI LEGAL COMPLIANCE WORKFLOW
+-- ============================================================
+
+-- A compliance run groups all checks for one execution cycle
+create table if not exists public.compliance_runs (
+  id uuid primary key default gen_random_uuid(),
+  room_id uuid references public.instant_rooms(id) on delete set null,
+  deal_id uuid references public.green_acc_deals(id) on delete set null,
+  shipment_id uuid references public.supply_shipments(id) on delete set null,
+  run_status text not null default 'queued'
+    check (run_status in ('queued','running','completed','failed','aborted')),
+  triggered_by text,
+  scope text not null default 'full'
+    check (scope in ('full','sanctions','tariff','commodity','export_control','document')),
+  result_summary jsonb,
+  total_checks integer not null default 0,
+  passed_checks integer not null default 0,
+  failed_checks integer not null default 0,
+  started_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
+-- Individual verification gates within a compliance run
+create table if not exists public.compliance_checks (
+  id uuid primary key default gen_random_uuid(),
+  run_id uuid not null references public.compliance_runs(id) on delete cascade,
+  check_type text not null,
+  check_status text not null default 'pending'
+    check (check_status in ('pending','pass','fail','warning','skipped')),
+  subject text,
+  finding text,
+  legal_reference text,
+  recommendation text,
+  requires_human_review boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_compliance_runs_status on public.compliance_runs (run_status);
+create index if not exists idx_compliance_runs_room on public.compliance_runs (room_id);
+create index if not exists idx_compliance_runs_deal on public.compliance_runs (deal_id);
+create index if not exists idx_compliance_checks_run on public.compliance_checks (run_id);
+create index if not exists idx_compliance_checks_status on public.compliance_checks (check_status);
+
+-- ============================================================
 -- TRADING MONOLITH TABLES
 -- ============================================================
 
