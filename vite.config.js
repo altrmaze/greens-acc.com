@@ -8,6 +8,7 @@ export default defineConfig({
     emptyOutDir: false, // keep static files already copied by the build script
     rollupOptions: {
       input: {
+        main : 'index.html',
         admin: 'admin.html',
       },
     },

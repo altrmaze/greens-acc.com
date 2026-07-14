@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { DevGate }           from './components/DevGate';
+import LandingPage           from './pages/LandingPage';
 import Dashboard             from './pages/Dashboard';
 import CommandCenter         from './pages/CommandCenter';
 import NegotiationRooms      from './pages/NegotiationRooms';
@@ -27,10 +28,13 @@ export default function App() {
       {/* ── Auth ─────────────────────────────────────────────────── */}
       <Route path="/login" element={<Login />} />
 
+      {/* ── Public landing page ──────────────────────────────────── */}
+      <Route path="/" element={<LandingPage />} />
+
       {/* ── Existing public pages ────────────────────────────────── */}
-      <Route path="/" element={<DevGate><CommandCenter /></DevGate>} />
-      <Route path="/rooms" element={<DevGate><NegotiationRooms /></DevGate>} />
-      <Route path="/analytics" element={<DevGate><AgentAnalytics /></DevGate>} />
+      <Route path="/command-center" element={<DevGate><CommandCenter /></DevGate>} />
+      <Route path="/rooms"          element={<DevGate><NegotiationRooms /></DevGate>} />
+      <Route path="/analytics"      element={<DevGate><AgentAnalytics /></DevGate>} />
 
       {/* ── Customer protected pages ─────────────────────────────── */}
       <Route path="/dashboard"   element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -57,7 +61,7 @@ export default function App() {
       <Route path="/dashboard/analyzer"          element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 
       {/* ── Fallback ─────────────────────────────────────────────── */}
-      <Route path="*" element={<DevGate><CommandCenter /></DevGate>} />
+      <Route path="*" element={<LandingPage />} />
     </Routes>
   );
 }

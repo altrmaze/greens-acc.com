@@ -5,9 +5,9 @@ import i18n from '../i18n/index.js';
 import { useAuth } from '../hooks/useAuth';
 
 const PUBLIC_NAV = [
-  { to: '/',          end: true, icon: '🏛️', key: 'commandCenter' },
-  { to: '/rooms',     icon: '🤝', key: 'rooms' },
-  { to: '/analytics', icon: '🔬', key: 'analytics' },
+  { to: '/command-center', icon: '🏛️', key: 'commandCenter' },
+  { to: '/rooms',          icon: '🤝', key: 'rooms' },
+  { to: '/analytics',      icon: '🔬', key: 'analytics' },
 ];
 
 const CUSTOMER_NAV = [
