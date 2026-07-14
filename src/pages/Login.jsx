@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../supabaseClient';
+import { defaultRedirectForRole } from '../lib/auth';
 
 export default function Login() {
   const { t } = useTranslation();
@@ -16,13 +17,30 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
     if (err) {
-      setError(err.message);
+      // Surface a user-friendly message; never expose server internals.
+      setError(
+        err.status === 400 || err.message?.toLowerCase().includes('invalid')
+          ? 'Invalid email or password. Please try again.'
+          : err.message
+      );
       setLoading(false);
-    } else {
-      navigate('/');
+      return;
     }
+    // Fetch role from the server-side profiles table to decide where to redirect.
+    // The role in `data.user` JWT claims is not trusted here.
+    const userId = data.session?.user?.id;
+    let role = null;
+    if (userId) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single();
+      role = profile?.role ?? null;
+    }
+    navigate(defaultRedirectForRole(role), { replace: true });
   };
 
   const handleMagicLink = async () => {
