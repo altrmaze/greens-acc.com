@@ -17,8 +17,6 @@ jobs:
           node-version: '20'
 
       - name: Execute Native Verification & Build
-        env:
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           echo "Executing native workspace verification from PROJECT_ORCHESTRATION.md..."
           echo "Ensuring complete amnesia of old single-page assets..."
