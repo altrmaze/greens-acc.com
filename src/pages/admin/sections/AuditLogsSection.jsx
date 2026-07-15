@@ -1,22 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../../../supabaseClient';
-
-const AGENT_EVENT_COLOR = {
-  success: 'bg-emerald-500/10 text-emerald-400',
-  error:   'bg-red-500/10 text-red-400',
-  warning: 'bg-amber-500/10 text-amber-400',
-};
-
-const USER_ACTION_COLOR = {
-  invite_user:      'bg-emerald-500/10 text-emerald-400',
-  update_role:      'bg-blue-500/10 text-blue-400',
-  deactivate_user:  'bg-amber-500/10 text-amber-400',
-  reactivate_user:  'bg-emerald-500/10 text-emerald-400',
-  reset_password:   'bg-violet-500/10 text-violet-400',
-  delete_user:      'bg-red-500/10 text-red-400',
-};
+import {
+  actionLabel,
+  actionBadgeClass,
+  agentStatusBadgeClass,
+  matchesAuditFilter,
+  matchesAgentFilter,
+  USER_ACTION_TYPES,
+  formatTimestamp,
+} from '../../../lib/admin';
 
 const TABS = ['User Management', 'Agent Actions'];
+
+const AGENT_STATUSES = ['active', 'completed', 'success', 'running', 'pending', 'failed', 'error', 'warning'];
 
 function Skeleton({ rows = 6 }) {
   return (
@@ -24,6 +20,81 @@ function Skeleton({ rows = 6 }) {
       {[...Array(rows)].map((_, i) => (
         <div key={i} className="animate-pulse bg-slate-700 h-9 rounded" />
       ))}
+    </div>
+  );
+}
+
+function FilterBar({ filters, onChange, actionOptions, statusOptions }) {
+  return (
+    <div className="px-5 py-3 border-b border-slate-700 flex flex-wrap items-center gap-3">
+      {/* Text search */}
+      <div className="relative flex-1 min-w-[180px]">
+        <input
+          type="text"
+          value={filters.search}
+          onChange={(e) => onChange({ ...filters, search: e.target.value })}
+          placeholder="Search…"
+          className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg pl-8 pr-3 py-1.5 focus:outline-none focus:border-emerald-500/50 placeholder-slate-600"
+        />
+        <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+
+      {/* Action / Status filter */}
+      {actionOptions && (
+        <select
+          value={filters.action ?? ''}
+          onChange={(e) => onChange({ ...filters, action: e.target.value })}
+          className="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/50"
+        >
+          <option value="">All actions</option>
+          {actionOptions.map((a) => (
+            <option key={a} value={a}>{actionLabel(a)}</option>
+          ))}
+        </select>
+      )}
+
+      {statusOptions && (
+        <select
+          value={filters.status ?? ''}
+          onChange={(e) => onChange({ ...filters, status: e.target.value })}
+          className="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/50"
+        >
+          <option value="">All statuses</option>
+          {statusOptions.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+      )}
+
+      {/* Date from */}
+      <input
+        type="date"
+        value={filters.dateFrom}
+        onChange={(e) => onChange({ ...filters, dateFrom: e.target.value })}
+        title="From date"
+        className="bg-slate-900 border border-slate-700 text-slate-400 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-emerald-500/50 [color-scheme:dark]"
+      />
+
+      {/* Date to */}
+      <input
+        type="date"
+        value={filters.dateTo}
+        onChange={(e) => onChange({ ...filters, dateTo: e.target.value })}
+        title="To date"
+        className="bg-slate-900 border border-slate-700 text-slate-400 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-emerald-500/50 [color-scheme:dark]"
+      />
+
+      {/* Clear */}
+      {(filters.search || filters.action || filters.status || filters.dateFrom || filters.dateTo) && (
+        <button
+          onClick={() => onChange({ search: '', action: '', status: '', dateFrom: '', dateTo: '' })}
+          className="text-xs text-slate-500 hover:text-slate-300 transition-colors flex-shrink-0"
+        >
+          Clear filters
+        </button>
+      )}
     </div>
   );
 }
@@ -38,19 +109,19 @@ function UserAuditList({ events, loading, error }) {
   }
   if (loading) return <Skeleton />;
   if (events.length === 0) {
-    return <p className="px-5 py-6 text-slate-500 text-sm">No user management events recorded yet.</p>;
+    return <p className="px-5 py-6 text-slate-500 text-sm">No matching user management events.</p>;
   }
   return (
     <ul className="divide-y divide-slate-700 max-h-[60vh] overflow-y-auto">
       {events.map((ev) => {
-        const colorCls = USER_ACTION_COLOR[ev.action] ?? 'bg-slate-700 text-slate-400';
-        const details = ev.new_values || ev.old_values;
+        const colorCls = actionBadgeClass(ev.action);
+        const details  = ev.new_values || ev.old_values;
         return (
           <li key={ev.id} className="px-5 py-3 flex flex-wrap items-start gap-3 hover:bg-slate-700/40 transition-colors">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${colorCls}`}>
-                  {ev.action ?? '—'}
+                  {actionLabel(ev.action)}
                 </span>
                 {ev.target_id && (
                   <span className="text-xs text-slate-400 font-mono truncate max-w-[140px]">
@@ -65,7 +136,7 @@ function UserAuditList({ events, loading, error }) {
               )}
             </div>
             <span className="text-xs text-slate-600 flex-shrink-0">
-              {ev.created_at ? new Date(ev.created_at).toLocaleString() : '—'}
+              {formatTimestamp(ev.created_at)}
             </span>
           </li>
         );
@@ -84,13 +155,13 @@ function AgentActionList({ events, loading, error }) {
   }
   if (loading) return <Skeleton />;
   if (events.length === 0) {
-    return <p className="px-5 py-6 text-slate-500 text-sm">No agent events recorded yet.</p>;
+    return <p className="px-5 py-6 text-slate-500 text-sm">No matching agent events.</p>;
   }
   return (
     <ul className="divide-y divide-slate-700 max-h-[60vh] overflow-y-auto">
       {events.map((ev) => {
         const typeKey  = ev.action_type ?? ev.event_type ?? '';
-        const colorCls = AGENT_EVENT_COLOR[ev.status] ?? 'bg-slate-700 text-slate-400';
+        const colorCls = agentStatusBadgeClass(ev.status);
         return (
           <li key={ev.id} className="px-5 py-3 flex flex-wrap items-start gap-3 hover:bg-slate-700/40 transition-colors">
             <div className="flex-1 min-w-0">
@@ -107,7 +178,7 @@ function AgentActionList({ events, loading, error }) {
               </span>
             )}
             <span className="text-xs text-slate-600 flex-shrink-0">
-              {ev.created_at ? new Date(ev.created_at).toLocaleString() : '—'}
+              {formatTimestamp(ev.created_at)}
             </span>
           </li>
         );
@@ -115,6 +186,8 @@ function AgentActionList({ events, loading, error }) {
     </ul>
   );
 }
+
+const DEFAULT_FILTERS = { search: '', action: '', status: '', dateFrom: '', dateTo: '' };
 
 export default function AuditLogsSection() {
   const [activeTab, setActiveTab] = useState(0);
@@ -125,6 +198,9 @@ export default function AuditLogsSection() {
   const [agentLoading, setAgentLoading] = useState(true);
   const [userError,    setUserError]    = useState(null);
   const [agentError,   setAgentError]   = useState(null);
+
+  const [userFilters,  setUserFilters]  = useState(DEFAULT_FILTERS);
+  const [agentFilters, setAgentFilters] = useState(DEFAULT_FILTERS);
 
   useEffect(() => {
     (async () => {
@@ -152,9 +228,19 @@ export default function AuditLogsSection() {
     })();
   }, []);
 
+  const filteredUserEvents = useMemo(
+    () => userEvents.filter((ev) => matchesAuditFilter(ev, userFilters)),
+    [userEvents, userFilters],
+  );
+
+  const filteredAgentEvents = useMemo(
+    () => agentEvents.filter((ev) => matchesAgentFilter(ev, agentFilters)),
+    [agentEvents, agentFilters],
+  );
+
   const counts = [
-    userLoading  ? '…' : String(userEvents.length),
-    agentLoading ? '…' : String(agentEvents.length),
+    userLoading  ? '…' : `${filteredUserEvents.length}/${userEvents.length}`,
+    agentLoading ? '…' : `${filteredAgentEvents.length}/${agentEvents.length}`,
   ];
 
   return (
@@ -162,7 +248,7 @@ export default function AuditLogsSection() {
       <div>
         <h2 className="text-xl font-extrabold text-slate-100 mb-1">Audit Logs</h2>
         <p className="text-sm text-slate-500">
-          User-management actions and agent event streams.
+          User-management actions and agent event streams with real-time filters.
         </p>
       </div>
 
@@ -185,16 +271,34 @@ export default function AuditLogsSection() {
           ))}
         </div>
 
+        {/* Filter bar */}
+        {activeTab === 0 && (
+          <FilterBar
+            filters={userFilters}
+            onChange={setUserFilters}
+            actionOptions={[...USER_ACTION_TYPES]}
+            statusOptions={null}
+          />
+        )}
+        {activeTab === 1 && (
+          <FilterBar
+            filters={agentFilters}
+            onChange={setAgentFilters}
+            actionOptions={null}
+            statusOptions={AGENT_STATUSES}
+          />
+        )}
+
         {activeTab === 0 && (
           <UserAuditList
-            events={userEvents}
+            events={filteredUserEvents}
             loading={userLoading}
             error={userError}
           />
         )}
         {activeTab === 1 && (
           <AgentActionList
-            events={agentEvents}
+            events={filteredAgentEvents}
             loading={agentLoading}
             error={agentError}
           />

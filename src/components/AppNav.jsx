@@ -4,27 +4,8 @@ import { useTranslation } from 'react-i18next';
 import i18n from '../i18n/index.js';
 import { useAuth } from '../hooks/useAuth';
 
-const PUBLIC_NAV = [
-  { to: '/command-center', icon: '🏛️', key: 'commandCenter' },
-  { to: '/rooms',          icon: '🤝', key: 'rooms' },
-  { to: '/analytics',      icon: '🔬', key: 'analytics' },
-];
-
-const CUSTOMER_NAV = [
-  { to: '/dashboard',   icon: '🟢', key: 'dashboard' },
-  { to: '/container',   icon: '🟢', key: 'container' },
-  { to: '/documents',   icon: '📄', key: 'documents' },
-  { to: '/voice',       icon: '🎙️', key: 'voice' },
-  { to: '/travel',      icon: '✈️', key: 'travel' },
-  { to: '/forms',       icon: '📝', key: 'forms' },
-  { to: '/bills',       icon: '💳', key: 'bills' },
-  { to: '/household',   icon: '🏠', key: 'household' },
-  { to: '/permissions', icon: '🔑', key: 'permissions' },
-  { to: '/activity',    icon: '📋', key: 'activity' },
-  { to: '/automations', icon: '⚙️', key: 'automations' },
-  { to: '/security',    icon: '🛡️', key: 'security' },
-  { to: '/aegis',       icon: '🛡️', key: 'aegis' },
-  { to: '/settings',    icon: '⚙️', key: 'settings' },
+const DEV_NAV = [
+  { to: '/dev-dashboard', icon: '🖥️', key: 'devDashboard' },
 ];
 
 function NavItem({ to, icon, label, end, onClick }) {
@@ -70,11 +51,8 @@ export default function AppNav() {
 
         {/* Desktop nav — hidden on mobile */}
         <div className="hidden lg:flex items-center gap-1 overflow-x-auto">
-          {PUBLIC_NAV.map(({ to, icon, key, end }) => (
+          {DEV_NAV.map(({ to, icon, key, end }) => (
             <NavItem key={to} to={to} icon={icon} label={t(`nav.${key}`)} end={end} />
-          ))}
-          {user && CUSTOMER_NAV.map(({ to, icon, key }) => (
-            <NavItem key={to} to={to} icon={icon} label={t(`nav.${key}`)} />
           ))}
         </div>
 
@@ -116,23 +94,16 @@ export default function AppNav() {
       {menuOpen && (
         <div className="lg:hidden bg-slate-900 border-t border-slate-800 px-4 py-4 space-y-1 max-h-[80vh] overflow-y-auto">
           <p className="text-xs text-slate-500 uppercase tracking-wider mb-2 px-3">Navigation</p>
-          {PUBLIC_NAV.map(({ to, icon, key, end }) => (
+          {DEV_NAV.map(({ to, icon, key, end }) => (
             <NavItem key={to} to={to} icon={icon} label={t(`nav.${key}`)} end={end} onClick={close} />
           ))}
           {user && (
-            <>
-              <div className="my-3 border-t border-slate-800" />
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-2 px-3">My Account</p>
-              {CUSTOMER_NAV.map(({ to, icon, key }) => (
-                <NavItem key={to} to={to} icon={icon} label={t(`nav.${key}`)} onClick={close} />
-              ))}
-              <div className="mt-3 pt-3 border-t border-slate-800">
-                <button
-                  onClick={() => { signOut(); close(); }}
-                  className="w-full text-start px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                >{t('nav.logout')}</button>
-              </div>
-            </>
+            <div className="mt-3 pt-3 border-t border-slate-800">
+              <button
+                onClick={() => { signOut(); close(); }}
+                className="w-full text-start px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+              >{t('nav.logout')}</button>
+            </div>
           )}
         </div>
       )}
