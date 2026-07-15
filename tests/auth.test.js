@@ -90,8 +90,8 @@ test('developer role is an allowed role', () => {
   assert.equal(isAllowedRole(DEVELOPER_ROLE), true);
 });
 
-test('developer redirect points to /dev-dashboard', () => {
-  assert.equal(defaultRedirectForRole(DEVELOPER_ROLE), '/dev-dashboard');
+test('developer redirect points to /dashboard', () => {
+  assert.equal(defaultRedirectForRole(DEVELOPER_ROLE), '/dashboard');
 });
 
 // ── Unauthorized / disabled roles ────────────────────────────────────────
@@ -141,7 +141,7 @@ test('restored admin session retains admin access', () => {
 test('restored developer session retains developer access', () => {
   const restoredRole = DEVELOPER_ROLE;
   assert.equal(hasDeveloperAccess(restoredRole), true);
-  assert.equal(defaultRedirectForRole(restoredRole), '/dev-dashboard');
+  assert.equal(defaultRedirectForRole(restoredRole), '/dashboard');
 });
 
 // ── Logout ────────────────────────────────────────────────────────────────
