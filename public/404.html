@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Greens ACC</title>
+  <script>
+    /**
+     * GitHub Pages SPA fallback.
+     *
+     * GitHub Pages returns this 404 page for any URL that does not match a
+     * real file in the deployment.  This script immediately redirects the
+     * browser to the React SPA (index.html) with the original pathname
+     * encoded as a hash fragment so HashRouter can restore the route.
+     *
+     * Example:  /dashboard  →  /#/dashboard
+     *           /login       →  /#/login
+     */
+    (function () {
+      var l = window.location;
+      var origin = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '');
+      var path   = l.pathname.replace(/\/$/, '');
+      l.replace(origin + '/#' + (path || '/') + l.search);
+    })();
+  </script>
+</head>
+<body></body>
+</html>

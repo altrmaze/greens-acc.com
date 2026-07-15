@@ -17,6 +17,11 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    if (!supabase) {
+      setError('Authentication service is not configured. Please contact the administrator.');
+      setLoading(false);
+      return;
+    }
     const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
     if (err) {
       // Surface a user-friendly message; never expose server internals.
@@ -45,6 +50,10 @@ export default function Login() {
 
   const handleMagicLink = async () => {
     if (!email) { setError(t('common.required') + ': ' + t('common.email')); return; }
+    if (!supabase) {
+      setError('Authentication service is not configured. Please contact the administrator.');
+      return;
+    }
     setLoading(true);
     setError('');
     const { error: err } = await supabase.auth.signInWithOtp({ email });
