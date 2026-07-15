@@ -14,7 +14,7 @@ import { supabase } from '../supabaseClient';
 const AuthContext = createContext(null);
 
 async function fetchRoleFromDB(userId) {
-  if (!userId) return null;
+  if (!userId || !supabase) return null;
   const { data, error } = await supabase
     .from('profiles')
     .select('role')
@@ -30,6 +30,13 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If Supabase is not configured (missing credentials), skip auth check
+    // and leave the user unauthenticated so the app renders correctly.
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     // Restore session on mount — getSession() trusts the persisted JWT
@@ -65,7 +72,14 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const signOut = () => supabase.auth.signOut();
+  const signOut = () => supabase?.auth.signOut();
+
+  return (
+    <AuthContext.Provider value={{ user, role, loading, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
   return (
     <AuthContext.Provider value={{ user, role, loading, signOut }}>
