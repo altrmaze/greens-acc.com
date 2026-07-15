@@ -19,6 +19,27 @@
       var l = window.location;
       var origin = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '');
       var path   = l.pathname.replace(/\/$/, '');
+      var searchPayload = l.search ? l.search.slice(1) : '';
+      var hashPayload = l.hash ? l.hash.slice(1) : '';
+      var isRecoveryPayload = function (value) {
+        return /(^|[?&])(type=recovery|code=|token_hash=|access_token=|refresh_token=)/.test(value || '');
+      };
+      var recoveryPayload = isRecoveryPayload(searchPayload)
+        ? searchPayload
+        : isRecoveryPayload(hashPayload)
+          ? hashPayload
+          : '';
+
+      if (recoveryPayload) {
+        try {
+          window.sessionStorage.setItem('supabase-recovery-hash', recoveryPayload);
+        } catch (err) {
+          // Ignore storage failures and keep the redirect flow working.
+        }
+        l.replace(origin + '/#' + (path || '/'));
+        return;
+      }
+
       l.replace(origin + '/#' + (path || '/') + l.search);
     })();
   </script>

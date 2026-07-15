@@ -11,6 +11,8 @@
 
 export const ADMIN_ROLE     = 'admin';
 export const DEVELOPER_ROLE = 'developer';
+export const SUPABASE_RECOVERY_STORAGE_KEY = 'supabase-recovery-hash';
+export const SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY = 'supabase-recovery-active';
 
 /**
  * The exhaustive set of roles that are currently permitted to log in.
@@ -49,8 +51,58 @@ export function isAllowedRole(role) {
  */
 export function defaultRedirectForRole(role) {
   switch (role) {
-    case ADMIN_ROLE:
-    case DEVELOPER_ROLE: return '/dashboard';
+    case ADMIN_ROLE:     return '/dashboard';
+    case DEVELOPER_ROLE: return '/unauthorized';
     default:             return '/';
   }
+}
+
+export function normalizeBasePath(baseUrl = '/') {
+  if (typeof baseUrl !== 'string' || baseUrl === '/' || baseUrl === '') {
+    return '';
+  }
+
+  return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+}
+
+export function getResetPasswordPath(baseUrl = '/') {
+  return `${normalizeBasePath(baseUrl)}/reset-password`;
+}
+
+export function buildResetPasswordRedirect(origin, baseUrl = '/') {
+  return `${origin}${getResetPasswordPath(baseUrl)}`;
+}
+
+export function getHashRouterRouteUrl(baseUrl = '/', route = '/') {
+  const normalizedRoute = route.startsWith('/') ? route : `/${route}`;
+  return `${normalizeBasePath(baseUrl)}/#${normalizedRoute}`;
+}
+
+export function extractRecoveryParamsFromString(value) {
+  const rawValue = typeof value === 'string' ? value.trim() : '';
+  const withoutPrefix = rawValue.replace(/^[#?]/, '');
+  const paramsSource = withoutPrefix.includes('?')
+    ? withoutPrefix.slice(withoutPrefix.indexOf('?') + 1)
+    : withoutPrefix;
+  const params = new URLSearchParams(paramsSource);
+
+  return {
+    type: params.get('type'),
+    code: params.get('code'),
+    tokenHash: params.get('token_hash'),
+    accessToken: params.get('access_token'),
+    refreshToken: params.get('refresh_token'),
+  };
+}
+
+export function isRecoveryPayload(value) {
+  const {
+    type,
+    code,
+    tokenHash,
+    accessToken,
+    refreshToken,
+  } = extractRecoveryParamsFromString(value);
+
+  return type === 'recovery' || Boolean(code || tokenHash || accessToken || refreshToken);
 }

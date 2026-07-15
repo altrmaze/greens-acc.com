@@ -17,7 +17,7 @@ export default function SettingsSection() {
             { label: 'Auth Provider', value: 'Supabase Auth (JWT + DB role via profiles table)' },
             { label: 'RBAC Model',    value: 'Server-side role from profiles.role — never client-derived' },
             { label: 'Deployment',    value: 'GitHub Pages (dist/) via pages-deploy.yml' },
-            { label: 'Under Construction', value: 'Public landing page active · Admin panel live' },
+            { label: 'Under Construction', value: 'Public landing page active · hidden from authenticated admin/developer users' },
           ].map(({ label, value }) => (
             <div key={label} className="px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-1">
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider w-48 flex-shrink-0">{label}</span>
@@ -35,7 +35,7 @@ export default function SettingsSection() {
         <div className="divide-y divide-slate-700">
           {[
             { label: 'Admin Access',     value: '/dashboard requires admin role (server-verified)' },
-            { label: 'Redirect Policy',  value: 'Unauthenticated → /login · Non-admin → / (landing)' },
+            { label: 'Redirect Policy',  value: 'Unauthenticated → /login · Developer/invalid role → /unauthorized' },
             { label: 'RLS',              value: 'Row Level Security enabled on all Supabase tables' },
             { label: 'Role Source',      value: 'profiles table (Supabase DB) — not JWT claims' },
           ].map(({ label, value }) => (

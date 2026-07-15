@@ -1,34 +1,37 @@
 import { useState, useEffect } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { AdminProvider, useAdmin } from '../../context/AdminContext';
 import ErrorBoundary from '../../components/ErrorBoundary';
+import DashboardSection from './sections/DashboardSection';
+import UsersSection from './sections/UsersSection';
+import DevelopersSection from './sections/DevelopersSection';
+import SettingsSection from './sections/SettingsSection';
+import AuditLogsSection from './sections/AuditLogsSection';
 
 const NAV_ITEMS = [
-  { to: '/dashboard',            end: true,  icon: '📊', label: 'Dashboard'  },
-  { to: '/dashboard/users',      end: false, icon: '👥', label: 'Users'       },
-  { to: '/dashboard/developers', end: false, icon: '⚙️', label: 'Developers'  },
-  { to: '/dashboard/settings',   end: false, icon: '🔧', label: 'Settings'    },
-  { to: '/dashboard/audit-logs', end: false, icon: '📋', label: 'Audit Logs'  },
+  { key: 'overview',   icon: '📊', label: 'Dashboard', component: DashboardSection },
+  { key: 'users',      icon: '👥', label: 'Users', component: UsersSection },
+  { key: 'developers', icon: '⚙️', label: 'Developers', component: DevelopersSection },
+  { key: 'settings',   icon: '🔧', label: 'Settings', component: SettingsSection },
+  { key: 'audit-logs', icon: '📋', label: 'Audit Logs', component: AuditLogsSection },
 ];
 
-function SidebarLink({ to, end, icon, label, onClick }) {
+function SidebarLink({ icon, label, active, onClick }) {
   return (
-    <NavLink
-      to={to}
-      end={end}
+    <button
+      type="button"
       onClick={onClick}
-      className={({ isActive }) =>
-        `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-          isActive
-            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-            : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
-        }`
-      }
+      aria-pressed={active}
+      className={`flex w-full items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+        active
+          ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+          : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800'
+      }`}
     >
       <span className="text-base leading-none">{icon}</span>
       <span>{label}</span>
-    </NavLink>
+    </button>
   );
 }
 
@@ -69,7 +72,11 @@ function AdminNotification() {
 function AdminShell() {
   const { user, signOut } = useAuth();
   const navigate          = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sectionKey = searchParams.get('section') ?? 'overview';
+  const activeItem = NAV_ITEMS.find(({ key }) => key === sectionKey) ?? NAV_ITEMS[0];
+  const ActiveSection = activeItem.component;
 
   const handleSignOut = async () => {
     await signOut();
@@ -77,6 +84,16 @@ function AdminShell() {
   };
 
   const closeSidebar = () => setSidebarOpen(false);
+  const selectSection = (key) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (key === 'overview') {
+      nextParams.delete('section');
+    } else {
+      nextParams.set('section', key);
+    }
+    setSearchParams(nextParams, { replace: true });
+    closeSidebar();
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col">
@@ -102,7 +119,9 @@ function AdminShell() {
           GREENS ACC
         </span>
 
-        <span className="text-slate-600 text-xs hidden sm:block ms-2">/ Admin Control Room</span>
+        <span className="text-slate-600 text-xs hidden sm:block ms-2">
+          / Admin Control Room / {activeItem.label}
+        </span>
 
         <div className="ms-auto flex items-center gap-3">
           {user && (
@@ -142,14 +161,13 @@ function AdminShell() {
           <p className="text-xs font-semibold text-slate-600 uppercase tracking-widest px-4 mb-2">
             Navigation
           </p>
-          {NAV_ITEMS.map(({ to, end, icon, label }) => (
+          {NAV_ITEMS.map(({ key, icon, label }) => (
             <SidebarLink
-              key={to}
-              to={to}
-              end={end}
+              key={key}
               icon={icon}
               label={label}
-              onClick={closeSidebar}
+              active={activeItem.key === key}
+              onClick={() => selectSection(key)}
             />
           ))}
 
@@ -167,7 +185,7 @@ function AdminShell() {
         {/* ── Main content (wrapped in ErrorBoundary) ───────────────────── */}
         <main className="flex-1 min-w-0 p-6 md:p-8">
           <ErrorBoundary>
-            <Outlet />
+            <ActiveSection />
           </ErrorBoundary>
         </main>
       </div>

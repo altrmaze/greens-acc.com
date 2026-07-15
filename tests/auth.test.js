@@ -16,6 +16,14 @@ import {
   ADMIN_ROLE,
   DEVELOPER_ROLE,
   ALLOWED_ROLES,
+  SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY,
+  SUPABASE_RECOVERY_STORAGE_KEY,
+  normalizeBasePath,
+  getResetPasswordPath,
+  buildResetPasswordRedirect,
+  getHashRouterRouteUrl,
+  extractRecoveryParamsFromString,
+  isRecoveryPayload,
 } from '../src/lib/auth.js';
 
 let passed = 0;
@@ -90,8 +98,8 @@ test('developer role is an allowed role', () => {
   assert.equal(isAllowedRole(DEVELOPER_ROLE), true);
 });
 
-test('developer redirect points to /dashboard', () => {
-  assert.equal(defaultRedirectForRole(DEVELOPER_ROLE), '/dashboard');
+test('developer redirect points to /unauthorized', () => {
+  assert.equal(defaultRedirectForRole(DEVELOPER_ROLE), '/unauthorized');
 });
 
 // ── Unauthorized / disabled roles ────────────────────────────────────────
@@ -141,7 +149,7 @@ test('restored admin session retains admin access', () => {
 test('restored developer session retains developer access', () => {
   const restoredRole = DEVELOPER_ROLE;
   assert.equal(hasDeveloperAccess(restoredRole), true);
-  assert.equal(defaultRedirectForRole(restoredRole), '/dashboard');
+  assert.equal(defaultRedirectForRole(restoredRole), '/unauthorized');
 });
 
 // ── Logout ────────────────────────────────────────────────────────────────
@@ -164,6 +172,74 @@ test('after logout, role is null — not an allowed role', () => {
 
 test('after logout, redirect defaults to /', () => {
   assert.equal(defaultRedirectForRole(null), '/');
+});
+
+// ── Password recovery helpers ──────────────────────────────────────────────
+console.log('\nPassword recovery helpers:');
+
+test('recovery storage key is stable', () => {
+  assert.equal(SUPABASE_RECOVERY_STORAGE_KEY, 'supabase-recovery-hash');
+});
+
+test('recovery active storage key is stable', () => {
+  assert.equal(SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY, 'supabase-recovery-active');
+});
+
+test('normalizeBasePath trims trailing slash but keeps repo base path', () => {
+  assert.equal(normalizeBasePath('/greens-acc.com/'), '/greens-acc.com');
+});
+
+test('root base path normalizes to empty prefix', () => {
+  assert.equal(normalizeBasePath('/'), '');
+});
+
+test('reset password redirect uses app base path', () => {
+  assert.equal(
+    buildResetPasswordRedirect('https://greens-acc.com', '/portal/'),
+    'https://greens-acc.com/portal/reset-password'
+  );
+});
+
+test('hash router reset route is generated correctly', () => {
+  assert.equal(getHashRouterRouteUrl('/portal/', '/reset-password'), '/portal/#/reset-password');
+});
+
+test('reset password path is generated correctly', () => {
+  assert.equal(getResetPasswordPath('/portal/'), '/portal/reset-password');
+});
+
+test('extractRecoveryParamsFromString parses access and refresh tokens', () => {
+  assert.deepEqual(
+    extractRecoveryParamsFromString('#access_token=abc&refresh_token=def&type=recovery'),
+    {
+      type: 'recovery',
+      code: null,
+      tokenHash: null,
+      accessToken: 'abc',
+      refreshToken: 'def',
+    }
+  );
+});
+
+test('extractRecoveryParamsFromString parses route query payloads', () => {
+  assert.deepEqual(
+    extractRecoveryParamsFromString('/reset-password?code=123&type=recovery'),
+    {
+      type: 'recovery',
+      code: '123',
+      tokenHash: null,
+      accessToken: null,
+      refreshToken: null,
+    }
+  );
+});
+
+test('isRecoveryPayload detects recovery links', () => {
+  assert.equal(isRecoveryPayload('?token_hash=xyz&type=recovery'), true);
+});
+
+test('isRecoveryPayload ignores ordinary route hashes', () => {
+  assert.equal(isRecoveryPayload('#/dashboard'), false);
 });
 
 // ── Summary ───────────────────────────────────────────────────────────────
