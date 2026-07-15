@@ -81,13 +81,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-  return (
-    <AuthContext.Provider value={{ user, role, loading, signOut }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
 /**
  * useAuth — consume the AuthContext.
  * Must be called within a component tree that is wrapped by <AuthProvider>.
