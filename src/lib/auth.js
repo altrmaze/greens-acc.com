@@ -49,7 +49,7 @@ export function isAllowedRole(role) {
  */
 export function defaultRedirectForRole(role) {
   switch (role) {
-    case ADMIN_ROLE:     return '/dashboard/admin';
+    case ADMIN_ROLE:     return '/dashboard';
     case DEVELOPER_ROLE: return '/dev-dashboard';
     default:             return '/';
   }

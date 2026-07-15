@@ -71,8 +71,8 @@ test('admin role is an allowed role', () => {
   assert.equal(isAllowedRole(ADMIN_ROLE), true);
 });
 
-test('admin redirect points to /dashboard/admin', () => {
-  assert.equal(defaultRedirectForRole(ADMIN_ROLE), '/dashboard/admin');
+test('admin redirect points to /dashboard', () => {
+  assert.equal(defaultRedirectForRole(ADMIN_ROLE), '/dashboard');
 });
 
 // ── Developer access ──────────────────────────────────────────────────────
@@ -135,7 +135,7 @@ test('restored admin session retains admin access', () => {
   // Simulate: after getSession() returns a user with admin role in profiles
   const restoredRole = ADMIN_ROLE;
   assert.equal(hasAdminAccess(restoredRole), true);
-  assert.equal(defaultRedirectForRole(restoredRole), '/dashboard/admin');
+  assert.equal(defaultRedirectForRole(restoredRole), '/dashboard');
 });
 
 test('restored developer session retains developer access', () => {
