@@ -15,16 +15,16 @@ function LoadingScreen() {
 /**
  * AdminRoute — gates a route to authenticated users with the 'admin' role.
  *
- * • loading  → spinner (prevents flash of unauthorized content)
- * • no user  → redirect to /login
- * • non-admin → redirect to /unauthorized
- * • admin   → renders children
+ * • loading     → spinner (prevents flash of unauthorized content)
+ * • no user     → redirect to /login
+ * • non-admin   → redirect to / (public landing page)
+ * • admin       → renders children
  */
 export default function AdminRoute({ children }) {
   const { user, role, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
   if (!user)   return <Navigate to="/login" replace />;
-  if (!hasAdminAccess(role)) return <Navigate to="/unauthorized" replace />;
+  if (!hasAdminAccess(role)) return <Navigate to="/" replace />;
   return children;
 }
