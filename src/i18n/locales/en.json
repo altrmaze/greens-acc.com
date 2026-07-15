@@ -18,7 +18,8 @@
     "settings": "Settings",
     "login": "Login",
     "logout": "Logout",
-    "aegis": "Aegis Monitor"
+    "aegis": "Aegis Monitor",
+    "devDashboard": "Developer Console"
   },
   "common": {
     "loading": "Loading...",

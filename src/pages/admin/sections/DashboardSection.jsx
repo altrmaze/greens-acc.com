@@ -14,22 +14,22 @@ function StatCard({ label, value, icon }) {
 }
 
 export default function DashboardSection() {
-  const [stats, setStats]           = useState({ containers: 0, tasks: 0, glitches: 0, connectors: 0 });
+  const [stats, setStats]           = useState({ containers: 0, tasks: 0, auditEvents: 0, connectors: 0 });
   const [recentTasks, setRecentTasks] = useState([]);
   const [loading, setLoading]       = useState(true);
 
   useEffect(() => {
     (async () => {
-      const [contRes, taskRes, glitchRes, connRes] = await Promise.all([
+      const [contRes, taskRes, auditRes, connRes] = await Promise.all([
         supabase.from('green_containers').select('id', { count: 'exact', head: true }),
         supabase.from('agent_tasks').select('*').order('created_at', { ascending: false }).limit(8),
-        supabase.from('glitches').select('id', { count: 'exact', head: true }).eq('status', 'open'),
+        supabase.from('user_audit_logs').select('id', { count: 'exact', head: true }),
         supabase.from('external_connectors').select('id', { count: 'exact', head: true }),
       ]);
       setStats({
         containers: contRes.count ?? 0,
         tasks:      taskRes.data?.length ?? 0,
-        glitches:   glitchRes.count ?? 0,
+        auditEvents: auditRes.count ?? 0,
         connectors: connRes.count ?? 0,
       });
       setRecentTasks(taskRes.data ?? []);
@@ -50,7 +50,7 @@ export default function DashboardSection() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Green Containers" value={loading ? skeleton : stats.containers} icon="🟢" />
         <StatCard label="Recent Tasks"     value={loading ? skeleton : stats.tasks}      icon="⚙️" />
-        <StatCard label="Open Glitches"    value={loading ? skeleton : stats.glitches}   icon="⚠️" />
+        <StatCard label="Audit Events"     value={loading ? skeleton : stats.auditEvents} icon="📋" />
         <StatCard label="Connectors"       value={loading ? skeleton : stats.connectors} icon="🔗" />
       </div>
 
