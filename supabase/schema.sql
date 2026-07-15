@@ -538,3 +538,26 @@ create index if not exists idx_api_tokens_user on public.api_tokens (user_id);
 create index if not exists idx_api_tokens_prefix on public.api_tokens (token_prefix);
 create index if not exists idx_api_tokens_hash on public.api_tokens (token_hash);
 create index if not exists idx_api_tokens_active on public.api_tokens (is_active);
+
+
+-- ============================================================
+-- USER MANAGEMENT AUDIT LOG (Phase 4)
+-- ============================================================
+
+-- Immutable record of every admin action on user accounts.
+-- Written by the log_user_action() SECURITY DEFINER function
+-- and by the adminManageUser edge function (via service role).
+create table if not exists public.user_audit_logs (
+  id          uuid        primary key default gen_random_uuid(),
+  actor_id    uuid        references auth.users(id) on delete set null,
+  target_id   uuid        references auth.users(id) on delete set null,
+  action      text        not null,
+  old_values  jsonb,
+  new_values  jsonb,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists idx_user_audit_logs_actor      on public.user_audit_logs (actor_id);
+create index if not exists idx_user_audit_logs_target     on public.user_audit_logs (target_id);
+create index if not exists idx_user_audit_logs_action     on public.user_audit_logs (action);
+create index if not exists idx_user_audit_logs_created_at on public.user_audit_logs (created_at desc);
