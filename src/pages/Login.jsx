@@ -2,30 +2,34 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '../supabaseClient';
-import { defaultRedirectForRole } from '../lib/auth';
+import { buildResetPasswordRedirect, defaultRedirectForRole } from '../lib/auth';
 
 export default function Login() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [magicSent, setMagicSent] = useState(false);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setAuthError('');
     if (!supabase) {
-      setError('Authentication service is not configured. Please contact the administrator.');
+      setAuthError('Authentication service is not configured. Please contact the administrator.');
       setLoading(false);
       return;
     }
     const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
     if (err) {
       // Surface a user-friendly message; never expose server internals.
-      setError(
+      setAuthError(
         err.status === 400 || err.message?.toLowerCase().includes('invalid')
           ? 'Invalid email or password. Please try again.'
           : err.message
@@ -49,17 +53,53 @@ export default function Login() {
   };
 
   const handleMagicLink = async () => {
-    if (!email) { setError(t('common.required') + ': ' + t('common.email')); return; }
+    if (!email) { setAuthError(t('common.required') + ': ' + t('common.email')); return; }
     if (!supabase) {
-      setError('Authentication service is not configured. Please contact the administrator.');
+      setAuthError('Authentication service is not configured. Please contact the administrator.');
       return;
     }
     setLoading(true);
-    setError('');
+    setAuthError('');
     const { error: err } = await supabase.auth.signInWithOtp({ email });
     setLoading(false);
-    if (err) setError(err.message);
+    if (err) setAuthError(err.message);
     else setMagicSent(true);
+  };
+
+  const handleForgotPasswordToggle = () => {
+    setForgotPasswordOpen((open) => !open);
+    setResetEmail((currentValue) => currentValue || email);
+    setResetError('');
+    setResetSuccess('');
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!resetEmail) {
+      setResetError(t('common.required') + ': ' + t('common.email'));
+      return;
+    }
+    if (!supabase) {
+      setResetError('Authentication service is not configured. Please contact the administrator.');
+      return;
+    }
+
+    setLoading(true);
+    setResetError('');
+    setResetSuccess('');
+
+    const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: buildResetPasswordRedirect(window.location.origin, import.meta.env.BASE_URL),
+    });
+
+    setLoading(false);
+
+    if (err) {
+      setResetError('Unable to send the password reset email. Please try again.');
+      return;
+    }
+
+    setResetSuccess(t('auth.resetEmailSent'));
   };
 
   return (
@@ -108,9 +148,9 @@ export default function Login() {
                 />
               </div>
 
-              {error && (
+              {authError && (
                 <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
-                  {error}
+                  {authError}
                 </p>
               )}
 
@@ -139,7 +179,60 @@ export default function Login() {
               >
                 {t('auth.magicLink')}
               </button>
+
             </form>
+          )}
+
+          {!magicSent && (
+            <div className="space-y-3 mt-5">
+              <button
+                type="button"
+                onClick={handleForgotPasswordToggle}
+                className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                {t('auth.forgotPassword')}
+              </button>
+
+              {forgotPasswordOpen && (
+                <div className="border border-slate-800 rounded-xl bg-slate-950/60 p-4 space-y-3">
+                  <form onSubmit={handleForgotPassword} className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-400 mb-1.5">
+                        {t('auth.emailLabel')}
+                      </label>
+                      <input
+                        type="email"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                        className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors"
+                        placeholder="you@example.com"
+                      />
+                    </div>
+
+                    {resetError && (
+                      <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                        {resetError}
+                      </p>
+                    )}
+
+                    {resetSuccess && (
+                      <p className="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
+                        {resetSuccess}
+                      </p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 font-semibold rounded-lg py-2.5 text-sm border border-slate-700 transition-colors"
+                    >
+                      {loading ? t('common.loading') : t('auth.sendResetEmail')}
+                    </button>
+                  </form>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

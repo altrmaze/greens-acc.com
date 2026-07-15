@@ -2,6 +2,7 @@ import { Navigate, Routes, Route } from 'react-router-dom';
 import DeveloperRoute    from './components/DeveloperRoute';
 import UnderConstruction from './pages/UnderConstruction';
 import Login             from './pages/Login';
+import ResetPassword     from './pages/ResetPassword';
 import Unauthorized      from './pages/Unauthorized';
 import Dashboard         from './pages/Dashboard';
 
@@ -14,6 +15,7 @@ export default function App() {
 
       {/* ── Auth ─────────────────────────────────────────────────── */}
       <Route path="/login"        element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* ── Access-denied page ───────────────────────────────────── */}
       <Route path="/unauthorized" element={<Unauthorized />} />
