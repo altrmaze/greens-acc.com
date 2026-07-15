@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { AdminProvider, useAdmin } from '../../context/AdminContext';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 const NAV_ITEMS = [
   { to: '/dashboard',            end: true,  icon: '📊', label: 'Dashboard'  },
@@ -30,7 +32,41 @@ function SidebarLink({ to, end, icon, label, onClick }) {
   );
 }
 
-export default function AdminControlRoom() {
+function AdminNotification() {
+  const { notification, clearNotification } = useAdmin();
+  useEffect(() => {
+    if (!notification) return;
+    const t = setTimeout(clearNotification, 4000);
+    return () => clearTimeout(t);
+  }, [notification, clearNotification]);
+
+  if (!notification) return null;
+
+  const colorMap = {
+    success: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
+    error:   'bg-red-500/10 border-red-500/30 text-red-300',
+    info:    'bg-blue-500/10 border-blue-500/30 text-blue-300',
+  };
+  const cls = colorMap[notification.type] ?? colorMap.info;
+
+  return (
+    <div
+      role="alert"
+      className={`fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl border shadow-xl text-sm font-semibold max-w-sm transition-all ${cls}`}
+    >
+      <span className="flex-1">{notification.message}</span>
+      <button
+        onClick={clearNotification}
+        className="text-current opacity-60 hover:opacity-100 transition-opacity text-base leading-none"
+        aria-label="Dismiss"
+      >
+        ✕
+      </button>
+    </div>
+  );
+}
+
+function AdminShell() {
   const { user, signOut } = useAuth();
   const navigate          = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -128,11 +164,24 @@ export default function AdminControlRoom() {
           </div>
         </aside>
 
-        {/* ── Main content ─────────────────────────────────────────────── */}
+        {/* ── Main content (wrapped in ErrorBoundary) ───────────────────── */}
         <main className="flex-1 min-w-0 p-6 md:p-8">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
+
+      {/* ── Toast notification ───────────────────────────────────────────── */}
+      <AdminNotification />
     </div>
+  );
+}
+
+export default function AdminControlRoom() {
+  return (
+    <AdminProvider>
+      <AdminShell />
+    </AdminProvider>
   );
 }
