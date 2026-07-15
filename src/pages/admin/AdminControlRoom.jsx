@@ -1,13 +1,14 @@
-import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { AdminProvider, useAdmin } from '../../context/AdminContext';
 
 const NAV_ITEMS = [
-  { to: '/dashboard',            end: true,  icon: '📊', label: 'Dashboard'  },
-  { to: '/dashboard/users',      end: false, icon: '👥', label: 'Users'       },
-  { to: '/dashboard/developers', end: false, icon: '⚙️', label: 'Developers'  },
-  { to: '/dashboard/settings',   end: false, icon: '🔧', label: 'Settings'    },
-  { to: '/dashboard/audit-logs', end: false, icon: '📋', label: 'Audit Logs'  },
+  { to: '/dashboard',               end: true,  icon: '📊', label: 'Dashboard'     },
+  { to: '/dashboard/users',         end: false, icon: '👥', label: 'Users'         },
+  { to: '/dashboard/developers',    end: false, icon: '⚙️', label: 'Developers'    },
+  { to: '/dashboard/settings',      end: false, icon: '🔧', label: 'Settings'      },
+  { to: '/dashboard/audit-logs',    end: false, icon: '📋', label: 'Audit Logs'    },
+  { to: '/dashboard/system-health', end: false, icon: '🩺', label: 'System Health' },
 ];
 
 function SidebarLink({ to, end, icon, label, onClick }) {
@@ -31,9 +32,17 @@ function SidebarLink({ to, end, icon, label, onClick }) {
 }
 
 export default function AdminControlRoom() {
-  const { user, signOut } = useAuth();
-  const navigate          = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  return (
+    <AdminProvider>
+      <AdminControlRoomInner />
+    </AdminProvider>
+  );
+}
+
+function AdminControlRoomInner() {
+  const { user, signOut }               = useAuth();
+  const { sidebarOpen, setSidebarOpen } = useAdmin();
+  const navigate                        = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
