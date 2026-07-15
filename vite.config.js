@@ -6,6 +6,10 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    // Current bundle is ~551 kB gzipped to ~157 kB; acceptable for this SPA.
+    // Future improvement: split admin sections with dynamic import() to reduce
+    // initial load time.
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       input: {
         main: 'index.html',
