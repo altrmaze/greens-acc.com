@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
-import { buildResetPasswordRedirect, defaultRedirectForRole } from '../lib/auth';
+import {
+  buildResetPasswordRedirect,
+  defaultRedirectForRole,
+  isAllowedRole,
+} from '../lib/auth';
 
 export default function Login() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user, role, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [resetEmail, setResetEmail] = useState('');
@@ -16,6 +22,15 @@ export default function Login() {
   const [resetSuccess, setResetSuccess] = useState('');
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
   const [magicSent, setMagicSent] = useState(false);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate(
+        isAllowedRole(role) ? defaultRedirectForRole(role) : '/unauthorized',
+        { replace: true }
+      );
+    }
+  }, [authLoading, user, role, navigate]);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -42,13 +57,28 @@ export default function Login() {
     const userId = data.session?.user?.id;
     let role = null;
     if (userId) {
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', userId)
         .single();
+      if (profileError) {
+        await supabase.auth.signOut();
+        setAuthError('Unable to verify your account access. Please contact the administrator.');
+        setLoading(false);
+        return;
+      }
       role = profile?.role ?? null;
     }
+
+    if (!isAllowedRole(role)) {
+      await supabase.auth.signOut();
+      setAuthError('Your account is authenticated but does not have privileged access.');
+      setLoading(false);
+      navigate('/unauthorized', { replace: true });
+      return;
+    }
+
     navigate(defaultRedirectForRole(role), { replace: true });
   };
 
@@ -101,6 +131,16 @@ export default function Login() {
 
     setResetSuccess(t('auth.resetEmailSent'));
   };
+
+  if (authLoading || user) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+        <span className="text-emerald-400 animate-pulse text-sm font-mono">
+          Redirecting…
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">

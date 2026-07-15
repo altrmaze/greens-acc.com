@@ -1,23 +1,26 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { defaultRedirectForRole } from '../lib/auth';
+import { defaultRedirectForRole, isAllowedRole } from '../lib/auth';
 
 /**
  * UnderConstruction — the sole public entry point.
  *
  * • Unauthenticated visitors see the "Under Construction" screen with a
  *   link to /login.
- * • Authenticated users are immediately redirected to their role's
- *   default destination (admin → /dashboard, developer → /dashboard).
+ * • Authenticated users are immediately redirected away from the public
+ *   landing page based on their verified role.
  */
 export default function UnderConstruction() {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && user && role) {
-      navigate(defaultRedirectForRole(role), { replace: true });
+    if (!loading && user) {
+      navigate(
+        isAllowedRole(role) ? defaultRedirectForRole(role) : '/unauthorized',
+        { replace: true }
+      );
     }
   }, [loading, user, role, navigate]);
 
@@ -31,9 +34,15 @@ export default function UnderConstruction() {
     );
   }
 
-  // Authenticated users will be redirected by the effect above; render
-  // nothing to avoid a flash of the construction page.
-  if (user) return null;
+  if (user) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <span className="text-emerald-400 animate-pulse text-sm font-mono">
+          Redirecting…
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
