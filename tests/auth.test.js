@@ -16,6 +16,7 @@ import {
   ADMIN_ROLE,
   DEVELOPER_ROLE,
   ALLOWED_ROLES,
+  SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY,
   SUPABASE_RECOVERY_STORAGE_KEY,
   normalizeBasePath,
   getResetPasswordPath,
@@ -178,6 +179,10 @@ console.log('\nPassword recovery helpers:');
 
 test('recovery storage key is stable', () => {
   assert.equal(SUPABASE_RECOVERY_STORAGE_KEY, 'supabase-recovery-hash');
+});
+
+test('recovery active storage key is stable', () => {
+  assert.equal(SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY, 'supabase-recovery-active');
 });
 
 test('normalizeBasePath trims trailing slash but keeps repo base path', () => {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import {
+  SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY,
   extractRecoveryParamsFromString,
   isRecoveryPayload,
   SUPABASE_RECOVERY_STORAGE_KEY,
@@ -45,6 +46,15 @@ export default function ResetPassword() {
         const routeSearchPayload = location.search.replace(/^\?/, '');
         return isRecoveryPayload(routeSearchPayload) ? routeSearchPayload : '';
       })();
+      const recoverySessionActive = (() => {
+        if (typeof window === 'undefined') return false;
+
+        try {
+          return window.sessionStorage.getItem(SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY) === 'true';
+        } catch {
+          return false;
+        }
+      })();
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -76,11 +86,14 @@ export default function ResetPassword() {
           } else {
             throw new Error('Missing recovery session');
           }
+        } else if (!sessionPayload && !recoverySessionActive) {
+          throw new Error('Missing recovery session');
         }
 
         if (!active) return;
 
         try {
+          window.sessionStorage.setItem(SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY, 'true');
           window.sessionStorage.removeItem(SUPABASE_RECOVERY_STORAGE_KEY);
         } catch {
           // Ignore storage failures after recovery initialization.
@@ -128,6 +141,12 @@ export default function ResetPassword() {
       setError(updateError.message);
       setLoading(false);
       return;
+    }
+
+    try {
+      window.sessionStorage.removeItem(SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY);
+    } catch {
+      // Ignore storage cleanup failures after a successful reset.
     }
 
     await supabase.auth.signOut();

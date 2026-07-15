@@ -12,6 +12,7 @@
 export const ADMIN_ROLE     = 'admin';
 export const DEVELOPER_ROLE = 'developer';
 export const SUPABASE_RECOVERY_STORAGE_KEY = 'supabase-recovery-hash';
+export const SUPABASE_RECOVERY_ACTIVE_STORAGE_KEY = 'supabase-recovery-active';
 
 /**
  * The exhaustive set of roles that are currently permitted to log in.
