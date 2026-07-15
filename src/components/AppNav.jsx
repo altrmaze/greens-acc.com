@@ -4,8 +4,25 @@ import { useTranslation } from 'react-i18next';
 import i18n from '../i18n/index.js';
 import { useAuth } from '../hooks/useAuth';
 
+/** Pages visible to developer + admin roles in the main nav. */
 const DEV_NAV = [
-  { to: '/dev-dashboard', icon: '🖥️', key: 'devDashboard' },
+  { to: '/dev-dashboard',   icon: '🖥️',  key: 'devDashboard'  },
+  { to: '/command-center',  icon: '🌐',  key: 'commandCenter'  },
+  { to: '/rooms',           icon: '🤝',  key: 'rooms'          },
+  { to: '/analytics',       icon: '🔬',  key: 'analytics'      },
+  { to: '/security',        icon: '🛡️', key: 'security'        },
+  { to: '/monitor',         icon: '📡',  key: 'aegis'          },
+  { to: '/container',       icon: '🔐',  key: 'container'      },
+  { to: '/documents',       icon: '📄',  key: 'documents'      },
+  { to: '/automations',     icon: '⚙️', key: 'automations'    },
+  { to: '/voice',           icon: '🎙️', key: 'voice'          },
+  { to: '/travel',          icon: '✈️', key: 'travel'          },
+  { to: '/forms',           icon: '📝',  key: 'forms'          },
+  { to: '/bills',           icon: '💳',  key: 'bills'          },
+  { to: '/household',       icon: '🏠',  key: 'household'      },
+  { to: '/permissions',     icon: '🔑',  key: 'permissions'    },
+  { to: '/activity',        icon: '📋',  key: 'activity'       },
+  { to: '/settings',        icon: '🔧',  key: 'settings'       },
 ];
 
 function NavItem({ to, icon, label, end, onClick }) {
@@ -49,9 +66,9 @@ export default function AppNav() {
           GREENS ACC
         </span>
 
-        {/* Desktop nav — hidden on mobile */}
-        <div className="hidden lg:flex items-center gap-1 overflow-x-auto">
-          {DEV_NAV.map(({ to, icon, key, end }) => (
+        {/* Desktop nav — first few links visible, rest accessible via scroll */}
+        <div className="hidden lg:flex items-center gap-1 overflow-x-auto max-w-2xl">
+          {DEV_NAV.slice(0, 6).map(({ to, icon, key, end }) => (
             <NavItem key={to} to={to} icon={icon} label={t(`nav.${key}`)} end={end} />
           ))}
         </div>
@@ -90,7 +107,7 @@ export default function AppNav() {
         </div>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Mobile dropdown — full nav */}
       {menuOpen && (
         <div className="lg:hidden bg-slate-900 border-t border-slate-800 px-4 py-4 space-y-1 max-h-[80vh] overflow-y-auto">
           <p className="text-xs text-slate-500 uppercase tracking-wider mb-2 px-3">Navigation</p>
