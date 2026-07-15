@@ -1,36 +1,17 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { useAuth } from '../hooks/useAuth';
 
 /**
  * DashboardGuard
  *
  * Wraps any dashboard panel and gates it behind role-based clearance.
- * Renders children only when the authenticated user's role matches
- * `requiredRole` (or 'admin' if `allowAdmin` is true).
+ * Uses the shared AuthContext so no additional DB round-trips are needed.
  *
  * @param {string}   requiredRole  - The role string required to view the panel.
  * @param {boolean}  allowAdmin    - Whether the 'admin' role bypasses the gate (default true).
  * @param {ReactNode} children     - The protected panel content.
  */
 export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
-  const [userRole, setUserRole] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchUserContext() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        setUserRole(data?.role ?? null);
-      }
-      setLoading(false);
-    }
-    fetchUserContext();
-  }, []);
+  const { role, loading } = useAuth();
 
   if (loading) {
     return (
@@ -41,7 +22,7 @@ export function DashboardGuard({ requiredRole, allowAdmin = true, children }) {
   }
 
   const accessGranted =
-    userRole === requiredRole || (allowAdmin && userRole === 'admin');
+    role === requiredRole || (allowAdmin && role === 'admin');
 
   if (!accessGranted) {
     return (

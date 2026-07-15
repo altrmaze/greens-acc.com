@@ -5,14 +5,13 @@ import i18n from '../i18n/index.js';
 import { useAuth } from '../hooks/useAuth';
 
 const PUBLIC_NAV = [
-  { to: '/',          end: true, icon: '🏛️', key: 'commandCenter' },
-  { to: '/rooms',     icon: '🤝', key: 'rooms' },
-  { to: '/analytics', icon: '🔬', key: 'analytics' },
-  { to: '/dashboard', icon: '🟢', key: 'dashboard' },
-  { to: '/security',  icon: '🛡️', key: 'security' },
+  { to: '/command-center', icon: '🏛️', key: 'commandCenter' },
+  { to: '/rooms',          icon: '🤝', key: 'rooms' },
+  { to: '/analytics',      icon: '🔬', key: 'analytics' },
 ];
 
 const CUSTOMER_NAV = [
+  { to: '/dashboard',   icon: '🟢', key: 'dashboard' },
   { to: '/container',   icon: '🟢', key: 'container' },
   { to: '/documents',   icon: '📄', key: 'documents' },
   { to: '/voice',       icon: '🎙️', key: 'voice' },
@@ -23,6 +22,7 @@ const CUSTOMER_NAV = [
   { to: '/permissions', icon: '🔑', key: 'permissions' },
   { to: '/activity',    icon: '📋', key: 'activity' },
   { to: '/automations', icon: '⚙️', key: 'automations' },
+  { to: '/security',    icon: '🛡️', key: 'security' },
   { to: '/aegis',       icon: '🛡️', key: 'aegis' },
   { to: '/settings',    icon: '⚙️', key: 'settings' },
 ];

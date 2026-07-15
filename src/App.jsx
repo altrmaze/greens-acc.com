@@ -1,13 +1,16 @@
 import { Routes, Route } from 'react-router-dom';
 import { DevGate }           from './components/DevGate';
-import AdminPageRoute        from './AdminPageRoute';
+import LandingPage           from './pages/LandingPage';
 import Dashboard             from './pages/Dashboard';
 import CommandCenter         from './pages/CommandCenter';
 import NegotiationRooms      from './pages/NegotiationRooms';
 import AgentAnalytics        from './pages/AgentAnalytics';
 import GreenBubblesSecurity  from './pages/GreenBubblesSecurity';
 import ProtectedRoute        from './components/ProtectedRoute';
+import AdminRoute            from './components/AdminRoute';
+import DeveloperRoute        from './components/DeveloperRoute';
 import Login                 from './pages/Login';
+import Unauthorized          from './pages/Unauthorized';
 import GreenContainer        from './pages/GreenContainer';
 import Documents             from './pages/Documents';
 import Automations           from './pages/Automations';
@@ -21,22 +24,29 @@ import Activity              from './pages/Activity';
 import Settings              from './pages/Settings';
 import AegisMonitor          from './pages/AegisMonitor';
 import AdminDashboard        from './pages/admin/AdminDashboard';
+import DevDashboard          from './pages/DevDashboard';
 
 export default function App() {
   return (
     <Routes>
       {/* ── Auth ─────────────────────────────────────────────────── */}
-      <Route path="/login" element={<Login />} />
+      <Route path="/login"        element={<Login />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+
+      {/* ── Public landing page ──────────────────────────────────── */}
+      <Route path="/" element={<LandingPage />} />
 
       {/* ── Existing public pages ────────────────────────────────── */}
-      <Route path="/" element={<DevGate><CommandCenter /></DevGate>} />
-      <Route path="/rooms" element={<DevGate><NegotiationRooms /></DevGate>} />
-      <Route path="/analytics" element={<DevGate><AgentAnalytics /></DevGate>} />
-      <Route path="/dashboard" element={<DevGate><Dashboard /></DevGate>} />
-      <Route path="/admin" element={<AdminPageRoute />} />
-      <Route path="/security" element={<DevGate><GreenBubblesSecurity /></DevGate>} />
+      <Route path="/command-center" element={<DevGate><CommandCenter /></DevGate>} />
+      <Route path="/rooms"          element={<DevGate><NegotiationRooms /></DevGate>} />
+      <Route path="/analytics"      element={<DevGate><AgentAnalytics /></DevGate>} />
+
+      {/* ── Developer dashboard (developer + admin roles) ────────── */}
+      <Route path="/dev-dashboard" element={<DeveloperRoute><DevDashboard /></DeveloperRoute>} />
 
       {/* ── Customer protected pages ─────────────────────────────── */}
+      <Route path="/dashboard"   element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/security"    element={<ProtectedRoute><GreenBubblesSecurity /></ProtectedRoute>} />
       <Route path="/container"   element={<ProtectedRoute><GreenContainer /></ProtectedRoute>} />
       <Route path="/documents"   element={<ProtectedRoute><Documents /></ProtectedRoute>} />
       <Route path="/automations" element={<ProtectedRoute><Automations /></ProtectedRoute>} />
@@ -50,16 +60,16 @@ export default function App() {
       <Route path="/settings"    element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/aegis"       element={<ProtectedRoute><AegisMonitor /></ProtectedRoute>} />
 
-      {/* ── Admin sub-route dashboards ───────────────────────────── */}
-      <Route path="/dashboard/admin"             element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/engineer"          element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/accounting"        element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/account-manager"   element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/financial-manager" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/analyzer"          element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+      {/* ── Admin control room (admin role only) ─────────────────── */}
+      <Route path="/dashboard/admin"             element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/dashboard/engineer"          element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/dashboard/accounting"        element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/dashboard/account-manager"   element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/dashboard/financial-manager" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      <Route path="/dashboard/analyzer"          element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
       {/* ── Fallback ─────────────────────────────────────────────── */}
-      <Route path="*" element={<DevGate><CommandCenter /></DevGate>} />
+      <Route path="*" element={<LandingPage />} />
     </Routes>
   );
 }
