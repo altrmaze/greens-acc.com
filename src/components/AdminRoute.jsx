@@ -17,7 +17,7 @@ function LoadingScreen() {
  *
  * • loading     → spinner (prevents flash of unauthorized content)
  * • no user     → redirect to /login
- * • non-admin   → redirect to / (public landing page)
+ * • non-admin   → redirect to /unauthorized
  * • admin       → renders children
  */
 export default function AdminRoute({ children }) {
@@ -25,6 +25,6 @@ export default function AdminRoute({ children }) {
 
   if (loading) return <LoadingScreen />;
   if (!user)   return <Navigate to="/login" replace />;
-  if (!hasAdminAccess(role)) return <Navigate to="/" replace />;
+  if (!hasAdminAccess(role)) return <Navigate to="/unauthorized" replace />;
   return children;
 }
