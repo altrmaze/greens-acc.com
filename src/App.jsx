@@ -1,36 +1,35 @@
-import { Routes, Route } from 'react-router-dom';
-import { DevGate }           from './components/DevGate';
-import LandingPage           from './pages/LandingPage';
-import CommandCenter         from './pages/CommandCenter';
-import NegotiationRooms      from './pages/NegotiationRooms';
-import AgentAnalytics        from './pages/AgentAnalytics';
-import AdminRoute            from './components/AdminRoute';
-import DeveloperRoute        from './components/DeveloperRoute';
-import Login                 from './pages/Login';
-import AdminControlRoom      from './pages/admin/AdminControlRoom';
-import DashboardSection      from './pages/admin/sections/DashboardSection';
-import UsersSection          from './pages/admin/sections/UsersSection';
-import DevelopersSection     from './pages/admin/sections/DevelopersSection';
-import SettingsSection       from './pages/admin/sections/SettingsSection';
-import AuditLogsSection      from './pages/admin/sections/AuditLogsSection';
-import DevDashboard          from './pages/DevDashboard';
+import { Navigate, Routes, Route } from 'react-router-dom';
+import AdminRoute       from './components/AdminRoute';
+import DeveloperRoute   from './components/DeveloperRoute';
+import UnderConstruction from './pages/UnderConstruction';
+import Login            from './pages/Login';
+import Unauthorized     from './pages/Unauthorized';
+import AdminControlRoom from './pages/admin/AdminControlRoom';
+import DashboardSection from './pages/admin/sections/DashboardSection';
+import UsersSection     from './pages/admin/sections/UsersSection';
+import DevelopersSection from './pages/admin/sections/DevelopersSection';
+import SettingsSection  from './pages/admin/sections/SettingsSection';
+import AuditLogsSection from './pages/admin/sections/AuditLogsSection';
+import DevDashboard     from './pages/DevDashboard';
 
 export default function App() {
   return (
     <Routes>
+      {/* ── Public entry point ───────────────────────────────────── */}
+      {/* Unauthenticated → Under Construction; logged-in → redirect */}
+      <Route path="/" element={<UnderConstruction />} />
+
       {/* ── Auth ─────────────────────────────────────────────────── */}
       <Route path="/login" element={<Login />} />
 
-      {/* ── Public landing page ──────────────────────────────────── */}
-      <Route path="/" element={<LandingPage />} />
-
-      {/* ── Public dev-gated pages ───────────────────────────────── */}
-      <Route path="/command-center" element={<DevGate><CommandCenter /></DevGate>} />
-      <Route path="/rooms"          element={<DevGate><NegotiationRooms /></DevGate>} />
-      <Route path="/analytics"      element={<DevGate><AgentAnalytics /></DevGate>} />
+      {/* ── Access-denied page ───────────────────────────────────── */}
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* ── Developer dashboard (developer + admin roles) ────────── */}
-      <Route path="/dev-dashboard" element={<DeveloperRoute><DevDashboard /></DeveloperRoute>} />
+      <Route
+        path="/dev-dashboard"
+        element={<DeveloperRoute><DevDashboard /></DeveloperRoute>}
+      />
 
       {/* ── Admin Control Room (admin role only) ─────────────────── */}
       <Route
@@ -44,8 +43,8 @@ export default function App() {
         <Route path="audit-logs"    element={<AuditLogsSection />}  />
       </Route>
 
-      {/* ── Fallback ─────────────────────────────────────────────── */}
-      <Route path="*" element={<LandingPage />} />
+      {/* ── Fallback: unknown paths → Under Construction ─────────── */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
