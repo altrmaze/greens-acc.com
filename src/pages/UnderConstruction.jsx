@@ -9,7 +9,7 @@ import { defaultRedirectForRole } from '../lib/auth';
  * • Unauthenticated visitors see the "Under Construction" screen with a
  *   link to /login.
  * • Authenticated users are immediately redirected to their role's
- *   default destination (admin → /dashboard, developer → /dev-dashboard).
+ *   default destination (admin → /dashboard, developer → /dashboard).
  */
 export default function UnderConstruction() {
   const { user, role, loading } = useAuth();

@@ -6,7 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 
 /** Pages visible to developer + admin roles in the main nav. */
 const DEV_NAV = [
-  { to: '/dev-dashboard',   icon: '🖥️',  key: 'devDashboard'  },
+  { to: '/dashboard',       icon: '📊',  key: 'dashboard'      },
   { to: '/command-center',  icon: '🌐',  key: 'commandCenter'  },
   { to: '/rooms',           icon: '🤝',  key: 'rooms'          },
   { to: '/analytics',       icon: '🔬',  key: 'analytics'      },
