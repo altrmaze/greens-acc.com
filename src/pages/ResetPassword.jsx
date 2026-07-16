@@ -125,6 +125,10 @@ export default function ResetPassword() {
       setError('Authentication service is not configured. Please contact the administrator.');
       return;
     }
+    if (newPassword.length < 8) {
+      setError(t('auth.passwordTooShort'));
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setError(t('auth.passwordMismatch'));
       return;
@@ -188,6 +192,7 @@ export default function ResetPassword() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
+                  minLength={8}
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors"
                   placeholder="••••••••"
                 />
@@ -202,6 +207,7 @@ export default function ResetPassword() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  minLength={8}
                   className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 transition-colors"
                   placeholder="••••••••"
                 />

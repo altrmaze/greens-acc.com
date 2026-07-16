@@ -67,6 +67,7 @@
     "updatePassword": "تحديث كلمة المرور",
     "resetPasswordInvalid": "رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية.",
     "passwordMismatch": "كلمتا المرور غير متطابقتين.",
+    "passwordTooShort": "يجب أن تكون كلمة المرور 8 أحرف على الأقل.",
     "passwordUpdatedSuccess": "تم تحديث كلمة المرور بنجاح.",
     "signOut": "تسجيل الخروج",
     "unauthorized": "غير مخوّل لك عرض هذه الصفحة"

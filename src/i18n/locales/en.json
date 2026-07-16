@@ -67,6 +67,7 @@
     "updatePassword": "Update Password",
     "resetPasswordInvalid": "This password reset link is invalid or has expired.",
     "passwordMismatch": "Passwords do not match.",
+    "passwordTooShort": "Password must be at least 8 characters.",
     "passwordUpdatedSuccess": "Password updated successfully.",
     "signOut": "Sign Out",
     "unauthorized": "You are not authorized to view this page"
