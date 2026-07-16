@@ -64,7 +64,13 @@ export default function Login() {
         .single();
       if (profileError) {
         await supabase.auth.signOut();
-        setAuthError('Unable to verify your account access. Please contact the administrator.');
+        // PGRST116 = no rows returned: the profile row is missing for this user.
+        // All other codes indicate a network or permission issue.
+        setAuthError(
+          profileError.code === 'PGRST116'
+            ? 'Your account profile has not been set up yet. Please contact an administrator.'
+            : 'Unable to verify your account access. Please contact the administrator.'
+        );
         setLoading(false);
         return;
       }
@@ -119,7 +125,7 @@ export default function Login() {
     setResetSuccess('');
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: 'https://greensacc.com/reset-password',
+      redirectTo: 'https://greensacc.com/#/reset-password',
     });
 
     setLoading(false);
