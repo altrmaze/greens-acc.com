@@ -2,6 +2,10 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { hasAdminAccess } from '../lib/auth';
 
+// TEMPORARY OWNER PREVIEW — remove once the profiles row for this account is
+// confirmed to exist in Supabase with role='admin'.
+const OWNER_PREVIEW_EMAIL = 'altrmaze00@gmail.com';
+
 function LoadingScreen() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -15,16 +19,22 @@ function LoadingScreen() {
 /**
  * AdminRoute — gates a route to authenticated users with the 'admin' role.
  *
- * • loading     → spinner (prevents flash of unauthorized content)
- * • no user     → redirect to /login
- * • non-admin   → redirect to /unauthorized
- * • admin       → renders children
+ * • loading             → spinner (prevents flash of unauthorized content)
+ * • no user             → redirect to /login
+ * • owner preview email → allow even when profile/role is missing (temporary)
+ * • non-admin           → redirect to /unauthorized
+ * • admin               → renders children
  */
 export default function AdminRoute({ children }) {
   const { user, role, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
   if (!user)   return <Navigate to="/login" replace />;
+
+  // Temporary owner bypass: the authenticated Supabase session email is the
+  // sole gate — no localStorage, no URL params, no env vars.
+  if (user.email === OWNER_PREVIEW_EMAIL) return children;
+
   if (!hasAdminAccess(role)) return <Navigate to="/unauthorized" replace />;
   return children;
 }
