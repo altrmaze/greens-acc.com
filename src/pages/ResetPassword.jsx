@@ -24,15 +24,35 @@ export default function ResetPassword() {
   useEffect(() => {
     let active = true;
 
-    const initializeRecovery = async () => {
-      if (!supabase) {
-        if (active) {
-          setError('Authentication service is not configured. Please contact the administrator.');
-          setCheckingRecovery(false);
-        }
-        return;
-      }
+    // eslint-disable-next-line no-console
+    console.log('[ResetPassword] URL:', window.location.href);
+    // eslint-disable-next-line no-console
+    console.log('[ResetPassword] search:', window.location.search);
+    // eslint-disable-next-line no-console
+    console.log('[ResetPassword] hash:', window.location.hash);
+    // eslint-disable-next-line no-console
+    console.log('[ResetPassword] location.search (HashRouter):', location.search);
 
+    if (!supabase) {
+      if (active) {
+        setError(t('auth.resetPasswordInvalid'));
+        setCheckingRecovery(false);
+      }
+      return;
+    }
+
+    // Listen for PASSWORD_RECOVERY events (implicit / legacy flow).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return;
+      // eslint-disable-next-line no-console
+      console.log('[ResetPassword] onAuthStateChange event:', event, 'session:', session);
+      if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryReady(true);
+        setCheckingRecovery(false);
+      }
+    });
+
+    const initializeRecovery = async () => {
       const sessionPayload = (() => {
         if (typeof window === 'undefined') return '';
 
@@ -58,6 +78,8 @@ export default function ResetPassword() {
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        // eslint-disable-next-line no-console
+        console.log('[ResetPassword] getSession result:', session);
 
         if (!session?.user) {
           const {
@@ -68,9 +90,14 @@ export default function ResetPassword() {
             refreshToken,
           } = extractRecoveryParamsFromString(sessionPayload);
 
+          // eslint-disable-next-line no-console
+          console.log('[ResetPassword] extracted params:', { type, code: code ? '[present]' : null, tokenHash: tokenHash ? '[present]' : null, accessToken: accessToken ? '[present]' : null });
+
           if (code) {
-            const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-            if (exchangeError) throw exchangeError;
+            const result = await supabase.auth.exchangeCodeForSession(code);
+            // eslint-disable-next-line no-console
+            console.log('[ResetPassword] exchangeCodeForSession result:', result);
+            if (result.error) throw result.error;
           } else if (accessToken && refreshToken) {
             const { error: sessionError } = await supabase.auth.setSession({
               access_token: accessToken,
@@ -116,13 +143,14 @@ export default function ResetPassword() {
 
     return () => {
       active = false;
+      subscription.unsubscribe();
     };
   }, [location.search, navigate, t]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!supabase) {
-      setError('Authentication service is not configured. Please contact the administrator.');
+      setError(t('auth.resetPasswordInvalid'));
       return;
     }
     if (newPassword.length < 8) {

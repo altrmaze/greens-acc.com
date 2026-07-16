@@ -15,6 +15,14 @@ function normalizeRecoveryRedirect() {
 
   const searchPayload = window.location.search.replace(/^\?/, '');
   const hashPayload = window.location.hash.replace(/^#/, '');
+
+  // eslint-disable-next-line no-console
+  console.log('[normalizeRecoveryRedirect] URL:', window.location.href);
+  // eslint-disable-next-line no-console
+  console.log('[normalizeRecoveryRedirect] search params:', window.location.search);
+  // eslint-disable-next-line no-console
+  console.log('[normalizeRecoveryRedirect] hash params:', window.location.hash);
+
   const recoveryPayload = isRecoveryPayload(searchPayload)
     ? searchPayload
     : isRecoveryPayload(hashPayload)

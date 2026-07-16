@@ -37,7 +37,7 @@ export default function Login() {
     setLoading(true);
     setAuthError('');
     if (!supabase) {
-      setAuthError('Authentication service is not configured. Please contact the administrator.');
+      setAuthError('Sign-in is temporarily unavailable. Please try again later.');
       setLoading(false);
       return;
     }
@@ -85,7 +85,7 @@ export default function Login() {
   const handleMagicLink = async () => {
     if (!email) { setAuthError(t('common.required') + ': ' + t('common.email')); return; }
     if (!supabase) {
-      setAuthError('Authentication service is not configured. Please contact the administrator.');
+      setAuthError('Sign-in is temporarily unavailable. Please try again later.');
       return;
     }
     setLoading(true);
@@ -110,7 +110,7 @@ export default function Login() {
       return;
     }
     if (!supabase) {
-      setResetError('Authentication service is not configured. Please contact the administrator.');
+      setResetError('Password reset is temporarily unavailable. Please try again later.');
       return;
     }
 
@@ -119,7 +119,7 @@ export default function Login() {
     setResetSuccess('');
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: buildResetPasswordRedirect(window.location.origin, import.meta.env.BASE_URL),
+      redirectTo: 'https://greensacc.com/reset-password',
     });
 
     setLoading(false);
