@@ -6,7 +6,6 @@ import { AuthProvider } from './context/AuthContext';
 import App from './App';
 import {
   getHashRouterRouteUrl,
-  getResetPasswordPath,
   isRecoveryPayload,
   SUPABASE_RECOVERY_STORAGE_KEY,
 } from './lib/auth';
@@ -14,17 +13,23 @@ import {
 function normalizeRecoveryRedirect() {
   if (typeof window === 'undefined') return;
 
-  const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
-  const resetPasswordPath = getResetPasswordPath(import.meta.env.BASE_URL);
   const searchPayload = window.location.search.replace(/^\?/, '');
   const hashPayload = window.location.hash.replace(/^#/, '');
+
+  // eslint-disable-next-line no-console
+  console.log('[normalizeRecoveryRedirect] URL:', window.location.href);
+  // eslint-disable-next-line no-console
+  console.log('[normalizeRecoveryRedirect] search params:', window.location.search);
+  // eslint-disable-next-line no-console
+  console.log('[normalizeRecoveryRedirect] hash params:', window.location.hash);
+
   const recoveryPayload = isRecoveryPayload(searchPayload)
     ? searchPayload
     : isRecoveryPayload(hashPayload)
       ? hashPayload
       : '';
 
-  if (currentPath !== resetPasswordPath || !recoveryPayload) return;
+  if (!recoveryPayload) return;
 
   try {
     window.sessionStorage.setItem(SUPABASE_RECOVERY_STORAGE_KEY, recoveryPayload);

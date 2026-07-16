@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import {
-  buildResetPasswordRedirect,
   defaultRedirectForRole,
   isAllowedRole,
 } from '../lib/auth';
@@ -37,7 +36,7 @@ export default function Login() {
     setLoading(true);
     setAuthError('');
     if (!supabase) {
-      setAuthError('Authentication service is not configured. Please contact the administrator.');
+      setAuthError('Sign-in is temporarily unavailable. Please try again later.');
       setLoading(false);
       return;
     }
@@ -64,7 +63,13 @@ export default function Login() {
         .single();
       if (profileError) {
         await supabase.auth.signOut();
-        setAuthError('Unable to verify your account access. Please contact the administrator.');
+        // PGRST116 = no rows returned: the profile row is missing for this user.
+        // All other codes indicate a network or permission issue.
+        setAuthError(
+          profileError.code === 'PGRST116'
+            ? 'Your account profile has not been set up yet. Please contact an administrator.'
+            : 'Unable to verify your account access. Please contact the administrator.'
+        );
         setLoading(false);
         return;
       }
@@ -85,7 +90,7 @@ export default function Login() {
   const handleMagicLink = async () => {
     if (!email) { setAuthError(t('common.required') + ': ' + t('common.email')); return; }
     if (!supabase) {
-      setAuthError('Authentication service is not configured. Please contact the administrator.');
+      setAuthError('Sign-in is temporarily unavailable. Please try again later.');
       return;
     }
     setLoading(true);
@@ -110,7 +115,7 @@ export default function Login() {
       return;
     }
     if (!supabase) {
-      setResetError('Authentication service is not configured. Please contact the administrator.');
+      setResetError('Password reset is temporarily unavailable. Please try again later.');
       return;
     }
 
@@ -119,7 +124,7 @@ export default function Login() {
     setResetSuccess('');
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: buildResetPasswordRedirect(window.location.origin, import.meta.env.BASE_URL),
+      redirectTo: window.location.origin + '/#/reset-password',
     });
 
     setLoading(false);
