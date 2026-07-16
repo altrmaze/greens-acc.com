@@ -2,6 +2,9 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { hasAdminAccess } from '../lib/auth';
 
+// TEMPORARY TEST MODE ONLY — set to false to restore normal auth gate
+const DEV_BYPASS = true;
+
 // TEMPORARY OWNER PREVIEW — remove once the profiles row for this account is
 // confirmed to exist in Supabase with role='admin'.
 const OWNER_PREVIEW_EMAIL = 'altrmaze00@gmail.com';
@@ -27,6 +30,8 @@ function LoadingScreen() {
  */
 export default function AdminRoute({ children }) {
   const { user, role, loading } = useAuth();
+
+  if (DEV_BYPASS) return children;
 
   if (loading) return <LoadingScreen />;
   if (!user)   return <Navigate to="/login" replace />;
