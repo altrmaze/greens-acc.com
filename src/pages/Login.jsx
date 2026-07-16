@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 import {
-  buildResetPasswordRedirect,
   defaultRedirectForRole,
   isAllowedRole,
 } from '../lib/auth';
@@ -125,7 +124,7 @@ export default function Login() {
     setResetSuccess('');
 
     const { error: err } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: 'https://greensacc.com/#/reset-password',
+      redirectTo: window.location.origin + '/#/reset-password',
     });
 
     setLoading(false);
