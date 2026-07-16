@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { defaultRedirectForRole, isAllowedRole } from '../lib/auth';
 
+// TEMPORARY TEST MODE ONLY — set to false to restore normal login flow
+const DEV_BYPASS = true;
+
 /**
  * UnderConstruction — the sole public entry point.
  *
@@ -74,11 +77,11 @@ export default function UnderConstruction() {
 
         {/* Login CTA */}
         <button
-          onClick={() => navigate('/login')}
+          onClick={() => navigate(DEV_BYPASS ? '/dashboard' : '/login')}
           className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500
             text-white font-semibold rounded-xl px-8 py-3 text-sm transition-colors"
         >
-          Admin Sign In
+          {DEV_BYPASS ? 'Access' : 'Admin Sign In'}
           <span aria-hidden="true">→</span>
         </button>
 

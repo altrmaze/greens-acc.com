@@ -9,6 +9,10 @@ import DevelopersSection from './sections/DevelopersSection';
 import SettingsSection from './sections/SettingsSection';
 import AuditLogsSection from './sections/AuditLogsSection';
 
+// TEMPORARY OWNER PREVIEW — must match the constant in AdminRoute.jsx.
+// Remove both constants once the profiles row is confirmed in Supabase.
+const OWNER_PREVIEW_EMAIL = 'altrmaze00@gmail.com';
+
 const NAV_ITEMS = [
   { key: 'overview',   icon: '📊', label: 'Dashboard', component: DashboardSection },
   { key: 'users',      icon: '👥', label: 'Users', component: UsersSection },
@@ -137,6 +141,14 @@ function AdminShell() {
           </button>
         </div>
       </header>
+
+      {/* TEMPORARY OWNER PREVIEW banner — visible only for the owner bypass account */}
+      {user?.email === OWNER_PREVIEW_EMAIL && (
+        <div className="bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 flex items-center gap-2 text-amber-300 text-xs font-semibold">
+          <span>⚠️</span>
+          <span>Temporary Owner Preview — role-based access is bypassed for this session. Remove <code className="font-mono bg-amber-500/10 px-1 rounded">OWNER_PREVIEW_EMAIL</code> from AdminRoute.jsx and AdminControlRoom.jsx once the admin profile row is confirmed in Supabase.</span>
+        </div>
+      )}
 
       <div className="flex flex-1 relative">
         {/* ── Mobile sidebar overlay ──────────────────────────────────── */}
